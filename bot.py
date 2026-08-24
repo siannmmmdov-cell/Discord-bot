@@ -1,3 +1,4 @@
+import os
 import discord
 
 intents = discord.Intents.default()
@@ -27,5 +28,5 @@ async def on_message(message):
     if message.content.lower() == '!salam':
         await message.channel.send('Aleykum salam! Server 24/7 qorunur! 🛡️')
 
-client.run("MTU0MDMzMjI2NzgyNDQ4ODQ1MA.G7NBn3.gTJxs4ZLHcqmaO6YY5eeMaRrtIMGw2z02fHLIQ")
-
+TOKEN = os.getenv('DISCORD_TOKEN')
+client.run(TOKEN)
