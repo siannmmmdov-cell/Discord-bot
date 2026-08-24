@@ -1,32 +1,51 @@
-import os
 import discord
+from discord.ext import commands
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.guilds = True
 intents.members = True
 
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 
-@client.event
+# Sənin atdığın səs kanalının İD-si
+VOICE_CHANNEL_ID = 1541243631896232026
+
+@bot.event
 async def on_ready():
-    print(f'Bot qoruma rejimində işləyir: {client.user}')
+    print(f"{bot.user} uğurla onlayn oldu!")
+    
+    # Səs kanalına qoşulma hissəsi
+    channel = bot.get_channel(VOICE_CHANNEL_ID)
+    if channel:
+        try:
+            await channel.connect()
+            print("Uğurla səs kanalına qoşuldu və qalır!")
+        except Exception as e:
+            print(e)
+    else:
+            print("Səs kanalı tapılmadı, ID-ni yoxla!")
 
-@client.event
+# Serveri qorumaq üçün: Kənar bot gələndə avtomatik qovmaq (Anti-Raid)
+@bot.event
 async def on_member_join(member):
     if member.bot:
         try:
-            await member.ban(reason="Icazesiz bot elave olundu! Anti-Raid qorumasi.")
-            print(f"Tehlukeli bot qovuldu: {member.name}")
-        except:
-            pass
+            await member.ban(reason="İcazəsiz bot əlavə edildi - Server Qoruması")
+            print(f"İcazəsiz bot ban olundu: {member.name}")
+        except Exception as e:
+            print(e)
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    
-    if message.content.lower() == '!salam':
-        await message.channel.send('Aleykum salam! Server 24/7 qorunur! 🛡️')
+# Sadə əmrlər və cavablar
+@bot.command()
+async def salam(ctx):
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Server tam qorunur və mən onlaynam! 🛡️")
 
-TOKEN = os.getenv('DISCORD_TOKEN')
-client.run(TOKEN)
+@bot.command()
+async def ping(ctx):
+    await ctx.send(f"Pong! 🏓 Gecikmə: {round(bot.latency * 1000)}ms")
+
+# Tokeni Render-də Environment Variables hissəsinə yazdığın üçün burdan oxuyur
+import os
+bot.run(os.environ.get("DISCORD_TOKEN"))
+
