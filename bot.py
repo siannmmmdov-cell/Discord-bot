@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import os
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -8,7 +9,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Sənin atdığın səs kanalının İD-si
+# Sənin səs kanalının İD-si
 VOICE_CHANNEL_ID = 1541243631896232026
 
 @bot.event
@@ -19,12 +20,13 @@ async def on_ready():
     channel = bot.get_channel(VOICE_CHANNEL_ID)
     if channel:
         try:
-            await channel.connect()
-            print("Uğurla səs kanalına qoşuldu və qalır!")
+            if not discord.utils.get(bot.voice_clients, guild=channel.guild):
+                await channel.connect()
+                print("Uğurla səs kanalına qoşuldu və qalır!")
         except Exception as e:
-            print(e)
+            print(f"Səs xətası: {e}")
     else:
-            print("Səs kanalı tapılmadı, ID-ni yoxla!")
+        print("Səs kanalı tapılmadı, ID-ni yoxla!")
 
 # Serveri qorumaq üçün: Kənar bot gələndə avtomatik qovmaq (Anti-Raid)
 @bot.event
@@ -45,7 +47,5 @@ async def salam(ctx):
 async def ping(ctx):
     await ctx.send(f"Pong! 🏓 Gecikmə: {round(bot.latency * 1000)}ms")
 
-# Tokeni Render-də Environment Variables hissəsinə yazdığın üçün burdan oxuyur
-import os
+# Tokeni Render-də Environment Variables hissəsindən oxuyur
 bot.run(os.environ.get("DISCORD_TOKEN"))
-
