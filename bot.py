@@ -28,7 +28,16 @@ intents.voice_states = True  # Səs kanalları üçün vacibdir
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Səs kanalının ID-si birbaşa yazıldı
-VOICE_CHANNEL_ID = 1541334551303954452 
+# Səs kanalına çağırmaq üçün əmr
+@bot.command()
+async def ses(ctx):
+    if ctx.author.voice:
+        channel = ctx.author.voice.channel
+        await channel.connect()
+        await ctx.send(f"✅ Səninlə birlikdə {channel.name} kanalına qoşuldum!")
+    else:
+        await ctx.send("⚠️ Əvvəlcə hər hansı bir səs kanalına qoşulmalısan!")
+        VOICE_CHANNEL_ID = 1541334551303954452 
 
 @bot.event
 async def on_ready():
