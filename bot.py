@@ -23,14 +23,25 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
 intents.members = True
+intents.voice_states = True  # Səs kanalları üçün vacibdir
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+# Səs kanalının ID-si birbaşa yazıldı
+VOICE_CHANNEL_ID = 1541334551303954452 
 
 @bot.event
 async def on_ready():
     print(f"{bot.user} onlayndır!")
+    try:
+        channel = bot.get_channel(VOICE_CHANNEL_ID)
+        if channel:
+            await channel.connect()
+            print("Bot səs kanalına uğurla qoşuldu!")
+    except Exception as e:
+        print(e)
 
-# 1. KƏNAR BOT QORUMASI (Serverə başqa bot gələndə atır)
+# 1. KƏNAR BOT QORUMASI
 @bot.event
 async def on_member_join(member):
     if member.bot:
@@ -39,7 +50,7 @@ async def on_member_join(member):
         except Exception as e:
             print(e)
 
-# 2. MESAJLARA NƏZARƏT (Yalnız linkləri silir, şəkillərə toxunmur!)
+# 2. MESAJLARA NƏZARƏT (Yalnız linkləri silir, şəkillərə toxunmur)
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -47,7 +58,6 @@ async def on_message(message):
 
     content = message.content.lower()
 
-    # Link qoruması (Mesajda link varsa silir)
     if "http://" in content or "https://" in content or "www." in content:
         try:
             await message.delete()
@@ -56,7 +66,6 @@ async def on_message(message):
         except Exception as e:
             print(e)
 
-    # Botun əmrləri işləməsi üçün bu mütləqdir
     await bot.process_commands(message)
 
 # Salam əmri
