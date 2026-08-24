@@ -27,17 +27,8 @@ intents.voice_states = True  # Səs kanalları üçün vacibdir
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Səs kanalının ID-si birbaşa yazıldı
-# Səs kanalına çağırmaq üçün əmr
-@bot.command()
-async def ses(ctx):
-    if ctx.author.voice:
-        channel = ctx.author.voice.channel
-        await channel.connect()
-        await ctx.send(f"✅ Səninlə birlikdə {channel.name} kanalına qoşuldum!")
-    else:
-        await ctx.send("⚠️ Əvvəlcə hər hansı bir səs kanalına qoşulmalısan!")
-        VOICE_CHANNEL_ID = 1541334551303954452 
+# Səs kanalının ID-si
+VOICE_CHANNEL_ID = 1541334551303954452 
 
 @bot.event
 async def on_ready():
@@ -81,6 +72,20 @@ async def on_message(message):
 @bot.command()
 async def salam(ctx):
     await ctx.send(f"Aleykum salam, {ctx.author.mention}! Server tam qorunur və mən onlaynam! 🛡️")
+
+# Səs kanalına qoşulma əmri (!ses)
+@bot.command()
+async def ses(ctx):
+    if ctx.author.voice:
+        channel = ctx.author.voice.channel
+        # Əgər bot artıq başqa səsikəndədirsə, çıxıb gəlməsi üçün əvvəlki əlaqəni kəsirik
+        if ctx.voice_client:
+            await ctx.voice_client.move_to(channel)
+        else:
+            await channel.connect()
+        await ctx.send(f"✅ Səninlə birlikdə **{channel.name}** kanalına qoşuldum!")
+    else:
+        await ctx.send("⚠️ Əvvəlcə hər hansı bir səs kanalına daxil olmalısan!")
 
 # Veb serveri işə salırıq və botu qoşuruq
 keep_alive()
