@@ -72,3 +72,6 @@ async def on_message(message):
 # Veb serveri işə salırıq və botu işə qoşuruq
 keep_alive()
 bot.run(os.environ.get("DISCORD_TOKEN"))
+@bot.command()
+async def salam(ctx):
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Server tam qorunur və mən onlaynam! 🛡️")
