@@ -4,7 +4,7 @@ import os
 from flask import Flask
 from threading import Thread
 
-# Flask ilə sadə veb server yaradırıq ki, Render yatmasın
+# Flask ilə sadə veb server (Render yatmasın deyə)
 app = Flask('')
 
 @app.route('/')
@@ -28,18 +28,18 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f"{bot.user} tam təhlükəsizlik və veb server rejimi ilə onlayn oldu!")
+    print(f"{bot.user} onlayndır!")
 
-# 1. KƏNAR BOT QORUMASI
+# 1. KƏNAR BOT QORUMASI (Serverə başqa bot gələndə atır)
 @bot.event
 async def on_member_join(member):
     if member.bot:
         try:
-            await member.ban(reason="İcazəsiz bot əlavə edildi - Avtomatik Təhlükəsizlik Qoruması")
+            await member.ban(reason="İcazəsiz bot - Təhlükəsizlik Qoruması")
         except Exception as e:
             print(e)
 
-# 2. MESAJLARA NƏZARƏT (Link və 18+ şəkil qoruması)
+# 2. MESAJLARA NƏZARƏT (Yalnız linkləri silir, şəkillərə toxunmur!)
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -47,7 +47,7 @@ async def on_message(message):
 
     content = message.content.lower()
 
-    # Link qoruması
+    # Link qoruması (Mesajda link varsa silir)
     if "http://" in content or "https://" in content or "www." in content:
         try:
             await message.delete()
@@ -56,22 +56,14 @@ async def on_message(message):
         except Exception as e:
             print(e)
 
-    # 18+ / Şəkil qoruması
-    if message.attachments:
-        for attachment in message.attachments:
-            if attachment.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp', '.mp4', '.mov')):
-                try:
-                    await message.delete()
-                    await message.channel.send(f"⚠️ {message.author.mention}, bu kanalda şəkil/video paylaşmaq qadağandır!", delete_after=5)
-                    return
-                except Exception as e:
-                    print(e)
-
+    # Botun əmrləri işləməsi üçün bu mütləqdir
     await bot.process_commands(message)
 
-# Veb serveri işə salırıq və botu işə qoşuruq
-keep_alive()
-bot.run(os.environ.get("DISCORD_TOKEN"))
+# Salam əmri
 @bot.command()
 async def salam(ctx):
     await ctx.send(f"Aleykum salam, {ctx.author.mention}! Server tam qorunur və mən onlaynam! 🛡️")
+
+# Veb serveri işə salırıq və botu qoşuruq
+keep_alive()
+bot.run(os.environ.get("DISCORD_TOKEN"))
