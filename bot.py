@@ -3,7 +3,7 @@ from discord.ext import commands
 import os
 import re
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 
 intents = discord.Intents.default()
@@ -11,47 +11,84 @@ intents.message_content = True
 intents.members = True
 intents.guilds = True
 
+# Bütün əmrlər yalnız "!" işarəsi ilə işləyəcək
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Spam və təhlükəsizlik izləmə lüğətləri
 spam_tracker = defaultdict(list)
 spam_warnings = Counter()
 
 @bot.event
 async def on_ready():
     print(f"==========================================")
-    print(f" Zirehli Qoruma Botu Aktivləşdi!")
-    print(f" Botun Adı: {bot.user.name}")
-    print(f" ID: {bot.user.id}")
-    print(f" Status: Server tam təhlükəsizlik altındadır!")
+    print(f" ULTIMATE ZİREHLİ ! QORUMA AKTİVDİR!")
+    print(f" Bot: {bot.user.name}")
+    print(f" Status: Server tam kilid və müdafiə altındadır!")
     print(f"==========================================")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Ruhumun Serverini 🛡️"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="!yardim | Server 🛡️"))
 
-# ==================== GÜVƏNLİK VƏ STATUS KOMUTLARI ====================
+# ==================== 1. YENİ HESAB VƏ RAİD QORUMASI ====================
+@bot.event
+async def on_member_join(member):
+    created_at = member.created_at
+    now = datetime.now(created_at.tzinfo)
+    account_age = now - created_at
 
-@bot.command(name="guvenlik", aliases=["güvənlik", "status"])
+    # 3 gündən yeni açılan şübhəli hesaplar
+    if account_age.days < 3:
+        try:
+            for channel in member.guild.text_channels:
+                if "qoruma" in channel.name or "log" in channel.name or "chat" in channel.name:
+                    await channel.send(f"🚨 **Diqqət!** Şübhəli yeni hesab aşkarlandı: {member.mention} (Hesab açılalı 3 gündən az olub).")
+                    break
+        except Exception:
+            pass
+
+# ==================== 2. MƏLUMAT VƏ YARDIM ƏMRLƏRİ (!) ====================
+@bot.command(name="yardim", aliases=["help", "komutlar"])
+async def yardim(ctx):
+    embed = discord.Embed(
+        title="🛠️ Server Mühafizə və İdarəetmə Paneli",
+        description="Bütün əmrlər **`!`** prefiksi ilə işləyir, Ruhum:",
+        color=discord.Color.blue()
+    )
+    embed.add_field(name="🛡️ `!guvenlik`", value="Serverin anlıq güvənlik və müdafiə statusunu göstərir.", inline=False)
+    embed.add_field(name="📜 `!qayda`", value="Serverin rəsmi qaydalarını ekrana gətirir.", inline=False)
+    embed.add_field(name="🧹 `!sil [say]`", value="Göstərilən miqdarda mesajı təmizləyir.", inline=False)
+    embed.add_field(name="🔨 `!ban [@istifadəçi]`", value="Təxribatçı istifadəçini serverdən uzaqlaşdırır.", inline=False)
+    embed.add_field(name="⏳ `!mute [@istifadəçi] [dəqiqə]`", value="Qayda pozan istifadəçini müvəqqəti susdurur.", inline=False)
+    embed.set_footer(text="Ruhum üçün maksimum güvənliklə hazırlandı.")
+    await ctx.send(embed=embed)
+
+@bot.command(name="guvenlik", aliases=["status"])
 async def guvenlik(ctx):
     server = ctx.guild
-    verification = str(server.verification_level).upper()
-    
     embed = discord.Embed(
-        title="🛡️ Server Güvənlik və Müdafiə Hesabatı",
-        description="Botumuz tərəfindən serverin anlıq təhlükəsizlik vəziyyəti:",
-        color=discord.Color.dark_red()
+        title="🛡️ Zirehli Təhlükəsizlik Paneli",
+        description="Serverin anlıq müdafiə göstəriciləri:",
+        color=discord.Color.red()
     )
     embed.add_field(name="📛 Server Adı", value=server.name, inline=True)
     embed.add_field(name="👥 Üzv Sayı", value=str(server.member_count), inline=True)
-    embed.add_field(name="🔒 Doğrulama Səviyyəsi", value=verification, inline=True)
-    embed.add_field(name="🤖 Mühafizə Sistemi", value="🟢 Aktiv (Anti-Spam, Anti-Link, Anti-Mention)", inline=False)
-    embed.set_footer(text="Ruhum üçün xüsusi olaraq hazırlanmışdır.")
+    embed.add_field(name="🔒 Anti-Raid / Anti-Spam", value="🟢 Maksimum səviyyədə aktiv", inline=False)
+    embed.add_field(name="🚫 Reklam və Etiket Filtri", value="🟢 Qüsursuz işləyir", inline=False)
+    await ctx.send(embed=embed)
+
+@bot.command(name="qayda", aliases=["qaydalar"])
+async def qayda(ctx):
+    embed = discord.Embed(
+        title="📜 Serverin Rəsmi Qaydaları",
+        description="1. Hər kəsə hörmət göstərmək mütləqdir, təhqir qəti qadağandır!\n"
+                    "2. Spam, flood və kütləvi mesaj yazmaq yasaqdır!\n"
+                    "3. Başqa serverlərin reklam linklərini paylaşmaq qadağandır, Ruhum!",
+        color=discord.Color.gold()
+    )
     await ctx.send(embed=embed)
 
 @bot.command(name="salam")
 async def salam(ctx):
-    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Server tam güvənlik altındadır, xoş gəldin!")
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Server ən yüksək səviyyədə güvənlik altındadır.")
 
-# ==================== MODERASİYA KOMUTLARI ====================
-
+# ==================== 3. MODERASİYA ƏMRLƏRİ (!) ====================
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
 async def sil(ctx, amount: int = 10):
@@ -71,74 +108,57 @@ async def ban(ctx, member: discord.Member, *, reason="Səbəb göstərilməyib")
     await member.ban(reason=reason)
     await ctx.send(f"🔨 **{member.mention}** serverdən ban olundu!\n📜 Səbəb: `{reason}`")
 
-@bot.command(name="mute", aliases=["timeout"])
+@bot.command(name="mute")
 @commands.has_permissions(moderate_members=True)
 async def mute(ctx, member: discord.Member, minutes: int = 5, *, reason="Qayda pozuntusu"):
     duration = timedelta(minutes=minutes)
     await member.timeout(duration, reason=reason)
-    await ctx.send(f"⏳ **{member.mention}** {minutes} dəqiqə müddətinə susduruldu (timeout)!")
+    await ctx.send(f"⏳ **{member.mention}** {minutes} dəqiqə müddətinə susduruldu!")
 
-@bot.command(name="kilid")
-@commands.has_permissions(manage_channels=True)
-async def kilid(ctx):
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
-    await ctx.send(f"🔒 **{ctx.channel.mention}** kanalı mesaj yazılması üçün kilidləndi!")
-
-@bot.command(name="ac", aliases=["aç"])
-@commands.has_permissions(manage_channels=True)
-async def ac(ctx):
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
-    await ctx.send(f"🔓 **{ctx.channel.mention}** kanalının kilidi açıldı!")
-
-# ==================== AVTOMATİK QORUMA SİSTEMİ (ANTİ-SPAM & LİNK) ====================
-
+# ==================== 4. AVTOMATİK GÜVƏNLİK FİLtrləri ====================
 @bot.event
 async def on_message(message):
-    # Botların öz mesajlarını yox sayırıq
     if message.author.bot:
         await bot.process_commands(message)
         return
 
-    # Adminlərə heç bir qadağa tətbiq olunmur
     if message.author.guild_permissions.administrator:
         await bot.process_commands(message)
         return
 
-    content = message.content
+    content = message.content.lower()
 
-    # 1. Dəvət Linki və Reklam Qoruması
+    # A) Reklam və Dəvət Linki Qoruması
     invite_regex = r"(https?://)?(www\.)?(discord\.(gg|io|me|li|club)|discordapp\.com/invite)/\w+"
-    if re.search(invite_regex, content):
+    if re.search(invite_regex, message.content):
         try:
             await message.delete()
-            warning = await message.channel.send(f"⚠️ {message.author.mention}, bu serverdə başqa yerlərin dəvət linkini/reklam atmaq qəti qadağandır!")
-            await asyncio.sleep(5)
+            warning = await message.channel.send(f"⚠️ {message.author.mention}, başqa serverlərin linkini atmaq yasaqdır!")
+            await asyncio.sleep(4)
             await warning.delete()
             return
         except Exception:
             pass
 
-    # 2. @everyone / @here kütləvi etiketləmə qoruması
-    if "@everyone" in content or "@here" in content:
+    # B) @everyone / @here Kütləvi Etiket Qoruması
+    if "@everyone" in message.content or "@here" in message.content:
         try:
             await message.delete()
-            warning = await message.channel.send(f"⚠️ {message.author.mention}, kütləvi etiket (`@everyone` / `@here`) atmaq qadağandır!")
-            await asyncio.sleep(5)
+            warning = await message.channel.send(f"⚠️ {message.author.mention}, kütləvi etiket atmaq qadağandır!")
+            await asyncio.sleep(4)
             await warning.delete()
             return
         except Exception:
             pass
 
-    # 3. Sürətli Spam Qoruması (Anti-Spam Engine)
+    # C) Sürətli Spam Qoruması (Anti-Spam)
     author_id = message.author.id
     current_time = time.time()
     
-    # Son 5 saniyə içindəki mesajları izləyirik
     spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 5]
     spam_tracker[author_id].append(current_time)
 
-    # Əgər 5 saniyə ərzində 6-dan çox mesaj atarsa spam sayılır
-    if len(spam_tracker[author_id]) >= 6:
+    if len(spam_tracker[author_id]) >= 5: # 5 saniyə ərzində 5-dən çox mesaj
         spam_tracker[author_id].clear()
         spam_warnings[author_id] += 1
         warn_count = spam_warnings[author_id]
@@ -149,25 +169,25 @@ async def on_message(message):
             pass
 
         if warn_count == 1:
-            await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq sürətli mesaj yazırsan! **1-ci Xəbərdarlıq**.", delete_after=5)
+            await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq sürətli mesaj yazırsan! Xəbərdarlıq.", delete_after=4)
         elif warn_count == 2:
             try:
-                await message.author.timeout(timedelta(seconds=30), reason="Spam etmək səbəbilə avtomatik mute.")
-                await message.channel.send(f"⏳ {message.author.mention}, spam etdiyin üçün **30 saniyəlik** zaman aşımına (mute) salındın!", delete_after=5)
+                await message.author.timeout(timedelta(seconds=60), reason="Spam.")
+                await message.channel.send(f"⏳ {message.author.mention}, spam etdiyin üçün 1 dəqiqəlik mute aldın!", delete_after=4)
             except:
                 pass
         elif warn_count >= 3:
             try:
-                await message.author.ban(reason="Ardıcıl və qarşısıalınmaz spam hücumu.")
-                await message.channel.send(f"🔨 {message.author.mention}, ardıcıl spam qaydasını pozduğu üçün serverdən **banlandı!**")
+                await message.author.ban(reason="Ardıcıl spam hücumu.")
+                await message.channel.send(f"🔨 {message.author.mention} dayanmadan spam etdiyi üçün banlandı!")
                 del spam_warnings[author_id]
             except:
                 pass
         return
 
-    # Komutların işləməsi üçün vacibdir
     await bot.process_commands(message)
 
-# Token birbaşa daxil edilib (Heç bir əlavə ayara ehtiyac yoxdur)
-bot.run("MTU0MDMzMjI2NzgyNDQ4ODQ1MA.G8IEhC.1dXBFpEbTx_wCtrNLv-OCuSST73vxLL4-WV32c")
-            
+# Tokeni təhlükəsiz şəkildə Render-dən alır
+token = os.environ.get("DISCORD_TOKEN")
+bot.run(token)
+    
