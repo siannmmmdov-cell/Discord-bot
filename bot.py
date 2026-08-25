@@ -3,6 +3,7 @@ from discord.ext import commands
 import os
 import re
 import time
+import asyncio
 from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 
@@ -33,7 +34,6 @@ async def on_member_join(member):
     now = datetime.now(created_at.tzinfo)
     account_age = now - created_at
 
-    # 3 gündən yeni açılan şübhəli hesaplar
     if account_age.days < 3:
         try:
             for channel in member.guild.text_channels:
@@ -96,7 +96,7 @@ async def sil(ctx, amount: int = 10):
         amount = 100
     await ctx.channel.purge(limit=amount + 1)
     msg = await ctx.send(f"🧹 Uğurla **{amount}** ədəd mesaj təmizləndi!")
-    await asyncio.sleep(3) if 'asyncio' in globals() else None
+    await asyncio.sleep(3)
     try:
         await msg.delete()
     except:
@@ -125,8 +125,6 @@ async def on_message(message):
     if message.author.guild_permissions.administrator:
         await bot.process_commands(message)
         return
-
-    content = message.content.lower()
 
     # A) Reklam və Dəvət Linki Qoruması
     invite_regex = r"(https?://)?(www\.)?(discord\.(gg|io|me|li|club)|discordapp\.com/invite)/\w+"
@@ -158,7 +156,7 @@ async def on_message(message):
     spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 5]
     spam_tracker[author_id].append(current_time)
 
-    if len(spam_tracker[author_id]) >= 5: # 5 saniyə ərzində 5-dən çox mesaj
+    if len(spam_tracker[author_id]) >= 5:
         spam_tracker[author_id].clear()
         spam_warnings[author_id] += 1
         warn_count = spam_warnings[author_id]
@@ -169,17 +167,17 @@ async def on_message(message):
             pass
 
         if warn_count == 1:
-            await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq sürətli mesaj yazırsan! Xəbərdarlıq.", delete_after=4)
+            await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq sürətli mesaj yazırsan!", delete_after=4)
         elif warn_count == 2:
             try:
                 await message.author.timeout(timedelta(seconds=60), reason="Spam.")
-                await message.channel.send(f"⏳ {message.author.mention}, spam etdiyin üçün 1 dəqiqəlik mute aldın!", delete_after=4)
+                await message.channel.send(f"⏳ {message.author.mention}, 1 dəqiqəlik mute aldın!", delete_after=4)
             except:
                 pass
         elif warn_count >= 3:
             try:
-                await message.author.ban(reason="Ardıcıl spam hücumu.")
-                await message.channel.send(f"🔨 {message.author.mention} dayanmadan spam etdiyi üçün banlandı!")
+                await message.author.ban(reason="Ardıcıl spam.")
+                await message.channel.send(f"🔨 {message.author.mention} spam etdiyi üçün banlandı!")
                 del spam_warnings[author_id]
             except:
                 pass
@@ -187,7 +185,6 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# Tokeni təhlükəsiz şəkildə Render-dən alır
 token = os.environ.get("DISCORD_TOKEN")
 bot.run(token)
     
