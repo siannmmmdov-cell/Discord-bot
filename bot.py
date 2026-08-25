@@ -1,92 +1,136 @@
 import discord
 from discord.ext import commands
 import os
-from flask import Flask
-from threading import Thread
+import re
+import time
+from collections import defaultdict, Counter
 
-# Flask ilə sadə veb server (Render yatmasın deyə)
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "Bot onlayndır və işləyir!"
-
-def run():
-    app.run(host='0.0.0.0', port=8080)
-
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
-
-# Discord Bot hissəsi
 intents = discord.Intents.default()
 intents.message_content = True
-intents.guilds = True
 intents.members = True
-intents.voice_states = True  # Səs kanalları üçün vacibdir
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+# İkinci bot üçün prefiks nöqtə (.) olur
+bot = commands.Bot(command_prefix=".", intents=intents)
 
-# Səs kanalının ID-si
-VOICE_CHANNEL_ID = 1541334551303954452 
+# Spam və xəbərdarlıq izləmə sistemləri
+spam_tracker = defaultdict(list)
+spam_warnings = Counter()
 
 @bot.event
 async def on_ready():
-    print(f"{bot.user} onlayndır!")
-    try:
-        channel = bot.get_channel(VOICE_CHANNEL_ID)
-        if channel:
-            await channel.connect()
-            print("Bot səs kanalına uğurla qoşuldu!")
-    except Exception as e:
-        print(e)
+    print(f"İkinci Ağır Mühafizə Botu işə düşdü, Ruhum: {bot.user}")
 
-# 1. KƏNAR BOT QORUMASI
-@bot.event
-async def on_member_join(member):
-    if member.bot:
-        try:
-            await member.ban(reason="İcazəsiz bot - Təhlükəsizlik Qoruması")
-        except Exception as e:
-            print(e)
+# 1. Ətraflə Durum Komutu
+@bot.command()
+async def durum(ctx):
+    server = ctx.guild
+    await ctx.send(
+        f"🔒 **İkinci Mühafizə Sistemi (Ruhum üçün Hesabat):**\n"
+        f"- Sunucu: {server.name}\n"
+        f"- Toplam Kanal: {len(server.channels)}\n"
+        f"- Toplam Rol: {len(server.roles)}\n"
+        f"- Üzv Sayı: {server.member_count}\n"
+        f"🛡️ *Status: 2-ci qat qoruma tam aktivdir!*"
+    )
 
-# 2. MESAJLARA NƏZARƏT (Yalnız linkləri silir, şəkillərə toxunmur)
+# 2. Qaydalar Komutu
+@bot.command()
+async def qayda(ctx):
+    await ctx.send(
+        f"📜 **Serverin Əsas Qaydaları:**\n"
+        f"1. Heç bir halda reklam və dəvət linki atmaq olmaz!\n"
+        f"2. Flood və ya ardıcıl spam etmək qadağandır!\n"
+        f"3. Caps Lock (böyük hərflərlə qışqıraraq yazmaq) yasaqdır!\n"
+        f"4. Hörmətsizlik dərhal cəzalandırılır, Ruhum!"
+    )
+
+# 3. Ping / Gecikmə Komutu
+@bot.command()
+async def ping(ctx):
+    latency = round(bot.latency * 1000)
+    await ctx.send(f"🏓 Pong! Botun gecikmə sürəti: **{latency}ms**")
+
+# 4. Çoxtərəfli Qoruma və Filtrləmə Sistemi (Automod)
 @bot.event
 async def on_message(message):
     if message.author.bot:
+        await bot.process_commands(message)
         return
 
-    content = message.content.lower()
+    # Adminlərə qoruma filtrləri tətbiq olunmur
+    if message.author.guild_permissions.administrator:
+        await bot.process_commands(message)
+        return
 
-    if "http://" in content or "https://" in content or "www." in content:
+    content = message.content
+
+    # A) Reklam / Dəvət Linki Qoruması
+    invite_regex = r"(https?://)?(www\.)?(discord\.(gg|io|me|li|club)|discordapp\.com/invite)/\w+"
+    if re.search(invite_regex, content):
         try:
             await message.delete()
-            await message.channel.send(f"⚠️ {message.author.mention}, bu serverdə link paylaşmaq qadağandır!", delete_after=5)
+            await message.channel.send(f"⚠️ {message.author.mention}, bu ikinci qatda reklam linki atmaq qəti qadağandır!", delete_after=5)
             return
-        except Exception as e:
-            print(e)
+        except Exception:
+            pass
+
+    # B) Qadağan Olunmuş Sözlər Filtri
+    qadagan_sozler = ["pissoz1", "pissoz2", "koylu"] # İstədiyin sözləri bura əlavə edə bilərsən
+    if any(soz in content.lower() for soz in qadagan_sozler):
+        try:
+            await message.delete()
+            await message.channel.send(f"⚠️ {message.author.mention}, bu sözü və ya ifadəni işlətmək yasaqdır!", delete_after=5)
+            return
+        except Exception:
+            pass
+
+    # C) Həddindən Artıq Böyük Hərf (Anti-Caps Lock) Qoruması
+    if len(content) > 10:
+        biyuk_herf_sayi = sum(1 for c in content if c.isupper())
+        if (biyuk_herf_sayi / len(content)) > 0.7: # Əgər mətnin 70%-dən çoxu böyük hərflərdirsə
+            try:
+                await message.delete()
+                await message.channel.send(f"⚠️ {message.author.mention}, zəhmət olmasa Caps Lock-u söndür, qışqıraraq yazmaq qadağandır!", delete_after=5)
+                return
+            except Exception:
+                pass
+
+    # D) Flood / Spam Qoruması (7 mesaj və ya sürətli təkrar)
+    author_id = message.author.id
+    current_time = time.time()
+    
+    spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 5]
+    spam_tracker[author_id].append(current_time)
+
+    if len(spam_tracker[author_id]) >= 7:
+        spam_tracker[author_id].clear()
+        spam_warnings[author_id] += 1
+        warn_count = spam_warnings[author_id]
+
+        try:
+            await message.delete()
+        except Exception:
+            pass
+
+        if warn_count == 1:
+            await message.channel.send(f"⚠️ {message.author.mention}, ikinci qoruma sistemi: Sürətli mesaj (spam) xəbərdarlığı!", delete_after=5)
+        elif warn_count == 2:
+            try:
+                from datetime import timedelta
+                await message.author.timeout(timedelta(seconds=15), reason="İkinci qat: Spam etdiyi üçün 15 saniyəlik timeout.")
+                await message.channel.send(f"⏳ {message.author.mention}, təkrar spam etdiyin üçün 15 saniyəlik zaman aşımına salındın!", delete_after=5)
+            except Exception:
+                pass
+        elif warn_count >= 3:
+            try:
+                await message.author.ban(reason="İkinci qat: Ardıcıl spam qaydasını pozduğu üçün banlandı.")
+                await message.channel.send(f"🔨 {message.author.mention}, spamda israr etdiyin üçün serverdən uzaqlaşdırıldın!")
+                del spam_warnings[author_id]
+            except Exception:
+                pass
+        return
 
     await bot.process_commands(message)
 
-# Salam əmri
-@bot.command()
-async def salam(ctx):
-    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Server tam qorunur və mən onlaynam! 🛡️")
-
-# Səs kanalına qoşulma əmri (!ses)
-@bot.command()
-async def ses(ctx):
-    if ctx.author.voice:
-        channel = ctx.author.voice.channel
-        # Əgər bot artıq başqa səsikəndədirsə, çıxıb gəlməsi üçün əvvəlki əlaqəni kəsirik
-        if ctx.voice_client:
-            await ctx.voice_client.move_to(channel)
-        else:
-            await channel.connect()
-        await ctx.send(f"✅ Səninlə birlikdə **{channel.name}** kanalına qoşuldum!")
-    else:
-        await ctx.send("⚠️ Əvvəlcə hər hansı bir səs kanalına daxil olmalısan!")
-
-# Veb serveri işə salırıq və botu qoşuruq
-keep_alive()
-bot.run(os.environ.get("DISCORD_TOKEN"))
+# İkinci botun tokeni
+bot.run(os.environ.get("DISCORD_TOKEN_2"))
