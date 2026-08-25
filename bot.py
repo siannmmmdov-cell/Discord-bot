@@ -10,7 +10,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Bot işləyir!"
+    return "Bot aktivdir!"
 
 def run_server():
     app.run(host='0.0.0.0', port=8081)
@@ -39,7 +39,10 @@ async def yardim(ctx):
         color=discord.Color.blue()
     )
     embed.add_field(name="🧹 `.sil [say]`", value="Mesajları təmizləyir.", inline=False)
+    embed.add_field(name="🔨 `.ban [@istifadəçi]`", value="İstifadəçini banlayır.", inline=False)
+    embed.add_field(name="⏳ `.mute [@istifadəçi] [dəqiqə]`", value="İstifadəçini susdurur.", inline=False)
     embed.add_field(name="🏓 `.ping`", value="Gecikməni yoxlayır.", inline=False)
+    embed.add_field(name="👤 `.userinfo [@istifadəçi]`", value="İstifadəçi məlumatını göstərir.", inline=False)
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
@@ -54,6 +57,27 @@ async def sil(ctx, amount: int = 10):
         amount = 100
     await ctx.channel.purge(limit=amount + 1)
     await ctx.send(f"🧹 **{amount}** ədəd mesaj silindi!", delete_after=3)
+
+@bot.command(name="ban")
+@commands.has_permissions(ban_members=True)
+async def ban(ctx, member: discord.Member, *, reason="Səbəb göstərilməyib"):
+    await member.ban(reason=reason)
+    await ctx.send(f"🔨 **{member.mention}** serverdən ban olundu!")
+
+@bot.command(name="mute")
+@commands.has_permissions(moderate_members=True)
+async def mute(ctx, member: discord.Member, minutes: int = 5, *, reason="Qayda pozuntusu"):
+    duration = timedelta(minutes=minutes)
+    await member.timeout(duration, reason=reason)
+    await ctx.send(f"⏳ **{member.mention}** {minutes} dəqiqə susduruldu!")
+
+@bot.command(name="userinfo")
+async def userinfo(ctx, member: discord.Member = None):
+    if member is None:
+        member = ctx.author
+    embed = discord.Embed(title=f"👤 İstifadəçi: {member.name}", color=discord.Color.green())
+    embed.add_field(name="ID", value=member.id, inline=True)
+    await ctx.send(embed=embed)
 
 keep_alive()
 
