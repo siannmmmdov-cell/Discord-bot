@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez firewall v7.0 tam güclə işləyir [ULTRA_SECURE]"
+    return "yenilmez firewall v8.0 [SECURE & FUN]"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -34,8 +34,8 @@ spam_tracker = {}
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ YENİLMEZ ULTRA KİBER-ŞƏBƏKƏ AKTİVDİR: {bot.user.name}')
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Bütün server nəzarət altındadır | r?bot"))
+    print(f'🛡️ YENİLMEZ KİBER & ƏYLƏNCƏ ŞƏBƏKƏSİ AKTİVDİR: {bot.user.name}')
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Şəbəkə və Əyləncə nəzarətdə | r?bot"))
 
 @bot.event
 async def on_member_join(member):
@@ -111,7 +111,7 @@ async def on_message(message):
             except:
                 pass
 
-    # 5. Bloklanmış Sürətli Spam / Flood Müdafiəsi
+    # 5. Bloklanmış Sürətli Spam / Flood Müdafiəsi (Normal istifadəçiyə toxunmur, yalnız saniyədə 5+ mesajı vurur)
     author_id = message.author.id
     current_time = time.time()
 
@@ -127,7 +127,7 @@ async def on_message(message):
             await message.delete()
             duration = timedelta(minutes=10)
             await message.author.timeout(duration, reason="Sistem Müdafiəsi: Flood / Spam")
-            await message.channel.send(f"🔒 **{message.author.mention}** şəbəkəni doldurmağa çalışdığı üçün 10 dəqiqəlik təcrid edildi.")
+            await message.channel.send(f"🔒 **{message.author.mention}** şəbəkəni spamla doldurmağa çalışdığı üçün 10 dəqiqəlik təcrid edildi.")
         except:
             pass
         return
@@ -138,31 +138,36 @@ async def on_message(message):
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="⚡ YENİLMEZ // ULTRA KİBER-TƏHLÜKƏSİZLİK MƏRKƏZİ",
-        description="Bu server **yenilmez** mərkəzi mühafizə sistemi tərəfindən idarə olunur. Bütün səlahiyyətli əmrlər:",
+        title="⚡ YENİLMEZ // KİBER-TƏHLÜKƏSİZLİK VƏ ƏYLƏNCƏ MƏRKƏZİ",
+        description="Bu server **yenilmez** mərkəzi tərəfindən qorunur. Bütün əmrlər:",
         color=0x050505
     )
     embed.add_field(
-        name="🛡️ 1. Firewall və Müdafiə Divarları",
+        name="🛡️ 1. Firewall və Müdafiə",
         value="• Avtomatik Sərt Salamlama\n• Qlobal Link / Reklam Filtri\n• @everyone / @here Bloku\n• Ağıllı Spam & 10 Dəqiqəlik Təcrid\n• İcazəsiz Botların Avtomatik Qovulması", 
         inline=False
     )
     embed.add_field(
-        name="🎧 2. Səs Şəbəkəsi İdarəetməsi",
+        name="🎧 2. Səs Şəbəkəsi",
         value="`r?qosul` — Səs kanalına qoşular\n`r?ayril` — Səs kanalından ayrılar", 
         inline=False
     )
     embed.add_field(
-        name="⚔️ 3. Ağır Moderasiya & Kanal Əmrləri",
-        value="`r?sil [say]` — Mesajları təmizləyər\n`r?ban [@istifadəçi]` — Serverdən qovar\n`r?unban [ID]` — Banı qaldırar\n`r?at [@istifadəçi]` — Kick edər\n`r?mute [@istifadəçi] [dəqiqə]` — Timeout verər\n`r?unmute [@istifadəçi]` — Timeoutu qaldırar\n`r?lock` — Kanalı kilidləyər (yazmağı bağlayar)\n`r?unlock` — Kanalın kilidini açar\n`r?slowmode [saniyə]` — Yavaş rejim\n`r?nuke` — Kanalı təmizləyib yenidən qurar", 
+        name="⚔️ 3. Ağır Moderasiya & Kanal",
+        value="`r?sil [say]` — Mesajları təmizləyər\n`r?ban [@istifadəçi]` — Serverdən qovar\n`r?unban [ID]` — Banı qaldırar\n`r?at [@istifadəçi]` — Kick edər\n`r?mute [@istifadəçi] [dəqiqə]` — Timeout\n`r?unmute [@istifadəçi]` — Timeoutu qaldırar\n`r?lock` / `r?unlock` — Kanalı kilidləyər / açar\n`r?slowmode [saniyə]` — Yavaş rejim\n`r?nuke` — Kanalı yenidən qurar", 
         inline=False
     )
     embed.add_field(
-        name="⚡ 4. Rol və İstifadəçi İdarəsi",
-        value="`r?rolver [@istifadəçi] [@rol]` — İstifadəçiyə rol verər\n`r?rolal [@istifadəçi] [@rol]` — İstifadəçidən rol alar\n`r?profil [@istifadəçi]` — Hədəf analizi\n`r?server` — Server məlumatı\n`r?guvenlik` — Təhlükəsizlik hesabatı\n`r?ping` — Gecikmə yoxlaması", 
+        name="🎮 4. Əyləncə və Vaxt Keçirmək Üçün",
+        value="`r?aura [@istifadəçi]` — İstifadəçinin aurasını yoxlayar\n`r?8ball [sual]` — Sehrli kiber-kürəyə sual ver\n`r?duel [@istifadəçi]` — Biri ilə döyüşə gir\n`r?zar` — Zər atar\n`r?yazıqtura` — Yazı-tura", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS v7.0 Ultimate Core • Tam Hakimiyyət")
+    embed.add_field(
+        name="⚡ 5. Rol və Sistem",
+        value="`r?rolver` / `r?rolal` — Rol idarəsi\n`r?profil` — Hədəf analizi\n`r?server` — Server məlumatı\n`r?guvenlik` — Təhlükəsizlik hesabatı\n`r?ping` — Gecikmə", 
+        inline=False
+    )
+    embed.set_footer(text="Yenilmez OS v8.0 • Tam Hakimiyyət və Əyləncə")
     await ctx.send(embed=embed)
 
 @bot.command(name="guvenlik")
@@ -263,7 +268,7 @@ async def lock(ctx):
         await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
     await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
-    await ctx.send("🔒 Bu kanal kilidləndi. İstifadəçilər mesaj yazabilməz.")
+    await ctx.send("🔒 Bu kanal kilidləndi. Mesaj yazmaq qadağandır.")
 
 @bot.command(name="unlock")
 async def unlock(ctx):
@@ -292,7 +297,45 @@ async def nuke(ctx):
     await new_channel.edit(position=position)
     await new_channel.send("💥 Kanal tamamilə təmizləndi və yenidən quruldu!")
 
-# --- ROL VƏ İSTİFADƏÇİ MƏLUMATLARI ---
+# --- ƏYLƏNCƏ VƏ OYUNLAR (VAXT KİRDİRMƏK ÜÇÜN) ---
+@bot.command(name="aura")
+async def aura(ctx, member: discord.Member = None):
+    member = member or ctx.author
+    faiz = random.randint(10, 100)
+    await ctx.send(f"✨ **{member.name}** istifadəçisinin bu günki Aura / Cool-luk səviyyəsi: **%{faiz}** 🔥")
+
+@bot.command(name="8ball")
+async def eight_ball(ctx, *, question: str):
+    responses = [
+        "Mütləq hə, qardaş.",
+        "Birmənalı olaraq xeyr.",
+        "Gələcək qaranlıqdır, bir də soruş.",
+        "Şübhəsiz ki, belə olacaq.",
+        "Heç vaxt baş verməyəcək.",
+        "Ehtimal yüksəkdir.",
+        "İnanmaq çətindir..."
+    ]
+    await ctx.send(f"🔮 Sual: {question}\n💬 Kiber-Kürənin cavabı: **{random.choice(responses)}**")
+
+@bot.command(name="duel")
+async def duel(ctx, member: discord.Member):
+    if member == ctx.author:
+        await ctx.send("❌ Özünlə döyüşə bilməzsən!")
+        return
+    qalib = random.choice([ctx.author, member])
+    await ctx.send(f"⚔️ Döyüş başladı: **{ctx.author.name}** vs **{member.name}**!\n🏆 Gərgin mübarizədən sonra qalib gəldi: **{qalib.name}** 🎉")
+
+@bot.command(name="zar")
+async def zar(ctx):
+    sayi = random.randint(1, 6)
+    await ctx.send(f"🎲 Zər atıldı: **{sayi}**")
+
+@bot.command(name="yazıqtura")
+async def yazıqtura(ctx):
+    netice = random.choice(["Yazı 🦅", "Tura 🪙"])
+    await ctx.send(f"🪙 Nəticə: **{netice}**")
+
+# --- ROL VƏ MƏLUMAT ---
 @bot.command(name="rolver")
 async def rolver(ctx, member: discord.Member, role: discord.Role):
     if not ctx.author.guild_permissions.manage_roles:
@@ -332,4 +375,4 @@ if token:
     bot.run(token)
 else:
     print("KİBER XƏTA: DISCORD_TOKEN tapılmadı!")
-    
+             
