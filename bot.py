@@ -15,7 +15,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v950 Ultimate aktivdir!"
+    return "Yenilmez OS v1000 Ultimate aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -49,7 +49,7 @@ SPAM_WINDOW = 3.5
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v950 ULTIMATE MASTER AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v1000 ULTIMATE MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
@@ -128,7 +128,7 @@ EMOJI_GRUPLARI = {
     "❤️": ["💖", "💘", "💓", "🖤", "🔥"],
     "💖": ["❤️", "💘", "💓", "✨"],
     "🖤": ["❤️", "🤍", "💜", "🔥"],
-    "💑": ["❤️", "💖", "🔥", "✨"], # Cütlük emojisi
+    "💑": ["❤️", "💖", "🔥", "✨"], 
     "😡": ["🤬", "💢", "👊", "🔥"],
     "🤬": ["😡", "💢", "💀", "🔥"],
     "⚔️": ["🛡️", "🔥", "💀", "🏆", "⚡"],
@@ -139,7 +139,6 @@ EMOJI_GRUPLARI = {
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    # Sənin atdığın VƏ YA botun özünün atdığı reaksiyaları izləməsi üçün:
     if payload.user_id != SAHIB_ID and payload.user_id != bot.user.id:
         return
     
@@ -155,7 +154,6 @@ async def on_raw_reaction_add(payload):
     except:
         return
 
-    # Əgər reaksiya botun özü tərəfindən atılıbsa və təkrar döngüyə (loop) düşməməsi üçündür
     if payload.user_id == bot.user.id:
         return
 
@@ -179,7 +177,7 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 5. MASTER SAHİB PANELİ ---
+# --- 5. MASTER SAHİB PANELİ (GÖZƏL v750 GÖRÜNÜŞÜ) ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -188,13 +186,13 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v950",
+        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v1000",
         description="Serverin idarəetmə mərkəzi və xüsusi səlahiyyətli əmrlər siyahısı:",
         color=0x050505
     )
     embed.add_field(
         name="👑 1. Sizin Xüsusi Sahib Əmrləriniz (Özəl)", 
-        value="• `r?elan [mətn]` — Rəsmi elan atır\n• `r?anket [sual]` — Səsvermə anketi açır\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik vaxtlı çəkiliş (Məs: `r?cekilis 3d Promo Nitro`)", 
+        value="• `r?elan [mətn]` — Rəsmi elan atır (@everyone)\n• `r?anket [sual]` — Serverdə səsvermə anket açır\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik vaxtlı çəkiliş (Məs: `r?cekilis 3d Nitro`)", 
         inline=False
     )
     embed.add_field(
@@ -204,12 +202,12 @@ async def bot_panel(ctx):
     )
     embed.add_field(
         name="🛡️ 3. Sərt Moderasiya & Təhlükəsizlik", 
-        value="• `r?sil [say]` — Mesajları təmizləyər\n• `r?mute [@istifadəçi]` — Susdurar\n• `r?ban [@istifadəçi]` — Qovar\n• `r?lock` / `r?unlock` — Kanalı bağlar/açar", 
+        value="• `r?sil [say]` — Mesajları təmizləyər\n• `r?mute [@istifadəçi]` — İstifadəçini susdurar\n• `r?unmute [@istifadəçi]` — Mute qaldırar\n• `r?ban [@istifadəçi]` — Serverdən qovar\n• `r?kick [@istifadəçi]` — Atar\n• `r?lock` / `r?unlock` — Kanalı bağlar/açar", 
         inline=False
     )
     embed.add_field(
         name="⚔️ 4. Auralı Oyunlar & Sistemlər", 
-        value="• `r?duel [@istifadəçi]` — 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Pul atma\n• `r?hacker [@istifadəçi]` — IP sızma simulyasiyası\n• `r?kasa` — Xəzinə kassası", 
+        value="• `r?duel [@istifadəçi]` — Bəhsə girmə / 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Pul atma oyunu\n• `r?hacker [@istifadəçi]` — Gizli IP sızma simulyasiyası\n• `r?kasa` — Xəzinə kassası", 
         inline=False
     )
     embed.set_footer(text="Yenilmez OS Elite - All Rights Reserved 2026")
@@ -360,11 +358,23 @@ async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
     await member.timeout(timedelta(minutes=dakika))
     await ctx.send(f"🔇 {member.mention} {dakika} dəqiqə mute olundu.")
 
+@bot.command(name="unmute")
+@commands.has_permissions(manage_roles=True)
+async def unmute_cmd(ctx, member: discord.Member):
+    await member.timeout(None)
+    await ctx.send(f"🔊 {member.mention} ün mute olundu (cəza qaldırıldı).")
+
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban_cmd(ctx, member: discord.Member, *, reason=None):
     await member.ban(reason=reason)
     await ctx.send(f"🔨 {member.name} ban olundu!")
+
+@bot.command(name="kick")
+@commands.has_permissions(kick_members=True)
+async def kick_cmd(ctx, member: discord.Member, *, reason=None):
+    await member.kick(reason=reason)
+    await ctx.send(f"👢 {member.name} serverdən atıldı!")
 
 @bot.command(name="lock")
 @commands.has_permissions(manage_channels=True)
@@ -427,4 +437,3 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-        
