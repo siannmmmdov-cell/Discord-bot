@@ -27,8 +27,6 @@ intents.message_content = True
 intents.members = True
 intents.guilds = True
 intents.voice_states = True
-# Qeyd: Onlayn/Oflayn saymaq üçün member intent-lərindən əlavə Discord Developer Portal-da 
-# Server Members Intent (Presence Intent) də aktiv olmalıdır!
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
@@ -151,13 +149,13 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# --- NƏHƏNG MASTER İDARƏETMƏ PANELİ (YALNIZ SƏNİN ÜÇÜN) ---
+# --- NƏHƏNG MASTER İDARƏETMƏ PANELİ ---
 @bot.command(name="bot")
 async def bot_panel(ctx):
     SAHIB_ID = 641014966312501259
     
     if ctx.author.id != SAHIB_ID:
-        return  # Başqası yazanda bot tamamilə susur, heç nə yazmır!
+        return
 
     embed = discord.Embed(
         title="⚡ YENİLMEZ // KİBER-TƏHLÜKƏSİZLİK VƏ İDARƏETMƏ MƏRKƏZİ",
@@ -210,18 +208,23 @@ async def ping(ctx):
     embed = discord.Embed(title="⚡ Sistem Gecikməsi", description=f"Cavab müddəti: `{latency}ms`", color=0x111111)
     await ctx.send(embed=embed)
 
-# --- SƏS ƏMRLƏRİ ---
+# --- SƏS ƏMRLƏRİ (YENİLƏNDİ VƏ TƏKMİLLƏŞDİRİLDİ) ---
 @bot.command(name="qosul")
 async def qosul(ctx):
-    if ctx.author.voice:
-        channel = ctx.author.voice.channel
+    if not ctx.author.voice:
+        await ctx.send("❌ Əvvəlcə səs kanalında olmalısan!")
+        return
+        
+    channel = ctx.author.voice.channel
+    
+    try:
         if ctx.voice_client is not None:
             await ctx.voice_client.move_to(channel)
         else:
             await channel.connect()
         await ctx.send(f"🔊 Əməliyyat kanalına qoşuldum: **{channel.name}**")
-    else:
-        await ctx.send("❌ Əvvəlcə səs kanalında olmalısan!")
+    except Exception as e:
+        await ctx.send(f"❌ Səsə qoşularkən xəta baş verdi: `{e}`")
 
 @bot.command(name="ayril")
 async def ayril(ctx):
@@ -325,7 +328,6 @@ async def say(ctx, status_type: str = None):
     guild = ctx.guild
     
     if status_type and status_type.lower() == "online":
-        # Onlayn olanlar (offline olmayanlar)
         online_count = sum(1 for m in guild.members if m.status != discord.Status.offline)
         embed = discord.Embed(title=f"🟢 Onlayn Üzv Statistikası", color=0x00FF00)
         embed.add_field(name="Onlayn İstifadəçilər", value=f"`{online_count}` nəfər", inline=True)
@@ -333,7 +335,6 @@ async def say(ctx, status_type: str = None):
         await ctx.send(embed=embed)
         
     elif status_type and status_type.lower() == "offline":
-        # Oflayn olanlar
         offline_count = sum(1 for m in guild.members if m.status == discord.Status.offline)
         embed = discord.Embed(title=f"⚫ Oflayn Üzv Statistikası", color=0x555555)
         embed.add_field(name="Oflayn İstifadəçilər", value=f"`{offline_count}` nəfər", inline=True)
@@ -341,7 +342,6 @@ async def say(ctx, status_type: str = None):
         await ctx.send(embed=embed)
         
     else:
-        # Ümumi statistika
         total_members = guild.member_count
         online_count = sum(1 for m in guild.members if m.status != discord.Status.offline)
         offline_count = sum(1 for m in guild.members if m.status == discord.Status.offline)
