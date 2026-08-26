@@ -3,9 +3,30 @@ from discord.ext import commands
 import time
 from datetime import timedelta
 import random
+import os
+from flask import Flask
+from threading import Thread
 
 # ==========================================
-# --- 1. BOTUN SAZLANMALARI VƏ INTENTS ---
+# --- 1. RENDER ÜÇÜN DİNAMİK PORTLU FLASK ---
+# ==========================================
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Yenilmez OS aktivdir və serveri qoruyur!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = Thread(target=run_flask)
+    t.start()
+
+
+# ==========================================
+# --- 2. BOTUN SAZLANMALARI VƏ INTENTS ---
 # ==========================================
 intents = discord.Intents.default()
 intents.message_content = True
@@ -29,13 +50,13 @@ async def on_ready():
     print(f" [X] YENILMEZ OS v350 ULTIMATE MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
-    print(f" [X] Təhlükəsizlik və 70+ Əmr Yükləndi.")
+    print(f" [X] Təhlükəsizlik və Bütün Əmrlər Yükləndi.")
     print(f"==================================================")
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Server Qorunur 🛡️"))
 
 
 # ==========================================
-# --- 2. GÜCLÜ ANTİ-SPAM & ANTI-FLOOD QORUNMASI ---
+# --- 3. GÜCLÜ ANTİ-SPAM & ANTI-FLOOD QORUNMASI ---
 # ==========================================
 @bot.event
 async def on_message(message):
@@ -92,7 +113,7 @@ async def on_message(message):
 
 
 # ==========================================
-# --- 3. MASTER SAHİB PANELİ ---
+# --- 4. MASTER SAHİB PANELİ ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -102,7 +123,7 @@ async def bot_panel(ctx):
 
     embed = discord.Embed(
         title="🛡️ YENİLMEZ OS // SAHİB MASTER PANEL v350",
-        description="Serverin təhlükəsizliyi, səs sistemləri və 70+ əmr aktivdir:",
+        description="Serverin təhlükəsizliyi, səs sistemləri və bütün əmrlər aktivdir:",
         color=0x0b0e14
     )
     embed.add_field(name="👑 Sahib Əmrləri", value="`r?elan [mətn]` — Rəsmi server elanı atır", inline=False)
@@ -123,7 +144,7 @@ async def ping(ctx):
 
 
 # ==========================================
-# --- 4. SƏS KANALI İDARƏETMƏSİ ---
+# --- 5. SƏS KANALI İDARƏETMƏSİ ---
 # ==========================================
 @bot.command(name="join")
 async def join(ctx):
@@ -147,7 +168,7 @@ async def leave(ctx):
 
 
 # ==========================================
-# --- 5. MODERASİYA & TƏHLÜKƏSİZLİK ---
+# --- 6. MODERASİYA & TƏHLÜKƏSİZLİK ---
 # ==========================================
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
@@ -204,7 +225,7 @@ async def elan(ctx, *, elan_metni: str):
 
 
 # ==========================================
-# --- 6. FAL VƏ KAFE SİSTEMİ ---
+# --- 7. FAL VƏ KAFE SİSTEMİ ---
 # ==========================================
 @bot.command(name="fal")
 async def fal(ctx):
@@ -228,7 +249,7 @@ async def yemek(ctx):
 
 
 # ==========================================
-# --- 7. OYUNLAR VƏ ƏYLƏNCƏ ---
+# --- 8. OYUNLAR VƏ ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="yazi_tura")
 async def yazi_tura(ctx):
@@ -274,7 +295,7 @@ async def hacker(ctx, user: discord.Member = None):
 
 
 # ==========================================
-# --- 8. PROFİL VƏ MƏLUMAT ---
+# --- 9. PROFİL VƏ MƏLUMAT ---
 # ==========================================
 @bot.command(name="avatar")
 async def avatar(ctx, member: discord.Member = None):
@@ -292,5 +313,11 @@ async def serverbilgi(ctx):
     embed.add_field(name="📅 Yaradılma Tarixi", value=str(guild.created_at.date()), inline=True)
     await ctx.send(embed=embed)
 
-# bot.run("SƏNİN_BOT_TOKENİN")
-                     
+
+# ==========================================
+# --- 10. BOTUN İŞƏ SALINMASI ---
+# ==========================================
+if __name__ == "__main__":
+    keep_alive()
+    bot.run("BURAYA_TƏZƏ_TOKENİNİ_YAPIŞDIR")
+                    
