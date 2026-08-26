@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez firewall v12.0 [CLEAN]"
+    return "yenilmez firewall v13.0 [CLEAN]"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -149,9 +149,14 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# --- NƏHƏNG MASTER İDARƏETMƏ PANELİ (r?bot) ---
+# --- NƏHƏNG MASTER İDARƏETMƏ PANELİ (YALNIZ SƏNİN ÜÇÜN) ---
 @bot.command(name="bot")
 async def bot_panel(ctx):
+    SAHIB_ID = 641014966312501259
+    
+    if ctx.author.id != SAHIB_ID:
+        return  # Başqası yazanda bot tamamilə susur, heç nə yazmır!
+
     embed = discord.Embed(
         title="⚡ YENİLMEZ // KİBER-TƏHLÜKƏSİZLİK VƏ İDARƏETMƏ MƏRKƏZİ",
         description="Bu server **yenilmez** mərkəzi tərəfindən qorunur. Bütün əmrlər:",
@@ -182,7 +187,7 @@ async def bot_panel(ctx):
         value="`r?rolver` / `r?rolal` — Rol idarəsi\n`r?profil` — Hədəf analizi\n`r?server` — Server məlumatı\n`r?guvenlik` — Təhlükəsizlik hesabatı\n`r?ping` — Gecikmə", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS v12.0 • Peşəkar İdarəetmə Sistemi")
+    embed.set_footer(text="Yenilmez OS • Şəxsi İdarəetmə Paneli")
     await ctx.send(embed=embed)
 
 @bot.command(name="guvenlik")
@@ -381,4 +386,4 @@ if token:
     bot.run(token)
 else:
     print("KİBER XƏTA: DISCORD_TOKEN tapılmadı!")
-    
+        
