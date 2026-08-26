@@ -315,9 +315,10 @@ async def serverbilgi(ctx):
 
 
 # ==========================================
-# --- 10. BOTUN İŞƏ SALINMASI ---
+# --- 10. BOTUN GİZLİ TOKENLƏ İŞƏ SALINMASI ---
 # ==========================================
 if __name__ == "__main__":
     keep_alive()
-    bot.run("BURAYA_TƏZƏ_TOKENİNİ_YAPIŞDIR")
-                    
+    token = os.environ.get("TOKEN")
+    bot.run(token)
+    
