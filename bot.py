@@ -293,4 +293,4 @@ async def serverbilgi(ctx):
     await ctx.send(embed=embed)
 
 # bot.run("SƏNİN_BOT_TOKENİN")
-
+                     
