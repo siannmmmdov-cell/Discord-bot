@@ -15,7 +15,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v1000 Ultimate aktivdir!"
+    return "Yenilmez OS v1050 Ultimate aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -35,6 +35,7 @@ intents.members = True
 intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
+intents.presences = True # Üzvlərin aktivlik statusunu görmək üçün vacibdir
 
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
@@ -49,7 +50,7 @@ SPAM_WINDOW = 4.0
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v1000 ULTIMATE MASTER AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v1050 ULTIMATE MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
@@ -76,7 +77,6 @@ async def on_message(message):
         spam_records[author_id] = {"last_time": current_time, "warns": 0}
     else:
         data = spam_records[author_id]
-        # Qısa müddət içində (4 saniyə) atılan ardıcıl mesajlar (randomlar daxil) spam sayılır
         if current_time - data["last_time"] < SPAM_WINDOW:
             data["last_time"] = current_time
             
@@ -95,13 +95,12 @@ async def on_message(message):
                 try:
                     await message.author.timeout(timedelta(minutes=5), reason="Spam / Random")
                     await message.channel.send(f"🔇 {message.author.mention}, spam/random cəhdinə görə 5 dəqiqəlik mute olundun!", delete_after=5)
-                    data["warns"] = 0 # Sıfırlayırıq
+                    data["warns"] = 0 
                 except:
                     pass
             return
         else:
             data["last_time"] = current_time
-            # Vaxt keçibsə xəbərdarlıq sayını yavaş-yavaş azaldırıq
             if data["warns"] > 0:
                 data["warns"] -= 1
 
@@ -181,7 +180,7 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 5. MASTER SAHİB PANELİ (TƏMİZLƏNMİŞ GÖRÜNÜŞ) ---
+# --- 5. MASTER SAHİB PANELİ (YENİLƏNMİŞ) ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -190,28 +189,33 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v1000",
+        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v1050",
         description="Serverin idarəetmə mərkəzi və xüsusi səlahiyyətli əmrlər siyahısı:",
         color=0x050505
     )
     embed.add_field(
         name="👑 1. Sizin Xüsusi Sahib Əmrləriniz (Özəl)", 
-        value="• `r?elan [mətn]` — Rəsmi elan atır\n• `r?anket [sual]` — Serverdə səsvermə anket açır\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik vaxtlı çəkiliş (Məs: `r?cekilis 3d Nitro`)", 
+        value="• `r?elan [mətn]` — Rəsmi elan atır\n• `r?anket [sual]` — Serverdə səsvermə anket açır\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik vaxtlı çəkiliş", 
         inline=False
     )
     embed.add_field(
-        name="🔊 2. Səs Sistemi İdarəsi", 
+        name="📊 2. Server & Məlumat Sistemləri", 
+        value="• `r?server` — Server haqqında ətraflı məlumat və aktiv üzvlər", 
+        inline=False
+    )
+    embed.add_field(
+        name="🔊 3. Səs Sistemi İdarəsi", 
         value="• `r?join` — Səs kanalına qoşular\n• `r?leave` — Səs kanalından ayrılar", 
         inline=False
     )
     embed.add_field(
-        name="🛡️ 3. Sərt Moderasiya & Təhlükəsizlik", 
-        value="• `r?sil [say]` — Mesajları təmizləyər\n• `r?mute [@istifadəçi]` — İstifadəçini susdurar\n• `r?unmute [@istifadəçi]` — Mute qaldırar\n• `r?ban [@istifadəçi]` — Serverdən qovar\n• `r?kick [@istifadəçi]` — Atar\n• `r?lock` / `r?unlock` — Kanalı bağlar/açar", 
+        name="🛡️ 4. Sərt Moderasiya & Təhlükəsizlik", 
+        value="• `r?sil [say]` — Mesajları təmizləyər\n• `r?mute / r?unmute` — Susdurma əməliyyatları\n• `r?ban / r?kick` — Qovma əməliyyatları\n• `r?lock / r?unlock` — Kanalı bağlar/açar", 
         inline=False
     )
     embed.add_field(
-        name="⚔️ 4. Oyunlar & Əyləncə", 
-        value="• `r?duel [@istifadəçi]` — Bəhsə girmə / 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Pul atma oyunu\n• `r?hacker [@istifadəçi]` — Gizli IP sızma simulyasiyası\n• `r?kasa` — Xəzinə kassası", 
+        name="⚔️ 5. Oyunlar & Əyləncə", 
+        value="• `r?duel` • `r?coinflip` • `r?hacker` • `r?kasa`", 
         inline=False
     )
     embed.set_footer(text="Yenilmez OS Elite - All Rights Reserved 2026")
@@ -219,7 +223,7 @@ async def bot_panel(ctx):
 
 
 # ==========================================
-# --- 6. ÜMUMI ƏMRLƏR ---
+# --- 6. ÜMUMI ƏMRLƏR & SERVER MƏLUMAT (r?server) ---
 # ==========================================
 @bot.command(name="salam")
 async def salam(ctx):
@@ -228,6 +232,53 @@ async def salam(ctx):
 @bot.command(name="ping")
 async def ping(ctx):
     await ctx.send(f"⚡ Ping: **{round(bot.latency * 1000)}ms**")
+
+@bot.command(name="server", aliases=["serverinfo", "bilgi"])
+async def server_info(ctx):
+    guild = ctx.guild
+    
+    # Üzvlərin statuslarına görə sayılması
+    online_count = sum(1 for m in guild.members if m.status == discord.Status.online)
+    idle_count = sum(1 for m in guild.members if m.status == discord.Status.idle)
+    dnd_count = sum(1 for m in guild.members if m.status == discord.Status.dnd)
+    offline_count = sum(1 for m in guild.members if m.status == discord.Status.offline)
+    
+    embed = discord.Embed(
+        title=f"🛡️ {guild.name} — Server Haqqında Məlumat",
+        color=0x050505
+    )
+    
+    if guild.icon:
+        embed.set_thumbnail(url=guild.icon.url)
+        
+    embed.add_field(
+        name="👑 Server Sahib", 
+        value=f"{guild.owner.mention if guild.owner else 'Naməlum'}", 
+        inline=True
+    )
+    embed.add_field(
+        name="📅 Yaradılma Tarixi", 
+        value=f"<t:{int(guild.created_at.timestamp())}:R>", 
+        inline=True
+    )
+    embed.add_field(
+        name="👥 Toplam Üzv Sayı", 
+        value=f"**{guild.member_count}** nəfər", 
+        inline=True
+    )
+    embed.add_field(
+        name="🟢 Aktiv Üzvlər (Statuslar)", 
+        value=f"🟢 Online: **{online_count}**\n🌙 Boşda (Idle): **{idle_count}**\n🔴 Narahat Etməyin (DND): **{dnd_count}**\n⚪ Offline: **{offline_count}**", 
+        inline=False
+    )
+    embed.add_field(
+        name="💬 Kanal Məlumatları", 
+        value=f"📁 Kateqoriyalar: {len(guild.categories)}\n💬 Mətn Kanalları: {len(guild.text_channels)}\n🔊 Səs Kanalları: {len(guild.voice_channels)}", 
+        inline=False
+    )
+    
+    embed.set_footer(text=f"Sorğulayan: {ctx.author.name} | Yenilmez OS System", icon_url=ctx.author.display_avatar.url)
+    await ctx.send(embed=embed)
 
 
 # ==========================================
@@ -298,7 +349,7 @@ async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
         elif vaxt_str.endswith("d"):
             saniye = int(vaxt_str[:-1]) * 86400
         else:
-            await ctx.send("⚠️ Vaxt formatı səhvdir! Məsələn: `r?cekilis 3d Promo Nitro` (d=gün, h=saat, m=dəqiqə)")
+            await ctx.send("⚠️ Vaxt formatı səhvdir! Məsələn: `r?cekilis 3d Promo Nitro`")
             return
     except:
         await ctx.send("⚠️ Vaxtı düzgün daxil edin! Məsələn: `3d`, `2h`, `30m`")
@@ -314,7 +365,6 @@ async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
     msg = await ctx.send(embed=embed)
     await msg.add_reaction("🎁")
 
-    # Vaxtın bitməsini gözləyir
     await asyncio.sleep(saniye)
 
     try:
@@ -331,7 +381,7 @@ async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
             break
 
     if not istirakcilar:
-        no_user_embed = discord.Embed(title="🎉 ÇƏKİLİŞ BİTDİ", description=f"Hədiyyə: **{hediyye}**\n\n⚠️ Təəssüf ki, heç kim 🎁 reaksiyasına basmadığı üçün qalib seçilmədi!", color=0x050505)
+        no_user_embed = discord.Embed(title="🎉 ÇƏKİLİŞ BİTDİ", description=f"Hədiyyə: **{hediyye}**\n\n⚠️ Heç kim 🎁 reaksiyasına basmadığı üçün qalib seçilmədi!", color=0x050505)
         await ctx.send(embed=no_user_embed)
         return
 
@@ -441,3 +491,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
+    
