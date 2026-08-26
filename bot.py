@@ -38,7 +38,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v30.0 [ADVANCED GIVEAWAY & MIRROR SYSTEM] - Online"
+    return "Yenilmez OS v31.0 [STRICT OWNER EXCLUSIVE SUITE] - Online"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -54,7 +54,7 @@ intents.message_content = True
 intents.members = True
 intents.guilds = True
 intents.voice_states = True
-intents.reactions = True  # Reaksiyaları izləmək üçün vacibdir
+intents.reactions = True
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
@@ -68,7 +68,7 @@ SAHIB_ID = 641014966312501259
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ [YENİLMEZ OS v30]: Çekiliş və Reaksiya Aynalama sistemləri aktivdir -> {bot.user.name}')
+    print(f'🛡️ [YENİLMEZ OS v31]: Sahibə özəl çekiliş və anket sistemləri aktivdir -> {bot.user.name}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="r?yardim | Server Qorunur"))
 
 # ==========================================
@@ -78,7 +78,6 @@ async def on_ready():
 async def on_reaction_add(reaction, user):
     if user.bot:
         return
-    # Kim reaksiya atırsa atsın, bot da həmin mesaja həmin emojini əlavə edir
     try:
         await reaction.message.add_reaction(reaction.emoji)
     except:
@@ -208,17 +207,17 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="🛡️ YENİLMEZ OS // SAHİB MASTER PANEL v30",
-        description="Serverin idarəetməsi, təhlükəsizliyi və inkişaf etmiş sistemlər:",
+        title="🛡️ YENİLMEZ OS // SAHİB MASTER PANEL v31",
+        description="Serverin idarəetməsi, təhlükəsizliyi və xüsusi sahib əmrləri:",
         color=0x0b0e14
     )
     
     embed.add_field(
-        name="📢 Elan & İnkişaf Etmiş Çekiliş",
+        name="👑 Sahibə Özəl Alətlər (Yalnız Sən Edə Bilərsən)",
         value=(
             "`r?elan [mətn]` — Rəsmi server elanı atır\n"
-            "`r?cekilis [vaxt] [hədiyyə]` — Məs: `r?cekilis 2d 5h Nitro` (d=gün, h=saat, m=dəq, s=san)\n"
-            "`r?sorğu [sual]` — Anket/sorğu açır"
+            "`r?çekiliş / r?cekilis [vaxt] [hədiyyə]` — Məs: `r?çekiliş 1d 5h Nitro`\n"
+            "`r?anket / r?sorğu [sual]` — Anket açır"
         ),
         inline=False
     )
@@ -245,7 +244,7 @@ async def bot_panel(ctx):
         inline=False
     )
     
-    embed.set_footer(text="Yenilmez OS v30.0 • Advanced Giveaway & Mirror Suite")
+    embed.set_footer(text="Yenilmez OS v31.0 • Strict Owner Exclusive Suite")
     await ctx.send(embed=embed)
 
 @bot.command(name="yardim")
@@ -257,18 +256,18 @@ async def yardim(ctx):
     )
     embed.add_field(
         name="Komandalar", 
-        value="`r?bot`, `r?elan`, `r?cekilis`, `r?sorğu`, `r?sil`, `r?ban`, `r?kick`, `r?mute`, `r?lock`, `r?unlock`, `r?nuke`, `r?white`, `r?black`, `r?server`, `r?profil`, `r?avatar`, `r?ping`, `r?cuzdan`, `r?rusruleti`, `r?qosul`, `r?ayril`, `r?afk`", 
+        value="`r?bot`, `r?elan`, `r?çekiliş`, `r?anket`, `r?sil`, `r?ban`, `r?kick`, `r?mute`, `r?lock`, `r?unlock`, `r?nuke`, `r?white`, `r?black`, `r?server`, `r?profil`, `r?avatar`, `r?ping`, `r?cuzdan`, `r?rusruleti`, `r?qosul`, `r?ayril`, `r?afk`", 
         inline=False
     )
     await ctx.send(embed=embed)
 
 # ==========================================
-# ELAN VƏ GÜN/SAATLI ÇEKİLİŞ SİSTEMİ
+# SAHİBƏ ÖZƏL: ELAN, ÇEKİLİŞ VƏ ANKET SİSTEMLƏRİ
 # ==========================================
 @bot.command(name="elan")
 async def elan(ctx, *, text):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        await ctx.send("❌ Səlahiyyətin çatmır.")
+    if ctx.author.id != SAHIB_ID:
+        await ctx.send("❌ Bu əmri yalnız botun sahibi istifadə edə bilər!")
         return
     try: await ctx.message.delete()
     except: pass
@@ -277,13 +276,12 @@ async def elan(ctx, *, text):
     embed.set_footer(text=f"Elan edən: {ctx.author.name}", icon_url=ctx.author.avatar.url if ctx.author.avatar else ctx.author.default_avatar.url)
     await ctx.send(embed=embed)
 
-@bot.command(name="cekilis")
+@bot.command(name="çekiliş", aliases=["cekilis"])
 async def cekilis(ctx, time_str: str, *, prize):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        await ctx.send("❌ Səlahiyyətin yoxdur.")
+    if ctx.author.id != SAHIB_ID:
+        await ctx.send("❌ Çekilişi yalnız botun sahibi başlada bilər!")
         return
 
-    # Vaxtın təhlili (d = gün, h = saat, m = dəqiqə, s = saniyə)
     seconds = 0
     match_d = re.search(r'(\d+)d', time_str)
     match_h = re.search(r'(\d+)h', time_str)
@@ -296,11 +294,10 @@ async def cekilis(ctx, time_str: str, *, prize):
     if match_s: seconds += int(match_s.group(1))
 
     if seconds == 0:
-        # Əgər sadəcə rəqəm yazılıbsa, birbaşa saniyə kimi qəbul etsin
         try:
             seconds = int(time_str)
         except:
-            await ctx.send("❌ Xəta! Vaxtı düzgün qeyd et. Məsələn: `r?cekilis 1d 5h 30m Discord Nitro` və ya sadəcə `r?cekilis 60 Nitro`")
+            await ctx.send("❌ Xəta! Vaxtı düzgün qeyd et. Məsələn: `r?çekiliş 1d 5h 30m Nitro` və ya `r?çekiliş 60 Nitro`")
             return
 
     embed = discord.Embed(title="🎉 ÇEKİLİŞ BAŞLADI! 🎉", description=f"Hədiyyə: **{prize}**\nQatılmaq üçün 🎁 emojisinə toxun!", color=0xffd700)
@@ -320,12 +317,14 @@ async def cekilis(ctx, time_str: str, *, prize):
     else:
         await ctx.send("😢 Heç kim qatılmadı.")
 
-@bot.command(name="sorğu")
-async def sorgu(ctx, *, question):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+@bot.command(name="anket", aliases=["sorğu"])
+async def anket(ctx, *, question):
+    if ctx.author.id != SAHIB_ID:
+        await ctx.send("❌ Anketləri yalnız botun sahibi aça bilər!")
         return
     try: await ctx.message.delete()
     except: pass
+    
     embed = discord.Embed(title="📊 SERVER ANKETİ", description=question, color=0x00ffff)
     embed.set_footer(text=f"Sorğunu açan: {ctx.author.name}")
     msg = await ctx.send(embed=embed)
@@ -448,7 +447,7 @@ async def avatar(ctx, member: discord.Member = None):
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
-async def ping(ctx):
+async def ping(ctx: commands.Context):
     await ctx.send(f"⚡ Gecikmə: {round(bot.latency * 1000)}ms")
 
 @bot.command(name="cuzdan")
@@ -490,4 +489,4 @@ async def afk(ctx, *, reason="Səbəb yoxdur"):
 token = os.environ.get("DISCORD_TOKEN")
 if token: bot.run(token)
 else: print("XƏTA: DISCORD_TOKEN tapılmadı!")
-        
+    
