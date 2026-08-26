@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez firewall v13.0 [CLEAN]"
+    return "yenilmez firewall v14.0 [CLEAN]"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -27,6 +27,8 @@ intents.message_content = True
 intents.members = True
 intents.guilds = True
 intents.voice_states = True
+# Qeyd: Onlayn/Oflayn saymaq üçün member intent-lərindən əlavə Discord Developer Portal-da 
+# Server Members Intent (Presence Intent) də aktiv olmalıdır!
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
@@ -179,7 +181,7 @@ async def bot_panel(ctx):
     )
     embed.add_field(
         name="🛠️ 4. Faydalı Alətlər və Özəlliklər",
-        value="`r?afk [səbəb]` — AFK rejiminə keç\n`r?avatar [@istifadəçi]` — Profil şəklini göstər\n`r?yaz [mətn]` — Bot vasitəsilə elan yaz\n`r?say` — Serverin üzv statistikasını göstər", 
+        value="`r?afk [səbəb]` — AFK rejiminə keç\n`r?avatar [@istifadəçi]` — Profil şəklini göstər\n`r?yaz [mətn]` — Bot vasitəsilə elan yaz\n`r?say` / `r?say online` / `r?say offline` — Üzv statistikası", 
         inline=False
     )
     embed.add_field(
@@ -317,7 +319,40 @@ async def nuke(ctx):
     await new_channel.edit(position=position)
     await new_channel.send("💥 Kanal tamamilə təmizləndi və yenidən quruldu!")
 
-# --- FAYDALI ƏMRLƏR ---
+# --- FAYDALI ƏMRLƏR (SAY, ONLINE, OFFLINE) ---
+@bot.command(name="say")
+async def say(ctx, status_type: str = None):
+    guild = ctx.guild
+    
+    if status_type and status_type.lower() == "online":
+        # Onlayn olanlar (offline olmayanlar)
+        online_count = sum(1 for m in guild.members if m.status != discord.Status.offline)
+        embed = discord.Embed(title=f"🟢 Onlayn Üzv Statistikası", color=0x00FF00)
+        embed.add_field(name="Onlayn İstifadəçilər", value=f"`{online_count}` nəfər", inline=True)
+        embed.set_footer(text=guild.name, icon_url=guild.icon.url if guild.icon else None)
+        await ctx.send(embed=embed)
+        
+    elif status_type and status_type.lower() == "offline":
+        # Oflayn olanlar
+        offline_count = sum(1 for m in guild.members if m.status == discord.Status.offline)
+        embed = discord.Embed(title=f"⚫ Oflayn Üzv Statistikası", color=0x555555)
+        embed.add_field(name="Oflayn İstifadəçilər", value=f"`{offline_count}` nəfər", inline=True)
+        embed.set_footer(text=guild.name, icon_url=guild.icon.url if guild.icon else None)
+        await ctx.send(embed=embed)
+        
+    else:
+        # Ümumi statistika
+        total_members = guild.member_count
+        online_count = sum(1 for m in guild.members if m.status != discord.Status.offline)
+        offline_count = sum(1 for m in guild.members if m.status == discord.Status.offline)
+        
+        embed = discord.Embed(title=f"📊 Server Statistikası", color=0x111111)
+        embed.add_field(name="Ümumi Üzv", value=total_members, inline=True)
+        embed.add_field(name="Onlayn", value=online_count, inline=True)
+        embed.add_field(name="Oflayn", value=offline_count, inline=True)
+        embed.set_footer(text=guild.name, icon_url=guild.icon.url if guild.icon else None)
+        await ctx.send(embed=embed)
+
 @bot.command(name="afk")
 async def afk(ctx, *, reason="Səbəb qeyd edilməyib"):
     afk_users[ctx.author.id] = reason
@@ -337,14 +372,6 @@ async def yaz(ctx, *, mesaj: str):
         return
     await ctx.message.delete()
     await ctx.send(f"📢 **Elan:** {mesaj}")
-
-@bot.command(name="say")
-async def say(ctx):
-    guild = ctx.guild
-    embed = discord.Embed(title=f"📊 Server Statistikası", color=0x111111)
-    embed.add_field(name="Ümumi Üzv", value=guild.member_count, inline=True)
-    embed.set_footer(text=guild.name, icon_url=guild.icon.url if guild.icon else None)
-    await ctx.send(embed=embed)
 
 # --- ROL VƏ MƏLUMAT ---
 @bot.command(name="rolver")
@@ -386,4 +413,4 @@ if token:
     bot.run(token)
 else:
     print("KİBER XƏTA: DISCORD_TOKEN tapılmadı!")
-        
+    
