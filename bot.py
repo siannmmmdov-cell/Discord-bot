@@ -29,7 +29,7 @@ intents.guilds = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Spam və flood izləmə sistemləri
+# Spam və flood izləmə lüğəti
 spam_tracker = {}
 
 @bot.event
@@ -53,7 +53,7 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # Adminda olanlara qoruma qadağaları şamil olunmur
+    # Adminlərə heç bir qoruma məhdudiyyəti düşmür
     if message.author.guild_permissions.administrator:
         await bot.process_commands(message)
         return
@@ -61,7 +61,7 @@ async def on_message(message):
     content = message.content
     lower_content = content.lower()
 
-    # 1. Salamlaşma Sistemi (Daha səliqəli, "qardaş" sözü olmadan və server adına özəl)
+    # 1. Salamlaşma Sistemi (Rəsmi və təmiz)
     words = lower_content.split()
     salam_sozleri = ["salam", "salamun aleykum", "sa", "as", "slm", "səlam"]
     if any(word in salam_sozleri for word in words):
@@ -112,17 +112,19 @@ async def on_message(message):
             except:
                 pass
 
-    # 5. Ağıllı Flood / Spam Qoruması (Sürətli mesaj yazanda 5 dəqiqəlik mute)
+    # 5. Ağıllı Basqın və Flood Qoruması (+100000000 gücləndirilmiş, amma dostlara toxunmayan)
     author_id = message.author.id
     current_time = time.time()
 
     if author_id not in spam_tracker:
         spam_tracker[author_id] = []
 
+    # Son 3 saniyə içində yazılan mesajları izləyirik
     spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 3]
     spam_tracker[author_id].append(current_time)
 
-    if len(spam_tracker[author_id]) > 5:
+    # Əgər kimsə 3 saniyə içində 6-dan ÇOX mesaj yazarsa (həqiqi basqın/spam halı)
+    if len(spam_tracker[author_id]) > 6:
         spam_tracker[author_id].clear()
         try:
             await message.delete()
@@ -131,8 +133,8 @@ async def on_message(message):
 
         try:
             duration = timedelta(minutes=5)
-            await message.author.timeout(duration, reason="Həddindən artıq sürətli mesaj yazmaq (Spam)")
-            await message.channel.send(f"🔇 **{message.author.mention}** çox sürətli mesaj yazdığı üçün 5 dəqiqəlik susduruldu.")
+            await message.author.timeout(duration, reason="Həddindən artıq sürətli mesaj (Spam/Basqın)")
+            await message.channel.send(f"🔇 **{message.author.mention}** çatı spam etdiyi üçün 5 dəqiqəlik susduruldu.")
         except:
             pass
         return
@@ -147,7 +149,7 @@ async def yardim(ctx):
         description="Server tam təhlükəsizlik altındadır! Bütün əmrlər aşağıdadır:",
         color=discord.Color.gold()
     )
-    embed.add_field(name="🛡️ Təhlükəsizlik və Qoruma", value="Avtomatik Salam, Link, Spam/Flood Mute, Caps Lock qoruması aktivdir.", inline=False)
+    embed.add_field(name="🛡️ Təhlükəsizlik və Qoruma", value="Avtomatik Salam, Link, Spam Mute, Caps Lock qoruması aktivdir.", inline=False)
     embed.add_field(name="⚡ Moderasiya", value="`!sil [say]`, `!ban [@istifadəçi]`, `!at [@istifadəçi]`, `!mute [@istifadəçi] [dəqiqə]`", inline=False)
     embed.add_field(name="🎮 Oyunlar və Əyləncə", value="`!ping`, `!zar`, `!yazıqtura`, `!zarafat`, `!sunucukoru`", inline=False)
     await ctx.send(embed=embed)
@@ -160,7 +162,7 @@ async def sunucukoru(ctx):
         color=discord.Color.blue()
     )
     embed.add_field(name="Status", value="✅ Aktiv və İşlək", inline=True)
-    embed.add_field(name="Qorunan Sahələr", value="Link, Reklam, Spam/Flood (Mute sistemi), Caps Lock, İcazəsiz Botlar", inline=False)
+    embed.add_field(name="Qorunan Sahələr", value="Link, Reklam, Ağır Spam/Flood (Mute sistemi), Caps Lock, İcazəsiz Botlar", inline=False)
     embed.set_footer(text="Gecə-gündüz serverin güvəndədir!")
     await ctx.send(embed=embed)
 
@@ -270,4 +272,4 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
-                    
+    
