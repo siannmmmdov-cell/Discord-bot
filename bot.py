@@ -41,10 +41,10 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 # Yalnız sənin ID-n (Master Sahib)
 SAHIB_ID = 641014966312501259
 
-# Güclü Anti-Spam Bazası
+# Gücləndirilmiş Anti-Spam və Random/Simvol Qorunması
 spam_records = {}
-SPAM_THRESHOLD = 3      
-SPAM_WINDOW = 3.5       
+SPAM_THRESHOLD = 2      
+SPAM_WINDOW = 4.0       
 
 @bot.event
 async def on_ready():
@@ -57,13 +57,14 @@ async def on_ready():
 
 
 # ==========================================
-# --- 3. GÜCLÜ ANTİ-SPAM QORUNMASI ---
+# --- 3. GÜCLƏNDİRİLMİŞ ANTİ-SPAM & RANDOM QORUNMASI ---
 # ==========================================
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
 
+    # Adminlər və Sahib bu qorunmadan azaddır
     if message.author.guild_permissions.administrator or message.author.id == SAHIB_ID:
         await bot.process_commands(message)
         return
@@ -72,11 +73,11 @@ async def on_message(message):
     author_id = message.author.id
 
     if author_id not in spam_records:
-        spam_records[author_id] = {"count": 1, "last_time": current_time, "warns": 0}
+        spam_records[author_id] = {"last_time": current_time, "warns": 0}
     else:
         data = spam_records[author_id]
+        # Qısa müddət içində (4 saniyə) atılan ardıcıl mesajlar (randomlar daxil) spam sayılır
         if current_time - data["last_time"] < SPAM_WINDOW:
-            data["count"] += 1
             data["last_time"] = current_time
             
             try:
@@ -87,19 +88,22 @@ async def on_message(message):
             data["warns"] += 1
             if data["warns"] == 1:
                 try:
-                    await message.channel.send(f"⚠️ {message.author.mention}, spam etmə!", delete_after=4)
+                    await message.channel.send(f"⚠️ {message.author.mention}, random və ya sürətli mesaj (spam) yazmaq qadağandır!", delete_after=4)
                 except:
                     pass
             elif data["warns"] >= 2:
                 try:
-                    await message.author.timeout(timedelta(minutes=5), reason="Spam")
-                    await message.channel.send(f"🔇 {message.author.mention}, 5 dəqiqəlik mute!", delete_after=5)
+                    await message.author.timeout(timedelta(minutes=5), reason="Spam / Random")
+                    await message.channel.send(f"🔇 {message.author.mention}, spam/random cəhdinə görə 5 dəqiqəlik mute olundun!", delete_after=5)
+                    data["warns"] = 0 # Sıfırlayırıq
                 except:
                     pass
             return
         else:
-            data["count"] = 1
             data["last_time"] = current_time
+            # Vaxt keçibsə xəbərdarlıq sayını yavaş-yavaş azaldırıq
+            if data["warns"] > 0:
+                data["warns"] -= 1
 
     await bot.process_commands(message)
 
@@ -177,7 +181,7 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 5. MASTER SAHİB PANELİ (GÖZƏL v750 GÖRÜNÜŞÜ) ---
+# --- 5. MASTER SAHİB PANELİ (TƏMİZLƏNMİŞ GÖRÜNÜŞ) ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -192,7 +196,7 @@ async def bot_panel(ctx):
     )
     embed.add_field(
         name="👑 1. Sizin Xüsusi Sahib Əmrləriniz (Özəl)", 
-        value="• `r?elan [mətn]` — Rəsmi elan atır (@everyone)\n• `r?anket [sual]` — Serverdə səsvermə anket açır\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik vaxtlı çəkiliş (Məs: `r?cekilis 3d Nitro`)", 
+        value="• `r?elan [mətn]` — Rəsmi elan atır\n• `r?anket [sual]` — Serverdə səsvermə anket açır\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik vaxtlı çəkiliş (Məs: `r?cekilis 3d Nitro`)", 
         inline=False
     )
     embed.add_field(
@@ -206,7 +210,7 @@ async def bot_panel(ctx):
         inline=False
     )
     embed.add_field(
-        name="⚔️ 4. Auralı Oyunlar & Sistemlər", 
+        name="⚔️ 4. Oyunlar & Əyləncə", 
         value="• `r?duel [@istifadəçi]` — Bəhsə girmə / 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Pul atma oyunu\n• `r?hacker [@istifadəçi]` — Gizli IP sızma simulyasiyası\n• `r?kasa` — Xəzinə kassası", 
         inline=False
     )
@@ -390,7 +394,7 @@ async def unlock(ctx):
 
 
 # ==========================================
-# --- 10. OYUNLAR & MƏLUMAT ---
+# --- 10. OYUNLAR & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
