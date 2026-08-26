@@ -319,6 +319,6 @@ async def serverbilgi(ctx):
 # ==========================================
 if __name__ == "__main__":
     keep_alive()
-    token = os.environ.get("TOKEN")
+    token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-    
+        
