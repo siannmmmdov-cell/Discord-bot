@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez firewall v8.0 [SECURE & FUN]"
+    return "yenilmez firewall v10.0 [ULTRA_SECURE]"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -31,11 +31,13 @@ intents.voice_states = True
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
 spam_tracker = {}
+afk_users = {}
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ YENİLMEZ KİBER & ƏYLƏNCƏ ŞƏBƏKƏSİ AKTİVDİR: {bot.user.name}')
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Şəbəkə və Əyləncə nəzarətdə | r?bot"))
+    print(f'🛡️ YENİLMEZ KİBER ŞƏBƏKƏ AKTİVDİR: {bot.user.name}')
+    # Profilin altında görünəcək auralı kiber status
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="root@yenilmez:~# secure_core active"))
 
 @bot.event
 async def on_member_join(member):
@@ -52,6 +54,22 @@ async def on_member_join(member):
 async def on_message(message):
     if message.author.bot:
         return
+
+    # AFK Sistem yoxlaması
+    if message.author.id in afk_users:
+        del afk_users[message.author.id]
+        try:
+            await message.channel.send(f"Welcome back, {message.author.mention}! AFK rejimindən çıxdın.", delete_after=5)
+        except:
+            pass
+
+    for mention in message.mentions:
+        if mention.id in afk_users:
+            reason = afk_users[mention.id]
+            try:
+                await message.channel.send(f"💤 **{mention.name}** şu an AFK-dır. Səbəb: `{reason}`")
+            except:
+                pass
 
     if message.author.guild_permissions.administrator:
         await bot.process_commands(message)
@@ -98,7 +116,7 @@ async def on_message(message):
         except:
             pass
 
-    # 4. Caps Lock (Həddindən artıq səs-küy) Filtri
+    # 4. Caps Lock Filtri
     if len(content) > 8:
         uppercase_count = sum(1 for c in content if c.isupper())
         if uppercase_count / len(content) > 0.7:
@@ -111,7 +129,7 @@ async def on_message(message):
             except:
                 pass
 
-    # 5. Bloklanmış Sürətli Spam / Flood Müdafiəsi (Normal istifadəçiyə toxunmur, yalnız saniyədə 5+ mesajı vurur)
+    # 5. Sürətli Spam / Flood Müdafiəsi
     author_id = message.author.id
     current_time = time.time()
 
@@ -138,7 +156,7 @@ async def on_message(message):
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="⚡ YENİLMEZ // KİBER-TƏHLÜKƏSİZLİK VƏ ƏYLƏNCƏ MƏRKƏZİ",
+        title="⚡ YENİLMEZ // KİBER-TƏHLÜKƏSİZLİK VƏ İDARƏETMƏ MƏRKƏZİ",
         description="Bu server **yenilmez** mərkəzi tərəfindən qorunur. Bütün əmrlər:",
         color=0x050505
     )
@@ -158,8 +176,8 @@ async def bot_panel(ctx):
         inline=False
     )
     embed.add_field(
-        name="🎮 4. Əyləncə və Vaxt Keçirmək Üçün",
-        value="`r?aura [@istifadəçi]` — İstifadəçinin aurasını yoxlayar\n`r?8ball [sual]` — Sehrli kiber-kürəyə sual ver\n`r?duel [@istifadəçi]` — Biri ilə döyüşə gir\n`r?zar` — Zər atar\n`r?yazıqtura` — Yazı-tura", 
+        name="🛠️ 4. Faydalı Alətlər və Özəlliklər",
+        value="`r?afk [səbəb]` — AFK rejiminə keç\n`r?avatar [@istifadəçi]` — Profil şəklini göstər\n`r?yaz [mətn]` — Bot vasitəsilə elan yaz\n`r?say` — Serverin üzv statistikasını göstər", 
         inline=False
     )
     embed.add_field(
@@ -167,7 +185,7 @@ async def bot_panel(ctx):
         value="`r?rolver` / `r?rolal` — Rol idarəsi\n`r?profil` — Hədəf analizi\n`r?server` — Server məlumatı\n`r?guvenlik` — Təhlükəsizlik hesabatı\n`r?ping` — Gecikmə", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS v8.0 • Tam Hakimiyyət və Əyləncə")
+    embed.set_footer(text="Yenilmez OS v10.0 • Peşəkar İdarəetmə Sistemi")
     await ctx.send(embed=embed)
 
 @bot.command(name="guvenlik")
@@ -297,43 +315,34 @@ async def nuke(ctx):
     await new_channel.edit(position=position)
     await new_channel.send("💥 Kanal tamamilə təmizləndi və yenidən quruldu!")
 
-# --- ƏYLƏNCƏ VƏ OYUNLAR (VAXT KİRDİRMƏK ÜÇÜN) ---
-@bot.command(name="aura")
-async def aura(ctx, member: discord.Member = None):
+# --- FAYDALI ƏMRLƏR ---
+@bot.command(name="afk")
+async def afk(ctx, *, reason="Səbəb qeyd edilməyib"):
+    afk_users[ctx.author.id] = reason
+    await ctx.send(f"💤 **{ctx.author.name}**, artıq AFK-san. Səbəb: `{reason}`")
+
+@bot.command(name="avatar")
+async def avatar(ctx, member: discord.Member = None):
     member = member or ctx.author
-    faiz = random.randint(10, 100)
-    await ctx.send(f"✨ **{member.name}** istifadəçisinin bu günki Aura / Cool-luk səviyyəsi: **%{faiz}** 🔥")
+    embed = discord.Embed(title=f"🖼️ {member.name} - Profil Şəkli", color=0x111111)
+    embed.set_image(url=member.avatar.url if member.avatar else member.default_avatar.url)
+    await ctx.send(embed=embed)
 
-@bot.command(name="8ball")
-async def eight_ball(ctx, *, question: str):
-    responses = [
-        "Mütləq hə, qardaş.",
-        "Birmənalı olaraq xeyr.",
-        "Gələcək qaranlıqdır, bir də soruş.",
-        "Şübhəsiz ki, belə olacaq.",
-        "Heç vaxt baş verməyəcək.",
-        "Ehtimal yüksəkdir.",
-        "İnanmaq çətindir..."
-    ]
-    await ctx.send(f"🔮 Sual: {question}\n💬 Kiber-Kürənin cavabı: **{random.choice(responses)}**")
-
-@bot.command(name="duel")
-async def duel(ctx, member: discord.Member):
-    if member == ctx.author:
-        await ctx.send("❌ Özünlə döyüşə bilməzsən!")
+@bot.command(name="yaz")
+async def yaz(ctx, *, mesaj: str):
+    if not ctx.author.guild_permissions.manage_messages:
+        await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
-    qalib = random.choice([ctx.author, member])
-    await ctx.send(f"⚔️ Döyüş başladı: **{ctx.author.name}** vs **{member.name}**!\n🏆 Gərgin mübarizədən sonra qalib gəldi: **{qalib.name}** 🎉")
+    await ctx.message.delete()
+    await ctx.send(f"📢 **Elan:** {mesaj}")
 
-@bot.command(name="zar")
-async def zar(ctx):
-    sayi = random.randint(1, 6)
-    await ctx.send(f"🎲 Zər atıldı: **{sayi}**")
-
-@bot.command(name="yazıqtura")
-async def yazıqtura(ctx):
-    netice = random.choice(["Yazı 🦅", "Tura 🪙"])
-    await ctx.send(f"🪙 Nəticə: **{netice}**")
+@bot.command(name="say")
+async def say(ctx):
+    guild = ctx.guild
+    embed = discord.Embed(title=f"📊 Server Statistikası", color=0x111111)
+    embed.add_field(name="Ümumi Üzv", value=guild.member_count, inline=True)
+    embed.set_footer(text=guild.name, icon_url=guild.icon.url if guild.icon else None)
+    await ctx.send(embed=embed)
 
 # --- ROL VƏ MƏLUMAT ---
 @bot.command(name="rolver")
@@ -375,4 +384,4 @@ if token:
     bot.run(token)
 else:
     print("KİBER XƏTA: DISCORD_TOKEN tapılmadı!")
-             
+        
