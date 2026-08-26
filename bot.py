@@ -39,6 +39,22 @@ async def on_ready():
     print(f"👑 KRAL BOT AKTİVDİR VƏ QORUYUR: {bot.user.name}")
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Server Qorunur | !yardim"))
 
+
+# --- YENİ: İCAZƏSİZ BOT GİRİŞİNİN QARŞISINI ALAN SİSTEM ---
+@bot.event
+async def on_member_join(member):
+    if member.bot:
+        # Bura yalnız sənin botunun ID-si daxildir. Başqa kimsə bot gətirsə avtomatik qovulacaq.
+        icazeli_bot_idleri = [bot.user.id]
+        
+        if member.id not in icazeli_bot_idleri:
+            try:
+                await member.kick(reason="İcazəsiz bot girişinə qadağa qoyulub!")
+                print(f"🚨 İcazəsiz bot aşkarlandı və qovuldu: {member.name} (ID: {member.id})")
+            except Exception as e:
+                print(f"Botu qovmaq mümkün olmadı: {e}")
+
+
 # --- GÜVƏNLİK, SALAMLAMA VƏ QORUMA SİSTEMİ ---
 @bot.event
 async def on_message(message):
@@ -141,7 +157,7 @@ async def yardim(ctx):
         description="Server tam güvənlik altındadır, qaqaş! Bütün əmrlər `!` ilə işləyir:",
         color=discord.Color.gold()
     )
-    embed.add_field(name="🛡️ Güvənlik və Qoruma", value="• Avtomatik Salamlama sistemi\n• Reklam/Link qoruması\n• @everyone qoruması\n• Caps Lock qoruması\n• 5 mesaj flood qoruması + Timeout", inline=False)
+    embed.add_field(name="🛡️ Güvənlik və Qoruma", value="• Avtomatik Salamlama sistemi\n• Reklam/Link qoruması\n• @everyone qoruması\n• Caps Lock qoruması\n• İcazəsiz Bot Giriş Qadağası\n• 5 mesaj flood qoruması + Timeout", inline=False)
     embed.add_field(name="🧹 Moderasiya", value="• `!sil [say]` - Mesajları təmizləyir\n• `!ban [@istifadəçi]` - Ban edir\n• `!mute [@istifadəçi] [dəqiqə]` - Susdurur\n• `!sunucukoru` - Qoruma statusunu yoxlayır", inline=False)
     embed.add_field(name="🎮 Oyunlar və Əyləncə", value="• `!ping` - Gecikməni yoxlayır\n• `!zar` - Zər atır\n• `!zarafat` - Lətifələr deyir\n• `!yaziqtura` - Yazı-Tura oyunu oynayır\n• `!salam`, `!sa`, `!slm` - Salamlaşma əmrləri", inline=False)
     await ctx.send(embed=embed)
@@ -154,7 +170,7 @@ async def sunucukoru(ctx):
         color=discord.Color.blue()
     )
     embed.add_field(name="Status", value="✅ Aktiv və İşlək", inline=True)
-    embed.add_field(name="Qorunan Sahələr", value="Link, Reklam, Flood, Caps Lock, Everyone", inline=True)
+    embed.add_field(name="Qorunan Sahələr", value="Link, Reklam, Flood, Caps Lock, Yad Botlar", inline=True)
     embed.set_footer(text="Gecə-gündüz serverin güvəndədir!")
     await ctx.send(embed=embed)
 
