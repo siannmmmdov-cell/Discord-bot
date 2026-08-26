@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez firewall v6.0 tam güclə işləyir [SECURE_CORE]"
+    return "yenilmez firewall v7.0 tam güclə işləyir [ULTRA_SECURE]"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -34,8 +34,8 @@ spam_tracker = {}
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ YENİLMEZ KİBER-ŞƏBƏKƏ AKTİVDİR: {bot.user.name}')
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Kanal trafikinə nəzarət edilir | r?bot"))
+    print(f'🛡️ YENİLMEZ ULTRA KİBER-ŞƏBƏKƏ AKTİVDİR: {bot.user.name}')
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Bütün server nəzarət altındadır | r?bot"))
 
 @bot.event
 async def on_member_join(member):
@@ -138,31 +138,31 @@ async def on_message(message):
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="⚡ YENİLMEZ // NƏHƏNG KİBER-TƏHLÜKƏSİZLİK MƏRKƏZİ",
-        description="Bu server **yenilmez** mərkəzi mühafizə sistemi tərəfindən idarə olunur. Bütün alt sistemlər tam güclə işləyir:",
+        title="⚡ YENİLMEZ // ULTRA KİBER-TƏHLÜKƏSİZLİK MƏRKƏZİ",
+        description="Bu server **yenilmez** mərkəzi mühafizə sistemi tərəfindən idarə olunur. Bütün səlahiyyətli əmrlər:",
         color=0x050505
     )
     embed.add_field(
         name="🛡️ 1. Firewall və Müdafiə Divarları",
-        value="• **Avtomatik Sərt Salamlama**: İzləmə protokolu aktiv\n• **Qlobal Link / Reklam Filtri**: Sıfır tolerans siyasəti\n• **Massive Ping Qoruması**: @everyone / @here bloku\n• **Ağıllı Spam & Flood Əngəli**: 10 dəqiqəlik avtomatik təcrid\n• **Bot İnyeksiya Bloku**: İcazəsiz botların dərhal qovulması", 
+        value="• Avtomatik Sərt Salamlama\n• Qlobal Link / Reklam Filtri\n• @everyone / @here Bloku\n• Ağıllı Spam & 10 Dəqiqəlik Təcrid\n• İcazəsiz Botların Avtomatik Qovulması", 
         inline=False
     )
     embed.add_field(
-        name="🎧 2. Səs Şəbəkəsi və Trafik İdarəetməsi",
-        value="`r?qosul` — Əməliyyat səs kanalına qoşular\n`r?ayril` — Səs şəbəkəsindən bağlantını kəsər", 
+        name="🎧 2. Səs Şəbəkəsi İdarəetməsi",
+        value="`r?qosul` — Səs kanalına qoşular\n`r?ayril` — Səs kanalından ayrılar", 
         inline=False
     )
     embed.add_field(
-        name="⚔️ 3. Sərt Moderasiya Protokolları",
-        value="`r?sil [say]` — Ərazidəki izləri təmizləyər\n`r?ban [@istifadəçi]` — Şəbəkədən tamamilə silər\n`r?at [@istifadəçi]` — Ərazidən uzaqlaşdırar\n`r?mute [@istifadəçi] [dəqiqə]` — Səsini 100% kəsər\n`r?lock` — Kanalı ümumi trafikə bağlayar\n`r?unlock` — Kanalın kilidini açar\n`r?slowmode [saniyə]` — Trafiki məhdudlaşdırar", 
+        name="⚔️ 3. Ağır Moderasiya & Kanal Əmrləri",
+        value="`r?sil [say]` — Mesajları təmizləyər\n`r?ban [@istifadəçi]` — Serverdən qovar\n`r?unban [ID]` — Banı qaldırar\n`r?at [@istifadəçi]` — Kick edər\n`r?mute [@istifadəçi] [dəqiqə]` — Timeout verər\n`r?unmute [@istifadəçi]` — Timeoutu qaldırar\n`r?lock` — Kanalı kilidləyər (yazmağı bağlayar)\n`r?unlock` — Kanalın kilidini açar\n`r?slowmode [saniyə]` — Yavaş rejim\n`r?nuke` — Kanalı təmizləyib yenidən qurar", 
         inline=False
     )
     embed.add_field(
-        name="📊 4. Sistem Diaqnostikası və Hədəf Analizi",
-        value="`r?guvenlik` — Şəbəkə təhlükəsizlik hesabatı\n`r?profil [@istifadəçi]` — İstifadəçi hədəf analizi\n`r?server` — Server qovşaq məlumatları\n`r?ping` — Əlaqə gecikmə yoxlaması", 
+        name="⚡ 4. Rol və İstifadəçi İdarəsi",
+        value="`r?rolver [@istifadəçi] [@rol]` — İstifadəçiyə rol verər\n`r?rolal [@istifadəçi] [@rol]` — İstifadəçidən rol alar\n`r?profil [@istifadəçi]` — Hədəf analizi\n`r?server` — Server məlumatı\n`r?guvenlik` — Təhlükəsizlik hesabatı\n`r?ping` — Gecikmə yoxlaması", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS v6.0 Advanced Core • Bütün hüquqlar qorunur.")
+    embed.set_footer(text="Yenilmez OS v7.0 Ultimate Core • Tam Hakimiyyət")
     await ctx.send(embed=embed)
 
 @bot.command(name="guvenlik")
@@ -175,7 +175,6 @@ async def guvenlik(ctx):
     embed.add_field(name="Firewall Statusu", value="🟢 Mühafizə Aktiv", inline=True)
     embed.add_field(name="Şifrələmə", value="256-bit AES", inline=True)
     embed.add_field(name="Gecikmə", value=f"`{round(bot.latency * 1000)}ms`", inline=True)
-    embed.add_field(name="Aktiv Modullar", value="5 / 5 Qoruma Qatışığı İşləkdə", inline=False)
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
@@ -195,43 +194,51 @@ async def qosul(ctx):
             await channel.connect()
         await ctx.send(f"🔊 Əməliyyat kanalına qoşuldum: **{channel.name}**")
     else:
-        await ctx.send("❌ Əvvəlcə hər hansı bir səs kanalında olmalısan!")
+        await ctx.send("❌ Əvvəlcə səs kanalında olmalısan!")
 
 @bot.command(name="ayril")
 async def ayril(ctx):
     if ctx.voice_client:
         await ctx.voice_client.disconnect()
-        await ctx.send("🔇 Səs kanalından ayrıldım, ərazi tərk edildi.")
+        await ctx.send("🔇 Səs kanalından ayrıldım.")
     else:
         await ctx.send("❌ Bot heç bir səs kanalında deyil.")
 
-# --- CİDDİ MODERASİYA ƏMRLƏRİ ---
+# --- KANAL VƏ MODERASİYA ƏMRLƏRİ ---
 @bot.command(name="sil")
 async def sil(ctx, amount: int = 10):
     if not ctx.author.guild_permissions.manage_messages:
-        await ctx.send("❌ Bu əmr üçün səlahiyyətin çatmır.")
+        await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
-    if amount > 100:
-        amount = 100
+    if amount > 100: amount = 100
     await ctx.channel.purge(limit=amount + 1)
-    msg = await ctx.send(f"🗑️ `{amount}` ədəd iz silindi.")
+    msg = await ctx.send(f"🗑️ `{amount}` ədəd mesaj silindi.")
     await msg.delete(delay=3)
 
 @bot.command(name="ban")
-async def ban(ctx, member: discord.Member, *, reason="Səbəb göstərilməyib"):
+async def ban(ctx, member: discord.Member, *, reason="Səbəb yoxdur"):
     if not ctx.author.guild_permissions.ban_members:
         await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
     await member.ban(reason=reason)
-    await ctx.send(f"🔨 **{member.mention}** şəbəkədən tamamilə silindi. Səbəb: {reason}")
+    await ctx.send(f"🔨 **{member.mention}** serverdən ban olundu. Səbəb: {reason}")
+
+@bot.command(name="unban")
+async def unban(ctx, user_id: int):
+    if not ctx.author.guild_permissions.ban_members:
+        await ctx.send("❌ Səlahiyyətin yoxdur.")
+        return
+    user = await bot.fetch_user(user_id)
+    await ctx.guild.unban(user)
+    await ctx.send(f"🔓 **{user.name}** istifadəçisinin banı qaldırıldı.")
 
 @bot.command(name="at")
-async def at(ctx, member: discord.Member, *, reason="Səbəb göstərilməyib"):
+async def at(ctx, member: discord.Member, *, reason="Səbəb yoxdur"):
     if not ctx.author.guild_permissions.kick_members:
         await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
     await member.kick(reason=reason)
-    await ctx.send(f"👢 **{member.mention}** ərazidən qovuldu. Səbəb: {reason}")
+    await ctx.send(f"👢 **{member.mention}** qovuldu. Səbəb: {reason}")
 
 @bot.command(name="mute")
 async def mute(ctx, member: discord.Member, minutes: int = 5, *, reason="Səbəb yoxdur"):
@@ -240,7 +247,15 @@ async def mute(ctx, member: discord.Member, minutes: int = 5, *, reason="Səbəb
         return
     duration = timedelta(minutes=minutes)
     await member.timeout(duration, reason=reason)
-    await ctx.send(f"🔇 **{member.mention}** `{minutes}` dəqiqə müddətinə susduruldu.")
+    await ctx.send(f"🔇 **{member.mention}** {minutes} dəqiqə susduruldu.")
+
+@bot.command(name="unmute")
+async def unmute(ctx, member: discord.Member):
+    if not ctx.author.guild_permissions.moderate_members:
+        await ctx.send("❌ Səlahiyyətin yoxdur.")
+        return
+    await member.timeout(None)
+    await ctx.send(f"🔊 **{member.mention}** istifadəçisinin susdurulması qaldırıldı.")
 
 @bot.command(name="lock")
 async def lock(ctx):
@@ -248,7 +263,7 @@ async def lock(ctx):
         await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
     await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
-    await ctx.send("🔒 Bu kanal müvəqqəti olaraq kilidləndi. Yazmaq qadağandır.")
+    await ctx.send("🔒 Bu kanal kilidləndi. İstifadəçilər mesaj yazabilməz.")
 
 @bot.command(name="unlock")
 async def unlock(ctx):
@@ -256,7 +271,7 @@ async def unlock(ctx):
         await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
     await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
-    await ctx.send("🔓 Kanalın kilidi açıldı. Trafik bərpa olundu.")
+    await ctx.send("🔓 Kanalın kilidi açıldı. Yazmaq sərbəstdir.")
 
 @bot.command(name="slowmode")
 async def slowmode(ctx, seconds: int = 0):
@@ -264,9 +279,36 @@ async def slowmode(ctx, seconds: int = 0):
         await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
     await ctx.channel.edit(slowmode_delay=seconds)
-    await ctx.send(f"⏱️ Kanal yavaş rejimə keçirildi: `{seconds}` saniyə.")
+    await ctx.send(f"⏱️ Yavaş rejim: `{seconds}` saniyə olaraq tənzimləndi.")
 
-# --- MƏLUMAT VƏ ANALİZ ---
+@bot.command(name="nuke")
+async def nuke(ctx):
+    if not ctx.author.guild_permissions.manage_channels:
+        await ctx.send("❌ Səlahiyyətin yoxdur.")
+        return
+    position = ctx.channel.position
+    new_channel = await ctx.channel.clone(reason="Kanal nukes edildi")
+    await ctx.channel.delete()
+    await new_channel.edit(position=position)
+    await new_channel.send("💥 Kanal tamamilə təmizləndi və yenidən quruldu!")
+
+# --- ROL VƏ İSTİFADƏÇİ MƏLUMATLARI ---
+@bot.command(name="rolver")
+async def rolver(ctx, member: discord.Member, role: discord.Role):
+    if not ctx.author.guild_permissions.manage_roles:
+        await ctx.send("❌ Səlahiyyətin yoxdur.")
+        return
+    await member.add_roles(role)
+    await ctx.send(f"✅ **{member.mention}** istifadəçisinə **{role.name}** rolu verildi.")
+
+@bot.command(name="rolal")
+async def rolal(ctx, member: discord.Member, role: discord.Role):
+    if not ctx.author.guild_permissions.manage_roles:
+        await ctx.send("❌ Səlahiyyətin yoxdur.")
+        return
+    await member.remove_roles(role)
+    await ctx.send(f"❌ **{member.mention}** istifadəçisindən **{role.name}** rolu alındı.")
+
 @bot.command(name="profil")
 async def profil(ctx, member: discord.Member = None):
     member = member or ctx.author
@@ -290,4 +332,4 @@ if token:
     bot.run(token)
 else:
     print("KİBER XƏTA: DISCORD_TOKEN tapılmadı!")
-
+    
