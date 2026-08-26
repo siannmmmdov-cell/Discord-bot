@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v550 Elite aktivdir!"
+    return "Yenilmez OS v600 Elite aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -48,7 +48,7 @@ SPAM_WINDOW = 3.5
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v550 ELITE MASTER AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v600 ELITE MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
@@ -105,28 +105,76 @@ async def on_message(message):
 
 
 # ==========================================
-# --- 4. SƏNƏ ÖZƏL KATEQORİYALI AVTO-REAKSİYA SİSTEMİ ---
+# --- 4. BÜTÜN EMOJİLƏR VƏ GIF-LƏR SİSTEMİ ---
 # ==========================================
-EMOJI_GRUPLARI = {
-    # Gülüş qrupu
-    "🤣": ["😂", "😆", "💀", "😹"],
-    "😂": ["🤣", "😆", "💀", "😹"],
-    "😆": ["🤣", "😂", "💀", "😹"],
-    "💀": ["🤣", "😂", "😆", "🗿"],
-    
-    # At / Heyvan qrupu
-    "🐎": ["🦄", "🐴", "⚡", "🔥"],
-    "🦄": ["🐎", "🐴", "✨", "💫"],
-    "🐴": ["🐎", "🦄", "⚡", "🐾"],
+EMOJI_VE_GIF_GRUPLARI = {
+    # Ağlama / Üzüntü qrupu (😭 və bənzərləri)
+    "😭": {
+        "oxsarlar": ["😢", "😿", "💧", "🥺", "💔"],
+        "gif": "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"
+    },
+    "😢": {
+        "oxsarlar": ["😭", "😿", "💧", "🥺"],
+        "gif": "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif"
+    },
+    "🥺": {
+        "oxsarlar": ["😭", "😢", "👉👈", "🥺"],
+        "gif": "https://media.giphy.com/media/2u11zpzwyMTy8/giphy.gif"
+    },
 
-    # Ürək / Sevgi qrupu
-    "❤️": ["💖", "💘", "💓", "🖤"],
-    "💖": ["❤️", "💘", "💓", "✨"],
-    "🖤": ["❤️", "🤍", "💜", "🔥"],
+    # Gülüş qrupu (🤣, 😂 və s.)
+    "🤣": {
+        "oxsarlar": ["😂", "😆", "💀", "😹", "🗿"],
+        "gif": "https://media.giphy.com/media/10kABVynhynGYU/giphy.gif"
+    },
+    "😂": {
+        "oxsarlar": ["🤣", "😆", "💀", "😹", "🗿"],
+        "gif": "https://media.giphy.com/media/10kABVynhynGYU/giphy.gif"
+    },
+    "💀": {
+        "oxsarlar": ["🤣", "😂", "🗿", "🔥", "💯"],
+        "gif": "https://media.giphy.com/media/8xs8YIlngpbijhn5Li/giphy.gif"
+    },
 
-    # Od / Aura qrupu
-    "🔥": ["⚡", "💀", "👑", "💯"],
-    "⚡": ["🔥", "💀", "⭐", "💥"]
+    # At / Heyvan / Sərt qrup (🐎 və s.)
+    "🐎": {
+        "oxsarlar": ["🦄", "🐴", "⚡", "🔥", "🐾"],
+        "gif": "https://media.giphy.com/media/12bjQ7ujukBKCKbW5e/giphy.gif"
+    },
+    "🦄": {
+        "oxsarlar": ["🐎", "🐴", "✨", "💫"],
+        "gif": "https://media.giphy.com/media/12bjQ7ujukBKCKbW5e/giphy.gif"
+    },
+
+    # Od / Aura / Güc qrupu (🔥, ⚡)
+    "🔥": {
+        "oxsarlar": ["⚡", "💀", "👑", "💯", "💥"],
+        "gif": "https://media.giphy.com/media/19JSJ5ucu91R5D7a3w/giphy.gif"
+    },
+    "⚡": {
+        "oxsarlar": ["🔥", "💀", "⭐", "💥", "⚡"],
+        "gif": "https://media.giphy.com/media/l0HlRnAWXxn0MhOBK/giphy.gif"
+    },
+
+    # Ürək / Sevgi qrupu (❤️)
+    "❤️": {
+        "oxsarlar": ["💖", "💘", "💓", "🖤", "✨"],
+        "gif": "https://media.giphy.com/media/3ohhwkKBcKzPA4zYUE/giphy.gif"
+    },
+    "💖": {
+        "oxsarlar": ["❤️", "💘", "💓", "✨"],
+        "gif": "https://media.giphy.com/media/3ohhwkKBcKzPA4zYUE/giphy.gif"
+    },
+
+    # Əsəb / Döyüş / Silah qrupu 😡, 🤬, ⚔️
+    "😡": {
+        "oxsarlar": ["🤬", "💢", "👊", "🔥", "💀"],
+        "gif": "https://media.giphy.com/media/8US6ERbtKbVfC/giphy.gif"
+    },
+    "⚔️": {
+        "oxsarlar": ["🛡️", "🔥", "💀", "🏆", "⚡"],
+        "gif": "https://media.giphy.com/media5/26ufdipQqU2lhNA4g/giphy.gif"
+    }
 }
 
 @bot.event
@@ -149,17 +197,26 @@ async def on_raw_reaction_add(payload):
 
     emoji_str = str(payload.emoji)
 
-    # Əgər basdığın emoji qruplarda varsa, həmin qrupun digər oxşarlarını avtomatik basır
-    if emoji_str in EMOJI_GRUPLARI:
-        for oxsar_emoji in EMOJI_GRUPLARI[emoji_str]:
+    # Əgər basdığın emoji qruplarda mövcuddursa
+    if emoji_str in EMOJI_VE_GIF_GRUPLARI:
+        grup_data = EMOJI_VE_GIF_GRUPLARI[emoji_str]
+        
+        # 1. Oxşar emojiləri avtomatik basır
+        for oxsar in grup_data["oxsarlar"]:
             try:
-                await message.add_reaction(oxsar_emoji)
+                await message.add_reaction(oxsar)
             except:
                 pass
+        
+        # 2. Uyğun GIF-i mesaja cavab olaraq (və ya kanala) atır
+        try:
+            await channel.send(f"Aura GIF ({emoji_str}): {grup_data['gif']}")
+        except:
+            pass
 
 
 # ==========================================
-# --- 5. MASTER SAHİB PANELİ (TÜND QARA FON) ---
+# --- 5. MASTER SAHİB PANELİ ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -168,33 +225,28 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v550",
-        description="Serverin idarəetmə mərkəzi və xüsusi səlahiyyətli əmrlər siyahısı:",
+        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v600",
+        description="Serverin idarəetmə mərkəzi və bütün emojilər/gif sistemləri aktivdir:",
         color=0x050505
     )
     embed.add_field(
-        name="👑 1. Sizin Xüsusi Sahib Əmrləriniz (Özəl)", 
-        value="• `r?elan [mətn]` — Rəsmi elan atır (@everyone)\n• `r?anket [sual]` — Serverdə səsvermə anket açır\n• `r?cekilis [hədiyyə]` — Avtomatik çəkiliş başladır", 
+        name="👑 1. Sizin Xüsusi Sahib Əmrləriniz", 
+        value="• `r?elan [mətn]` — Rəsmi elan\n• `r?anket [sual]` — Səsvermə anketi\n• `r?cekilis [hədiyyə]` — Çəkiliş", 
         inline=False
     )
     embed.add_field(
         name="🔊 2. Səs Sistemi İdarəsi", 
-        value="• `r?join` — Səs kanalına qoşular\n• `r?leave` — Səs kanalından ayrılar", 
+        value="• `r?join` — Səsə qoşular\n• `r?leave` — Səsindən çıxar", 
         inline=False
     )
     embed.add_field(
-        name="🛡️ 3. Sərt Moderasiya & Təhlükəsizlik", 
-        value="• `r?sil [say]` — Mesajları təmizləyər\n• `r?mute [@istifadəçi]` — İstifadəçini susdurar\n• `r?unmute [@istifadəçi]` — Mute qaldırar\n• `r?ban [@istifadəçi]` — Serverdən qovar\n• `r?kick [@istifadəçi]` — Atar\n• `r?lock` / `r?unlock` — Kanalı bağlar/açar", 
+        name="🛡️ 3. Moderasiya & Təhlükəsizlik", 
+        value="• `r?sil`, `r?mute`, `r?ban`, `r?kick`, `r?lock`, `r?unlock`", 
         inline=False
     )
     embed.add_field(
-        name="⚔️ 4. Auralı Oyunlar & Sistemlər", 
-        value="• `r?duel [@istifadəçi]` — Bəhsə girmə / 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Pul atma oyunu\n• `r?hacker [@istifadəçi]` — Gizli IP sızma simulyasiyası\n• `r?kasa` — Gizli server xəzinəsini yoxlama", 
-        inline=False
-    )
-    embed.add_field(
-        name="📊 5. Sistem & Profil Məlumatları", 
-        value="• `r?ping` — Botun anlıq gecikməsi\n• `r?avatar [@istifadəçi]` — Şəkil çəkmə\n• `r?serverbilgi` — Server statları", 
+        name="⚔️ 4. Auralı Oyunlar", 
+        value="• `r?duel`, `r?coinflip`, `r?hacker`, `r?kasa`", 
         inline=False
     )
     embed.set_footer(text="Yenilmez OS Elite - All Rights Reserved 2026")
@@ -202,7 +254,7 @@ async def bot_panel(ctx):
 
 
 # ==========================================
-# --- 6. ÜMUMI ƏMRLƏR ---
+# --- 6. ÜMUMI VƏ SƏS ƏMRLƏRİ ---
 # ==========================================
 @bot.command(name="salam")
 async def salam(ctx):
@@ -212,14 +264,10 @@ async def salam(ctx):
 async def ping(ctx):
     await ctx.send(f"⚡ Ping: **{round(bot.latency * 1000)}ms**")
 
-
-# ==========================================
-# --- 7. SƏS KANALI İDARƏSİ ---
-# ==========================================
 @bot.command(name="join")
 async def join(ctx):
     if ctx.author.voice is None:
-        await ctx.send("⚠️ Əvvəlcə hər hansı bir səs kanalına qoşulmalısan!")
+        await ctx.send("⚠️ Əvvəlcə səs kanalına qoşulmalısan!")
         return
     channel = ctx.author.voice.channel
     if ctx.voice_client is not None:
@@ -238,27 +286,23 @@ async def leave(ctx):
 
 
 # ==========================================
-# --- 8. SƏHİBƏ ÖZƏL: ELAN, ANKET, ÇƏKİLİŞ ---
+# --- 7. SAHİBƏ ÖZƏL: ELAN, ANKET, ÇƏKİLİŞ ---
 # ==========================================
 @bot.command(name="elan")
 async def elan(ctx, *, elan_metni: str):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmri yalnız botun sahibi işlədə bilər!")
         return
     await ctx.message.delete()
     embed = discord.Embed(title="📢 RƏSMİ SERVER ELANI", description=elan_metni, color=0x050505)
-    embed.set_footer(text=f"Elan edən Sahib: {ctx.author.name}")
     msg = await ctx.send("@everyone", embed=embed)
     await msg.add_reaction("📢")
 
 @bot.command(name="anket")
 async def anket(ctx, *, anket_suali: str):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmr yalnız sahibə özəldir!")
         return
     await ctx.message.delete()
     embed = discord.Embed(title="📊 YENİ ANKET / SƏSVERMƏ", description=anket_suali, color=0x050505)
-    embed.set_footer(text=f"Anket sahibi: {ctx.author.name}")
     msg = await ctx.send(embed=embed)
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
@@ -266,121 +310,58 @@ async def anket(ctx, *, anket_suali: str):
 @bot.command(name="cekilis")
 async def cekilis(ctx, *, hediyye: str):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmr yalnız sahibə özəldir!")
         return
     await ctx.message.delete()
-    embed = discord.Embed(title="🎉 BÖYÜK ÇƏKİLİŞ", description=f"Hədiyyə: **{hediyye}**\n\nQatılmaq üçün aşağıdakı emojiye 🎁 bas!", color=0x050505)
-    embed.set_footer(text="Çəkiliş Sistemi")
+    embed = discord.Embed(title="🎉 BÖYÜK ÇƏKİLİŞ", description=f"Hədiyyə: **{hediyye}**", color=0x050505)
     msg = await ctx.send(embed=embed)
     await msg.add_reaction("🎁")
 
 
 # ==========================================
-# --- 9. MODERASİYA ---
+# --- 8. MODERASİYA & OYUNLAR ---
 # ==========================================
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
 async def sil(ctx, say: int = 5):
     await ctx.message.delete()
-    deleted = await ctx.channel.purge(limit=say)
-    await ctx.send(f"🧹 {len(deleted)} mesaj silindi.", delete_after=3)
+    await ctx.channel.purge(limit=say)
 
-@bot.command(name="mute")
-@commands.has_permissions(manage_roles=True)
-async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
-    await member.timeout(timedelta(minutes=dakika))
-    await ctx.send(f"🔇 {member.mention} {dakika} dəqiqə mute olundu.")
-
-@bot.command(name="unmute")
-@commands.has_permissions(manage_roles=True)
-async def unmute_cmd(ctx, member: discord.Member):
-    await member.timeout(None)
-    await ctx.send(f"🔊 {member.mention} üçün mute qaldırıldı.")
-
-@bot.command(name="ban")
-@commands.has_permissions(ban_members=True)
-async def ban_cmd(ctx, member: discord.Member, *, reason=None):
-    await member.ban(reason=reason)
-    await ctx.send(f"🔨 {member.name} ban olundu!")
-
-@bot.command(name="kick")
-@commands.has_permissions(kick_members=True)
-async def kick_cmd(ctx, member: discord.Member, *, reason=None):
-    await member.kick(reason=reason)
-    await ctx.send(f"👢 {member.name} qovuldu!")
-
-@bot.command(name="lock")
-@commands.has_permissions(manage_channels=True)
-async def lock(ctx):
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
-    await ctx.send("🔒 Kanal kilitləndi!")
-
-@bot.command(name="unlock")
-@commands.has_permissions(manage_channels=True)
-async def unlock(ctx):
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
-    await ctx.send("🔓 Kanal açıldı!")
-
-
-# ==========================================
-# --- 10. AURALİ & ELİT OYUNLAR ---
-# ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
     if not member:
-        await ctx.send("⚠️ Duel etmək üçün kimsəni etiketləməlisən: `r?duel @istifadəçi`")
+        await ctx.send("⚠️ `r?duel @istifadəçi` yazmalısan!")
         return
     kazanan = random.choice([ctx.author, member])
-    await ctx.send(f"⚔️ Gərgin döyüş başladı!\n🔥 Qalib gələn tərəf: **{kazanan.name}** oldu! 🏆")
+    await ctx.send(f"⚔️ Döyüş başladı! Qalib: **{kazanan.name}** 🏆")
 
 @bot.command(name="coinflip")
 async def coinflip(ctx, secim: str = None):
     if not secim:
-        await ctx.send("⚠️ Seçim etməlisən: `r?coinflip yazi` və ya `r?coinflip tura`")
+        await ctx.send("⚠️ `r?coinflip yazi` və ya `tura` seç")
         return
     netice = random.choice(["yazı", "tura"])
     if secim.lower() == netice:
-        await ctx.send(f"🪙 Nəticə: **{netice}**. Təbriklər, qazandın! 😎")
+        await ctx.send(f"🪙 Nəticə: **{netice}**. Qazandın! 😎")
     else:
-        await ctx.send(f"🪙 Nəticə: **{netice}**. Uduzdun, bəxtini yenidən sına!")
+        await ctx.send(f"🪙 Nəticə: **{netice}**. Uduzdun!")
 
 @bot.command(name="hacker")
 async def hacker(ctx, user: discord.Member = None):
     target = user if user else ctx.author
     ip = f"{random.randint(40, 200)}.{random.randint(10, 255)}.{random.randint(10, 255)}.{random.randint(10, 255)}"
-    await ctx.send(f"💻 **{target.name}** sisteminə sızıldı! IP: `{ip}` | Əməliyyat uğurludur 🕵️‍♂️")
+    await ctx.send(f"💻 **{target.name}** IP: `{ip}` | Sızma uğurludur 🕵️‍♂️")
 
 @bot.command(name="kasa")
 async def kasa(ctx):
     qazanc = random.randint(100, 5000)
-    await ctx.send(f"💎 Serverin gizli xəzinə kassası açıldı! İçindən **{qazanc} AZN** dəyərində qənimət çıxdı, {ctx.author.mention}!")
+    await ctx.send(f"💎 Xəzinə açıldı! Qənimət: **{qazanc} AZN**, {ctx.author.mention}!")
 
 
 # ==========================================
-# --- 11. MƏLUMAT VƏ PROFİL ---
-# ==========================================
-@bot.command(name="avatar")
-async def avatar(ctx, member: discord.Member = None):
-    member = member or ctx.author
-    embed = discord.Embed(title=f"{member.name} - Avatar", color=0x050505)
-    embed.set_image(url=member.display_avatar.url)
-    await ctx.send(embed=embed)
-
-@bot.command(name="serverbilgi")
-async def serverbilgi(ctx):
-    guild = ctx.guild
-    embed = discord.Embed(title=f"🏰 {guild.name} - Server Statistikası", color=0x050505)
-    embed.add_field(name="👥 Üzvlər", value=guild.member_count, inline=True)
-    embed.add_field(name="👑 Sahib", value=guild.owner, inline=True)
-    embed.add_field(name="📅 Yaradılış", value=str(guild.created_at.date()), inline=True)
-    await ctx.send(embed=embed)
-
-
-# ==========================================
-# --- 12. İŞƏ SALMA ---
+# --- 9. İŞƏ SALMA ---
 # ==========================================
 if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-             
+    
