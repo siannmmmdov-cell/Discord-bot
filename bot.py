@@ -39,7 +39,7 @@ async def on_ready():
     print(f"👑 KRAL BOT AKTİVDİR VƏ QORUYUR: {bot.user.name}")
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Server Qorunur | !yardim"))
 
-# --- +1000000 GÜVƏNLİK, SALAMLAMA VƏ QORUMA SİSTEMİ ---
+# --- GÜVƏNLİK, SALAMLAMA VƏ QORUMA SİSTEMİ ---
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -53,12 +53,12 @@ async def on_message(message):
     content = message.content
     lower_content = content.lower()
 
-    # 1. Salamlaşma Sistemi (Kim salam verəndə bot cavab verir)
+    # 1. Salamlaşma Sistemi (Söz olaraq yazanda)
     salam_sozleri = ["salam", "salamun aleykum", "sa", "as", "heykəl", "hey", "merhaba", "sabahın xeyir", "axşamınız xeyir"]
     if any(s in lower_content for s in salam_sozleri) and len(lower_content) < 25:
         cevaplar = [
             f"Aleykum salam, {message.author.mention}! Xoş gəldin, necəsən? 👋",
-            f"Salam, {message.author.mention}! Gecən xeyrə qalsın ya da günün gözəl keçsin! 👑",
+            f"Salam, {message.author.mention}! Günün gözəl keçsin! 👑",
             f"Aleykum salam, qaqaş! Bot sənin xidmətindədir. 🤖"
         ]
         try:
@@ -89,7 +89,7 @@ async def on_message(message):
         except:
             pass
 
-    # 4. Həddindən artıq Böyük Hərf (Caps Lock) Qoruması (>70%)
+    # 4. Caps Lock Qoruması (>70%)
     if len(content) > 8:
         uppercase_count = sum(1 for c in content if c.isupper())
         if uppercase_count / len(content) > 0.7:
@@ -102,7 +102,7 @@ async def on_message(message):
             except:
                 pass
 
-    # 5. Sürətli Flood / Spam Qoruması (5 dəfə eyni sözü yazanda və ya ardıcıl tez mesaj atanda)
+    # 5. Sürətli Flood / Spam Qoruması
     author_id = message.author.id
     current_time = time.time()
     
@@ -112,7 +112,6 @@ async def on_message(message):
     spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 6]
     spam_tracker[author_id].append(current_time)
 
-    # 5 və ya daha çox mesaj qısa müddətdə gələrsə
     if len(spam_tracker[author_id]) >= 5:
         spam_tracker[author_id].clear()
         if author_id not in spam_warnings:
@@ -142,9 +141,9 @@ async def yardim(ctx):
         description="Server tam güvənlik altındadır, qaqaş! Bütün əmrlər `!` ilə işləyir:",
         color=discord.Color.gold()
     )
-    embed.add_field(name="🛡️ Güvənlik və Qoruma", value="• Avtomatik Salamlama sistemi\n• Reklam/Link qoruması\n• @everyone qoruması\n• Caps Lock qoruması\n• 5 mesaj flood qoruması + Zaman aşımı (Timeout)", inline=False)
+    embed.add_field(name="🛡️ Güvənlik və Qoruma", value="• Avtomatik Salamlama sistemi\n• Reklam/Link qoruması\n• @everyone qoruması\n• Caps Lock qoruması\n• 5 mesaj flood qoruması + Timeout", inline=False)
     embed.add_field(name="🧹 Moderasiya", value="• `!sil [say]` - Mesajları təmizləyir\n• `!ban [@istifadəçi]` - Ban edir\n• `!mute [@istifadəçi] [dəqiqə]` - Susdurur\n• `!sunucukoru` - Qoruma statusunu yoxlayır", inline=False)
-    embed.add_field(name="🎮 Oyunlar və Əyləncə", value="• `!ping` - Gecikməni yoxlayır\n• `!zar` - Zər atır\n• `!zarafat` - Lətifələr deyir\n• `!yaziqtura` - Yazı-Tura oyunu oynayır\n• `!sayish` - Əyləncəli sayma oyunu", inline=False)
+    embed.add_field(name="🎮 Oyunlar və Əyləncə", value="• `!ping` - Gecikməni yoxlayır\n• `!zar` - Zər atır\n• `!zarafat` - Lətifələr deyir\n• `!yaziqtura` - Yazı-Tura oyunu oynayır\n• `!salam`, `!sa`, `!slm` - Salamlaşma əmrləri", inline=False)
     await ctx.send(embed=embed)
 
 @bot.command(name="sunucukoru")
@@ -186,7 +185,7 @@ async def mute(ctx, member: discord.Member, minutes: int = 5, *, reason="Qayda p
     await member.timeout(duration, reason=reason)
     await ctx.send(f"⏳ **{member.mention}** {minutes} dəqiqə müddətinə susduruldu!")
 
-# --- OYUNLAR ---
+# --- OYUNLAR VƏ SALAM ƏMRLƏRİ ---
 @bot.command(name="zar")
 async def zar(ctx):
     sayi = random.randint(1, 6)
@@ -207,15 +206,7 @@ async def zarafat(ctx):
     ]
     await ctx.send(random.choice(zarafatlar))
 
-token = os.environ.get("DISCORD_TOKEN")
-if token:
-    bot.run(token)
-else:
-    print("XƏTA: DISCORD_TOKEN tapılmadı!")
-    @bot.command(name="salam")
-async def salam_cmd(ctx):
-    
-    @bot.command(name="salam")
+@bot.command(name="salam")
 async def salam_cmd(ctx):
     await ctx.send(f"Aleykum salam, {ctx.author.mention}! Xoş gəldin, qaqaş! 👋")
 
@@ -227,4 +218,10 @@ async def sa_cmd(ctx):
 async def slm_cmd(ctx):
     await ctx.send(f"Aleykum salam, {ctx.author.mention}! Xoş gördük! 🤖")
 
+# --- BOTU İŞƏ SALMA ---
+token = os.environ.get("DISCORD_TOKEN")
+if token:
+    bot.run(token)
+else:
+    print("XƏTA: DISCORD_TOKEN tapılmadı!")
     
