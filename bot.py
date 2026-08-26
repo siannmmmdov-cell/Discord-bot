@@ -153,7 +153,7 @@ async def yardim(ctx):
         color=discord.Color.gold()
     )
     embed.add_field(name="🛡️ Təhlükəsizlik və Qoruma", value="Avtomatik Salam, Link, Flood, Caps Lock və Bot Qoruması aktivdir.", inline=False)
-    embed.add_field(name="⚡ Moderasiya", value="`!sil [say]`, `!ban [@istifadəçi]`, `!mute [@istifadəçi] [dəqiqə]`", inline=False)
+    embed.add_field(name="⚡ Moderasiya", value="`!sil [say]`, `!ban [@istifadəçi]`, `!at [@istifadəçi]`, `!mute [@istifadəçi] [dəqiqə]`", inline=False)
     embed.add_field(name="🎮 Oyunlar və Əyləncə", value="`!ping`, `!zar`, `!yazıqtura`, `!zarafat`, `!sunucukoru`", inline=False)
     await ctx.send(embed=embed)
 
@@ -175,6 +175,7 @@ async def ping(ctx):
     embed = discord.Embed(title="🏓 Pong!", description=f"Botun gecikmə sürəti: `{latency}ms` 🚀", color=discord.Color.green())
     await ctx.send(embed=embed)
 
+# 1. Mesaj Təmizləmə
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
 async def sil(ctx, amount: int = 10):
@@ -184,18 +185,57 @@ async def sil(ctx, amount: int = 10):
     msg = await ctx.send(f"🗑️ `{amount}` ədəd mesaj təmizləndi!")
     await msg.delete(delay=3)
 
+# 2. Ban Əmri
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban(ctx, member: discord.Member, *, reason="Səbəb göstərilməyib"):
-    await member.ban(reason=reason)
-    await ctx.send(f"🔨 **{member.mention}** serverdən ban olundu! Səbəb: {reason}")
+    try:
+        await member.ban(reason=reason)
+        await ctx.send(f"🔨 **{member.mention}** serverdən ban olundu! Səbəb: {reason}")
+    except Exception as e:
+        await ctx.send(f"❌ Ban etmək olmadı! Xəta: {e}")
 
+@ban.error
+async def ban_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("❌ Bu əmri işlətmək üçün 'Ban Members' icazən yoxdur, qardaş!")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Zəhmət olmasa ban ediləcək adamı etiketlə! Məsələn: `!ban @istifadəçi səbəb`")
+
+# 3. Atmaq (Kick) Əmri (!at)
+@bot.command(name="at")
+@commands.has_permissions(kick_members=True)
+async def at(ctx, member: discord.Member, *, reason="Səbəb göstərilməyib"):
+    try:
+        await member.kick(reason=reason)
+        await ctx.send(f"👢 **{member.mention}** serverdən atıldı! Səbəb: {reason}")
+    except Exception as e:
+        await ctx.send(f"❌ İstifadəçini atmaq olmadı! Xəta: {e}")
+
+@at.error
+async def at_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("❌ Bu əmri işlətmək üçün 'Kick Members' icazən yoxdur, qardaş!")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Zəhmət olmasa atılacaq adamı etiketlə! Məsələn: `!at @istifadəçi səbəb`")
+
+# 4. Mute (Timeout) Əmri
 @bot.command(name="mute")
 @commands.has_permissions(moderate_members=True)
 async def mute(ctx, member: discord.Member, minutes: int = 5, *, reason="Səbəb yoxdur"):
-    duration = timedelta(minutes=minutes)
-    await member.timeout(duration, reason=reason)
-    await ctx.send(f"🔇 **{member.mention}** `{minutes}` dəqiqə müddətinə susduruldu.")
+    try:
+        duration = timedelta(minutes=minutes)
+        await member.timeout(duration, reason=reason)
+        await ctx.send(f"🔇 **{member.mention}** `{minutes}` dəqiqə müddətinə susduruldu. Səbəb: {reason}")
+    except Exception as e:
+        await ctx.send(f"❌ Mute etmək olmadı! Xəta: {e}")
+
+@mute.error
+async def mute_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("❌ Bu əmri işlətmək üçün 'Moderate Members' icazən yoxdur, qardaş!")
+    elif isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("❌ Zəhmət olmasa susdurulacaq adamı və dəqiqəni yaz! Məsələn: `!mute @istifadəçi 5`")
 
 # --- OYUNLAR VƏ SALAM ƏMRLƏRİ ---
 @bot.command(name="zar")
@@ -235,4 +275,3 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
-            
