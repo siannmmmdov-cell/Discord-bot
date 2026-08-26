@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez səs sistemi aktivdir və qoruyur!"
+    return "yenilmez tam güclə işləyir!"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -34,8 +34,8 @@ spam_tracker = {}
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ YENİLMEZ (SƏS VƏ QORUMA) AKTİVDİR: {bot.user.name}')
-    await bot.change_presence(activity=discord.Game(name="r?bot | səs və qoruma aktivdir"))
+    print(f'🛡️ YENİLMEZ (FULL VERSİYA) AKTİVDİR: {bot.user.name}')
+    await bot.change_presence(activity=discord.Game(name="r?bot | yenilmez tam güclə işləyir"))
 
 @bot.event
 async def on_member_join(member):
@@ -59,7 +59,7 @@ async def on_message(message):
     content = message.content
     lower_content = content.lower()
 
-    # 1. Salamlaşma Sistemi (Auralı)
+    # 1. Salamlaşma Sistemi
     words = lower_content.split()
     salam_sozleri = ["salam", "salamun aleykum", "sa", "as", "slm", "səlam"]
     if any(word in salam_sozleri for word in words):
@@ -121,49 +121,53 @@ async def on_message(message):
     spam_tracker[author_id].append(current_time)
 
     if len(spam_tracker[author_id]) > 6:
+        spam_tracker[spam_tracker] = [] if False else None
         spam_tracker[author_id].clear()
         try:
             await message.delete()
             duration = timedelta(minutes=5)
             await message.author.timeout(duration, reason="Spam")
-            await message.channel.send(f"🔇 **{message.author.mention}** spam cəhdinə görə 5 dəqiqəlik susduruldu.")
+            await message.channel.send(f"🔇 **{message.author.mention}** spam səbəbi ilə 5 dəqiqəlik susduruldu.")
         except:
             pass
         return
 
     await bot.process_commands(message)
 
-# --- İDARƏETMƏ VƏ PANEL ---
+# --- NƏHƏNG PANEL (r?bot) ---
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="👑 yenilmez - Gelişmiş Təhlükəsizlik və Səs Paneli",
-        description="Server yenilmez sistemi tərəfindən idarə olunur. Əmrlər:",
-        color=discord.Color.dark_theme()
+        title="👑 YENİLMEZ - NƏHƏNG İDARƏETMƏ VƏ QORUMA SİSTEMİ",
+        description="Server yenilmez tərəfindən 7/24 qorunur və idarə olunur. Bütün aktiv modullar:",
+        color=discord.Color.dark_red()
     )
-    embed.add_field(name="🔒 Müdafiə Modulları", value="Avtomatik Salam, Link, Spam Mute, Caps Lock filtri.", inline=False)
-    embed.add_field(name="🎧 Səs / Musiqi", value="`r?qosul`, `r?ayril`", inline=False)
-    embed.add_field(name="⚙️ Moderasiya", value="`r?sil [say]`, `r?ban [@istifadəçi]`, `r?at [@istifadəçi]`, `r?mute [@istifadəçi] [dəqiqə]`", inline=False)
-    embed.add_field(name="🎮 Əyləncə", value="`r?ping`, `r?zar`, `r?yazıqtura`, `r?zarafat`, `r?status`", inline=False)
+    embed.add_field(name="🔒 Təhlükəsizlik və Müdafiə", value="• Avtomatik Auralı Salamlama\n• Link və Reklam Filtri\n• @everyone / @here Qoruması\n• Caps Lock (Böyük Hərf) Qadağası\n• Ağıllı Spam və 5 Dəqiqəlik Mute Sistemi", inline=False)
+    embed.add_field(name="🎧 Səs və Musiqi Modulu", value="`r?qosul` - Səs kanalına qoşular\n`r?ayril` - Səs kanalından çıxar", inline=False)
+    embed.add_field(name="⚙️ Gelişmiş Moderasiya", value="`r?sil [say]` - Mesajları təmizləyər\n`r?ban [@istifadəçi]` - Serverdən qovar\n`r?at [@istifadəçi]` - Kick edər\n`r?mute [@istifadəçi] [dəqiqə]` - Timeout verər\n`r?slowmode [saniyə]` - Kanalı yavaşladar", inline=False)
+    embed.add_field(name="📊 İstifadəçi və Sistem", value="`r?profil [@istifadəçi]` - İstifadəçi məlumatı\n`r?server` - Server məlumatları\n`r?ping` - Bağlantı sürəti", inline=False)
+    embed.add_field(name="🎮 Əyləncə və Oyunlar", value="`r?zar` - Zər atar\n`r?yazıqtura` - Yazı-tura atar\n`r?zarafat` - Əyləncəli lətifələr", inline=False)
+    embed.set_footer(text="yenilmez v3.5 • Hər şey tam nəzarət altındadır!")
     await ctx.send(embed=embed)
 
 @bot.command(name="status")
 async def status(ctx):
     embed = discord.Embed(
         title="🛡️ yenilmez - Sistem Statusu",
-        description=f"Server və səs modulları aktivdir.",
+        description=f"Server tam təhlükəsizlik rejimində işləyir.",
         color=discord.Color.green()
     )
-    embed.add_field(name="Vəziyyət", value="🟢 Stabil", inline=True)
+    embed.add_field(name="Sistem Vəziyyəti", value="🟢 Stabil və Aktiv", inline=True)
+    embed.add_field(name="Ping", value=f"`{round(bot.latency * 1000)}ms`", inline=True)
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
 async def ping(ctx):
     latency = round(bot.latency * 1000)
-    embed = discord.Embed(title="🏓 Gecikmə", description=f"`{latency}ms`", color=discord.Color.blue())
+    embed = discord.Embed(title="🏓 Bağlantı Gecikməsi", description=f"Sürət dəyəri: `{latency}ms`", color=discord.Color.blue())
     await ctx.send(embed=embed)
 
-# --- SƏS (VOICE) ƏMRLƏRİ ---
+# --- SƏS ƏMRLƏRİ ---
 @bot.command(name="qosul")
 async def qosul(ctx):
     if ctx.author.voice:
@@ -174,7 +178,7 @@ async def qosul(ctx):
             await channel.connect()
         await ctx.send(f"🔊 Səs kanalına qoşuldum: **{channel.name}**")
     else:
-        await ctx.send("❌ Əvvəlcə hər hansı bir səs kanalına qoşulmalısan!")
+        await ctx.send("❌ Əvvəlcə səs kanalına qoşulmalısan!")
 
 @bot.command(name="ayril")
 async def ayril(ctx):
@@ -184,27 +188,27 @@ async def ayril(ctx):
     else:
         await ctx.send("❌ Bot heç bir səs kanalında deyil!")
 
-# --- MODERASİYA ƏMRLƏRİ ---
+# --- ƏLAVƏ MODERASİYA ƏMRLƏRİ ---
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
 async def sil(ctx, amount: int = 10):
     if amount > 100:
         amount = 100
     await ctx.channel.purge(limit=amount + 1)
-    msg = await ctx.send(f"🗑️ `{amount}` ədəd mesaj silindi.")
+    msg = await ctx.send(f"🗑️ `{amount}` ədəd mesaj təmizləndi.")
     await msg.delete(delay=3)
 
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban(ctx, member: discord.Member, *, reason="Səbəb yoxdur"):
     await member.ban(reason=reason)
-    await ctx.send(f"🔨 **{member.mention}** ban olundu.")
+    await ctx.send(f"🔨 **{member.mention}** serverdən ban olundu.")
 
 @bot.command(name="at")
 @commands.has_permissions(kick_members=True)
 async def at(ctx, member: discord.Member, *, reason="Səbəb yoxdur"):
     await member.kick(reason=reason)
-    await ctx.send(f"👢 **{member.mention}** qovuldu.")
+    await ctx.send(f"👢 **{member.mention}** serverdən uzaqlaşdırıldı.")
 
 @bot.command(name="mute")
 @commands.has_permissions(moderate_members=True)
@@ -213,11 +217,36 @@ async def mute(ctx, member: discord.Member, minutes: int = 5, *, reason="Səbəb
     await member.timeout(duration, reason=reason)
     await ctx.send(f"🔇 **{member.mention}** {minutes} dəqiqə susduruldu.")
 
+@bot.command(name="slowmode")
+@commands.has_permissions(manage_channels=True)
+async def slowmode(ctx, seconds: int = 0):
+    await ctx.channel.edit(slowmode_delay=seconds)
+    await ctx.send(f"⏱️ Kanalın yavaş rejim müddəti `{seconds}` saniyə olaraq tənzimləndi.")
+
+# --- İSTİFADƏÇİ VƏ SERVER MƏLUMATLARI ---
+@bot.command(name="profil")
+async def profil(ctx, member: discord.Member = None):
+    member = member or ctx.author
+    embed = discord.Embed(title=f"👤 {member.name} - Profil Məlumatı", color=discord.Color.gold())
+    embed.add_field(name="İstifadəçi ID", value=member.id, inline=True)
+    embed.add_field(name="Qoşulma Tarixi", value=member.joined_at.strftime("%d.%m.%Y"), inline=True)
+    embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+    await ctx.send(embed=embed)
+
+@bot.command(name="server")
+async def server(ctx):
+    guild = ctx.guild
+    embed = discord.Embed(title=f"🏰 {guild.name} - Server Məlumatı", color=discord.Color.purple())
+    embed.add_field(name="Üzv Sayı", value=guild.member_count, inline=True)
+    embed.add_field(name="Kanal Sayı", value=len(guild.channels), inline=True)
+    embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
+    await ctx.send(embed=embed)
+
 # --- OYUNLAR ---
 @bot.command(name="zar")
 async def zar(ctx):
     sayi = random.randint(1, 6)
-    await ctx.send(f"🎲 Zər: **{sayi}**")
+    await ctx.send(f"🎲 Zər atıldı: **{sayi}**")
 
 @bot.command(name="yazıqtura")
 async def yazıqtura(ctx):
@@ -228,7 +257,8 @@ async def yazıqtura(ctx):
 async def zarafat(ctx):
     latifeler = [
         "Müəllim şagirdə: — De görüm, su nişanı nədir? Şagird: — Suya basanda görünür müəllim! 😄",
-        "İki dana dəni kosmosdan gəlir, biri deyir: 'Ay nə gözəl yer idi, gəl bir də gedək!' 🚀"
+        "İki dana dəni kosmosdan gəlir, biri deyir: 'Ay nə gözəl yer idi, gəl bir də gedək!' 🚀",
+        "İnternetin o qədər yavaşdır ki, 'Google' axtarışa verəndə cavab gələnə kimi əsr dəyişir. 💻"
     ]
     await ctx.send(random.choice(latifeler))
 
