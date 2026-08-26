@@ -20,7 +20,7 @@ SAHIB_ID = 641014966312501259
 
 # Güclü Anti-Spam və Flood Qoruma Bazası
 spam_records = {}
-SPAM_THRESHOLD = 3      # 3 saniyədə 3-dən çox mesaj atarsa tutulur
+SPAM_THRESHOLD = 3      
 SPAM_WINDOW = 3.5       
 
 @bot.event
@@ -42,7 +42,6 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # Sahibə və Adminlərə qətiyyən toxunmur, sən sərbəst yaza bilərsən
     if message.author.guild_permissions.administrator or message.author.id == SAHIB_ID:
         await bot.process_commands(message)
         return
@@ -69,28 +68,19 @@ async def on_message(message):
 
                 if warn_level == 1:
                     try:
-                        await message.channel.send(
-                            f"⚠️ {message.author.mention}, chatı spam etmə! İlk xəbərdarlıq.", 
-                            delete_after=5
-                        )
+                        await message.channel.send(f"⚠️ {message.author.mention}, chatı spam etmə! İlk xəbərdarlıq.", delete_after=5)
                     except:
                         pass
                 elif warn_level == 2:
                     try:
                         await message.author.timeout(timedelta(minutes=5), reason="Spam / Flood")
-                        await message.channel.send(
-                            f"🔇 {message.author.mention}, xəbərdarlığa baxmadığın üçün **5 dəqiqəlik mute** olundun!", 
-                            delete_after=6
-                        )
+                        await message.channel.send(f"🔇 {message.author.mention}, 5 dəqiqəlik mute olundun!", delete_after=6)
                     except:
                         pass
                 elif warn_level >= 3:
                     try:
-                        await message.guild.ban(message.author, reason="Ardıcıl spam və flood.")
-                        await message.channel.send(
-                            f"🔨 {message.author.mention} təkrar spam etdiyi üçün serverdən **ban edildi**!", 
-                            delete_after=8
-                        )
+                        await message.guild.ban(message.author, reason="Ardıcıl spam.")
+                        await message.channel.send(f"🔨 {message.author.mention} serverdən ban edildi!", delete_after=8)
                     except:
                         pass
                 return
@@ -104,7 +94,7 @@ async def on_message(message):
 # ==========================================
 # --- 3. MASTER SAHİB PANELİ ---
 # ==========================================
-@bot.command(name="bot", help="Yalnız sahibin aça biləcəyi idarəetmə paneli.")
+@bot.command(name="bot")
 async def bot_panel(ctx):
     if ctx.author.id != SAHIB_ID:
         await ctx.send("❌ Bu master paneli yalnız botun əsl sahibi aça bilər!")
@@ -116,7 +106,7 @@ async def bot_panel(ctx):
         color=0x0b0e14
     )
     embed.add_field(name="👑 Sahib Əmrləri", value="`r?elan [mətn]` — Rəsmi server elanı atır", inline=False)
-    embed.add_field(name="🔊 Səs Kanalları", value="`r?join` (Səsə qoşulur), `r?leave` (Səsdən çıxır)", inline=False)
+    embed.add_field(name="🔊 Səs Kanalları", value="`r?join` , `r?leave`", inline=False)
     embed.add_field(name="🛡️ Moderasiya", value="`r?sil`, `r?ban`, `r?kick`, `r?mute`, `r?unmute`, `r?lock`, `r?unlock`", inline=False)
     embed.add_field(name="🎮 Oyunlar & Kafe", value="`r?fal`, `r?barmen`, `r?yemek`, `r?slot`, `r?zar`, `r?yazi_tura`, `r?sevgi`, `r?soyhun`, `r?hacker`", inline=False)
     embed.add_field(name="📊 Məlumat", value="`r?serverbilgi`, `r?avatar`, `r?ping`", inline=False)
@@ -157,7 +147,7 @@ async def leave(ctx):
 
 
 # ==========================================
-# --- 5. MODERASİYA & TƏHLÜKƏSİZLİK ƏMRLƏRİ ---
+# --- 5. MODERASİYA & TƏHLÜKƏSİZLİK ---
 # ==========================================
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
@@ -238,7 +228,7 @@ async def yemek(ctx):
 
 
 # ==========================================
-# --- 7. OYUNLAR VƏ ƏYLƏNCƏ ƏMRLƏRİ ---
+# --- 7. OYUNLAR VƏ ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="yazi_tura")
 async def yazi_tura(ctx):
@@ -284,7 +274,7 @@ async def hacker(ctx, user: discord.Member = None):
 
 
 # ==========================================
-# --- 8. PROFİL VƏ MƏLUMAT ƏMRLƏRİ ---
+# --- 8. PROFİL VƏ MƏLUMAT ---
 # ==========================================
 @bot.command(name="avatar")
 async def avatar(ctx, member: discord.Member = None):
@@ -303,3 +293,4 @@ async def serverbilgi(ctx):
     await ctx.send(embed=embed)
 
 # bot.run("SƏNİN_BOT_TOKENİN")
+
