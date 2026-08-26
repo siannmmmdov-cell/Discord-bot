@@ -38,7 +38,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v31.0 [STRICT OWNER EXCLUSIVE SUITE] - Online"
+    return "Yenilmez OS v32.0 [STRICT OWNER REACTION MIRROR] - Online"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -68,15 +68,16 @@ SAHIB_ID = 641014966312501259
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ [YENİLMEZ OS v31]: Sahibə özəl çekiliş və anket sistemləri aktivdir -> {bot.user.name}')
+    print(f'🛡️ [YENİLMEZ OS v32]: Yalnız sahibə özəl reaksiya aynası aktivdir -> {bot.user.name}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="r?yardim | Server Qorunur"))
 
 # ==========================================
-# REAKSİYA AYNALAMA SİSTEMİ (REACTION MIRROR)
+# YALNIZ SAHİB ÜÇÜN REAKSİYA AYNASI
 # ==========================================
 @bot.event
 async def on_reaction_add(reaction, user):
-    if user.bot:
+    # Əgər reaksiyanı atan botdursa və ya SAHIB_ID deyilsə, heç nə etmə
+    if user.bot or user.id != SAHIB_ID:
         return
     try:
         await reaction.message.add_reaction(reaction.emoji)
@@ -207,7 +208,7 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="🛡️ YENİLMEZ OS // SAHİB MASTER PANEL v31",
+        title="🛡️ YENİLMEZ OS // SAHİB MASTER PANEL v32",
         description="Serverin idarəetməsi, təhlükəsizliyi və xüsusi sahib əmrləri:",
         color=0x0b0e14
     )
@@ -244,7 +245,7 @@ async def bot_panel(ctx):
         inline=False
     )
     
-    embed.set_footer(text="Yenilmez OS v31.0 • Strict Owner Exclusive Suite")
+    embed.set_footer(text="Yenilmez OS v32.0 • Strict Owner Exclusive Suite")
     await ctx.send(embed=embed)
 
 @bot.command(name="yardim")
@@ -489,4 +490,4 @@ async def afk(ctx, *, reason="Səbəb yoxdur"):
 token = os.environ.get("DISCORD_TOKEN")
 if token: bot.run(token)
 else: print("XƏTA: DISCORD_TOKEN tapılmadı!")
-    
+
