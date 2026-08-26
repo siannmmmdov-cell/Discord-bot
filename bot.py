@@ -212,4 +212,19 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
+    @bot.command(name="salam")
+async def salam_cmd(ctx):
+    
+    @bot.command(name="salam")
+async def salam_cmd(ctx):
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Xoş gəldin, qaqaş! 👋")
+
+@bot.command(name="sa")
+async def sa_cmd(ctx):
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Necəsən? 👑")
+
+@bot.command(name="slm")
+async def slm_cmd(ctx):
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Xoş gördük! 🤖")
+
     
