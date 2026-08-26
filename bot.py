@@ -31,7 +31,6 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Spam və flood izləmə sistemləri
 spam_tracker = {}
-spam_warnings = {}
 
 @bot.event
 async def on_ready():
@@ -62,14 +61,15 @@ async def on_message(message):
     content = message.content
     lower_content = content.lower()
 
-    # 1. Salamlaşma Sistemi (Yalnız dəqiq söz olaraq yazıldıqda işləyir)
+    # 1. Salamlaşma Sistemi (Daha səliqəli, "qardaş" sözü olmadan və server adına özəl)
     words = lower_content.split()
     salam_sozleri = ["salam", "salamun aleykum", "sa", "as", "slm", "səlam"]
     if any(word in salam_sozleri for word in words):
+        server_adi = message.guild.name
         cevaplar = [
-            f"Aleykum salam, {message.author.mention}! Xoş gəldin, necəsən? 😎",
-            f"Salam, {message.author.mention}! Günün gözəl keçsin! 👑",
-            f"Aleykum salam, qardaş! Bot sənin xidmətindədir. 🤖"
+            f"Aleykum salam, {message.author.mention}! `{server_adi}` serverinə xoş gəldin.",
+            f"Salam, {message.author.mention}! Necəsən, günün necə keçir?",
+            f"Aleykum salam, {message.author.mention}! Xoş gördük."
         ]
         try:
             await message.channel.send(random.choice(cevaplar))
@@ -112,35 +112,30 @@ async def on_message(message):
             except:
                 pass
 
-    # 5. Sürətli Flood / Spam Qoruması
+    # 5. Ağıllı Flood / Spam Qoruması (Sürətli mesaj yazanda 5 dəqiqəlik mute)
     author_id = message.author.id
     current_time = time.time()
 
     if author_id not in spam_tracker:
         spam_tracker[author_id] = []
 
-    spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 5]
+    spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 3]
     spam_tracker[author_id].append(current_time)
 
     if len(spam_tracker[author_id]) > 5:
         spam_tracker[author_id].clear()
-        if author_id not in spam_warnings:
-            spam_warnings[author_id] = 0
-        spam_warnings[author_id] += 1
-
         try:
             await message.delete()
         except:
             pass
 
-        if spam_warnings[author_id] >= 1:
-            try:
-                duration = timedelta(minutes=3)
-                await message.author.timeout(duration, reason="Çox sürətli mesaj yazmaq (Flood)")
-                await message.channel.send(f"🔇 {message.author.mention} həddindən artıq sürətli mesaj yazdığı üçün 3 dəqiqəlik susduruldu.")
-            except:
-                pass
-            return
+        try:
+            duration = timedelta(minutes=5)
+            await message.author.timeout(duration, reason="Həddindən artıq sürətli mesaj yazmaq (Spam)")
+            await message.channel.send(f"🔇 **{message.author.mention}** çox sürətli mesaj yazdığı üçün 5 dəqiqəlik susduruldu.")
+        except:
+            pass
+        return
 
     await bot.process_commands(message)
 
@@ -149,10 +144,10 @@ async def on_message(message):
 async def yardim(ctx):
     embed = discord.Embed(
         title="👑 Kral Bot - İdarəetmə və Təhlükəsizlik Paneli",
-        description="Server tam təhlükəsizlik altındadır, qardaş! Bütün əmrlər aşağıdadır:",
+        description="Server tam təhlükəsizlik altındadır! Bütün əmrlər aşağıdadır:",
         color=discord.Color.gold()
     )
-    embed.add_field(name="🛡️ Təhlükəsizlik və Qoruma", value="Avtomatik Salam, Link, Flood, Caps Lock və Bot Qoruması aktivdir.", inline=False)
+    embed.add_field(name="🛡️ Təhlükəsizlik və Qoruma", value="Avtomatik Salam, Link, Spam/Flood Mute, Caps Lock qoruması aktivdir.", inline=False)
     embed.add_field(name="⚡ Moderasiya", value="`!sil [say]`, `!ban [@istifadəçi]`, `!at [@istifadəçi]`, `!mute [@istifadəçi] [dəqiqə]`", inline=False)
     embed.add_field(name="🎮 Oyunlar və Əyləncə", value="`!ping`, `!zar`, `!yazıqtura`, `!zarafat`, `!sunucukoru`", inline=False)
     await ctx.send(embed=embed)
@@ -161,11 +156,11 @@ async def yardim(ctx):
 async def sunucukoru(ctx):
     embed = discord.Embed(
         title="🛡️ Sunucu Qoruma Statusu",
-        description="Server hazırda **Kral Bot** tərəfindən 7/24 tam qorunur!",
+        description=f"Server hazırda **Kral Bot** tərəfindən 7/24 tam qorunur!",
         color=discord.Color.blue()
     )
     embed.add_field(name="Status", value="✅ Aktiv və İşlək", inline=True)
-    embed.add_field(name="Qorunan Sahələr", value="Link, Reklam, Flood, Caps Lock, İcazəsiz Botlar", inline=False)
+    embed.add_field(name="Qorunan Sahələr", value="Link, Reklam, Spam/Flood (Mute sistemi), Caps Lock, İcazəsiz Botlar", inline=False)
     embed.set_footer(text="Gecə-gündüz serverin güvəndədir!")
     await ctx.send(embed=embed)
 
@@ -191,16 +186,16 @@ async def sil(ctx, amount: int = 10):
 async def ban(ctx, member: discord.Member, *, reason="Səbəb göstərilməyib"):
     try:
         await member.ban(reason=reason)
-        await ctx.send(f"🔨 **{member.mention}** serverdən ban olundu! Səbəb: {reason}")
+        await ctx.send(f"🔨 **{member.mention}** serverdən ban olundu. Səbəb: {reason}")
     except Exception as e:
         await ctx.send(f"❌ Ban etmək olmadı! Xəta: {e}")
 
 @ban.error
 async def ban_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("❌ Bu əmri işlətmək üçün 'Ban Members' icazən yoxdur, qardaş!")
+        await ctx.send("❌ Bu əmri işlətmək üçün 'Ban Members' səlahiyyətiniz yoxdur.")
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("❌ Zəhmət olmasa ban ediləcək adamı etiketlə! Məsələn: `!ban @istifadəçi səbəb`")
+        await ctx.send("❌ Doğru istifadə: `!ban @istifadəçi səbəb`")
 
 # 3. Atmaq (Kick) Əmri (!at)
 @bot.command(name="at")
@@ -208,16 +203,16 @@ async def ban_error(ctx, error):
 async def at(ctx, member: discord.Member, *, reason="Səbəb göstərilməyib"):
     try:
         await member.kick(reason=reason)
-        await ctx.send(f"👢 **{member.mention}** serverdən atıldı! Səbəb: {reason}")
+        await ctx.send(f"👢 **{member.mention}** serverdən uzaqlaşdırıldı. Səbəb: {reason}")
     except Exception as e:
-        await ctx.send(f"❌ İstifadəçini atmaq olmadı! Xəta: {e}")
+        await ctx.send(f"❌ İstifadəçini uzaqlaşdırmaq olmadı! Xəta: {e}")
 
 @at.error
 async def at_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("❌ Bu əmri işlətmək üçün 'Kick Members' icazən yoxdur, qardaş!")
+        await ctx.send("❌ Bu əmri işlətmək üçün 'Kick Members' səlahiyyətiniz yoxdur.")
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("❌ Zəhmət olmasa atılacaq adamı etiketlə! Məsələn: `!at @istifadəçi səbəb`")
+        await ctx.send("❌ Doğru istifadə: `!at @istifadəçi səbəb`")
 
 # 4. Mute (Timeout) Əmri
 @bot.command(name="mute")
@@ -228,14 +223,14 @@ async def mute(ctx, member: discord.Member, minutes: int = 5, *, reason="Səbəb
         await member.timeout(duration, reason=reason)
         await ctx.send(f"🔇 **{member.mention}** `{minutes}` dəqiqə müddətinə susduruldu. Səbəb: {reason}")
     except Exception as e:
-        await ctx.send(f"❌ Mute etmək olmadı! Xəta: {e}")
+        await ctx.send(f"❌ Susdurmaq olmadı! Xəta: {e}")
 
 @mute.error
 async def mute_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
-        await ctx.send("❌ Bu əmri işlətmək üçün 'Moderate Members' icazən yoxdur, qardaş!")
+        await ctx.send("❌ Bu əmri işlətmək üçün səlahiyyətiniz yoxdur.")
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send("❌ Zəhmət olmasa susdurulacaq adamı və dəqiqəni yaz! Məsələn: `!mute @istifadəçi 5`")
+        await ctx.send("❌ Doğru istifadə: `!mute @istifadəçi [dəqiqə]`")
 
 # --- OYUNLAR VƏ SALAM ƏMRLƏRİ ---
 @bot.command(name="zar")
@@ -259,15 +254,15 @@ async def zarafat(ctx):
 
 @bot.command(name="salam")
 async def salam_cmd(ctx):
-    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Xoş gəldin, qardaşım! 😎")
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Xoş gəldin.")
 
 @bot.command(name="sa")
 async def sa_cmd(ctx):
-    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Necəsən? 👑")
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Necəsən?")
 
 @bot.command(name="slm")
 async def slm_cmd(ctx):
-    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Xoş gördük! 🤖")
+    await ctx.send(f"Aleykum salam, {ctx.author.mention}! Xoş gördük.")
 
 # --- BOTU İŞƏ SALMA ---
 token = os.environ.get("DISCORD_TOKEN")
@@ -275,3 +270,4 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
+                    
