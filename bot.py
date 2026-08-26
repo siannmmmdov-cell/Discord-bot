@@ -16,6 +16,12 @@ try:
 except ImportError:
     install_pkg("PyNaCl")
 
+try:
+    import flask
+except ImportError:
+    install_pkg("Flask")
+    import flask
+
 from discord.ext import commands
 import os
 import re
@@ -417,4 +423,4 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
-            
+
