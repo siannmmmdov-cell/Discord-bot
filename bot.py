@@ -38,7 +38,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v29.0 [STRICT OWNER PANEL] - Online"
+    return "Yenilmez OS v30.0 [ADVANCED GIVEAWAY & MIRROR SYSTEM] - Online"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -54,6 +54,7 @@ intents.message_content = True
 intents.members = True
 intents.guilds = True
 intents.voice_states = True
+intents.reactions = True  # Reaksiyaları izləmək üçün vacibdir
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
@@ -67,8 +68,21 @@ SAHIB_ID = 641014966312501259
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ [YENİLMEZ OS v29]: Sahib paneli kilidləndi -> {bot.user.name}')
+    print(f'🛡️ [YENİLMEZ OS v30]: Çekiliş və Reaksiya Aynalama sistemləri aktivdir -> {bot.user.name}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="r?yardim | Server Qorunur"))
+
+# ==========================================
+# REAKSİYA AYNALAMA SİSTEMİ (REACTION MIRROR)
+# ==========================================
+@bot.event
+async def on_reaction_add(reaction, user):
+    if user.bot:
+        return
+    # Kim reaksiya atırsa atsın, bot da həmin mesaja həmin emojini əlavə edir
+    try:
+        await reaction.message.add_reaction(reaction.emoji)
+    except:
+        pass
 
 # ==========================================
 # GÜVƏNLİK VƏ SALAMLAMA SİSTEMİ
@@ -189,22 +203,21 @@ async def on_message(message):
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
-    # BURADA YALNIZ SƏNİN ID-N YOXLANILIR:
     if ctx.author.id != SAHIB_ID:
         await ctx.send("❌ Bu master paneli yalnız botun sahibi aça bilər!")
         return
 
     embed = discord.Embed(
-        title="🛡️ YENİLMEZ OS // SAHİB MASTER PANEL v29",
-        description="Serverin idarəetməsi, təhlükəsizliyi və xüsusi elan sistemləri:",
+        title="🛡️ YENİLMEZ OS // SAHİB MASTER PANEL v30",
+        description="Serverin idarəetməsi, təhlükəsizliyi və inkişaf etmiş sistemlər:",
         color=0x0b0e14
     )
     
     embed.add_field(
-        name="📢 Elan & Xüsusi Alətlər",
+        name="📢 Elan & İnkişaf Etmiş Çekiliş",
         value=(
-            "`r?elan [mətn]` — Rəsmi və qəşəng server elanı atır\n"
-            "`r?cekilis [saniyə] [hədiyyə]` — Çekiliş başladır\n"
+            "`r?elan [mətn]` — Rəsmi server elanı atır\n"
+            "`r?cekilis [vaxt] [hədiyyə]` — Məs: `r?cekilis 2d 5h Nitro` (d=gün, h=saat, m=dəq, s=san)\n"
             "`r?sorğu [sual]` — Anket/sorğu açır"
         ),
         inline=False
@@ -232,7 +245,7 @@ async def bot_panel(ctx):
         inline=False
     )
     
-    embed.set_footer(text="Yenilmez OS v29.0 • Owner Protected Suite")
+    embed.set_footer(text="Yenilmez OS v30.0 • Advanced Giveaway & Mirror Suite")
     await ctx.send(embed=embed)
 
 @bot.command(name="yardim")
@@ -250,7 +263,7 @@ async def yardim(ctx):
     await ctx.send(embed=embed)
 
 # ==========================================
-# ELAN VƏ XÜSUSİ SİSTEMLƏR
+# ELAN VƏ GÜN/SAATLI ÇEKİLİŞ SİSTEMİ
 # ==========================================
 @bot.command(name="elan")
 async def elan(ctx, *, text):
@@ -265,16 +278,37 @@ async def elan(ctx, *, text):
     await ctx.send(embed=embed)
 
 @bot.command(name="cekilis")
-async def cekilis(ctx, duration: int, *, prize):
+async def cekilis(ctx, time_str: str, *, prize):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         await ctx.send("❌ Səlahiyyətin yoxdur.")
         return
 
+    # Vaxtın təhlili (d = gün, h = saat, m = dəqiqə, s = saniyə)
+    seconds = 0
+    match_d = re.search(r'(\d+)d', time_str)
+    match_h = re.search(r'(\d+)h', time_str)
+    match_m = re.search(r'(\d+)m', time_str)
+    match_s = re.search(r'(\d+)s', time_str)
+
+    if match_d: seconds += int(match_d.group(1)) * 86400
+    if match_h: seconds += int(match_h.group(1)) * 3600
+    if match_m: seconds += int(match_m.group(1)) * 60
+    if match_s: seconds += int(match_s.group(1))
+
+    if seconds == 0:
+        # Əgər sadəcə rəqəm yazılıbsa, birbaşa saniyə kimi qəbul etsin
+        try:
+            seconds = int(time_str)
+        except:
+            await ctx.send("❌ Xəta! Vaxtı düzgün qeyd et. Məsələn: `r?cekilis 1d 5h 30m Discord Nitro` və ya sadəcə `r?cekilis 60 Nitro`")
+            return
+
     embed = discord.Embed(title="🎉 ÇEKİLİŞ BAŞLADI! 🎉", description=f"Hədiyyə: **{prize}**\nQatılmaq üçün 🎁 emojisinə toxun!", color=0xffd700)
-    embed.set_footer(text=f"Müddət: {duration} saniyə")
+    embed.set_footer(text=f"Müddət: {time_str}")
     msg = await ctx.send(embed=embed)
     await msg.add_reaction("🎁")
-    await asyncio.sleep(duration)
+    
+    await asyncio.sleep(seconds)
 
     new_msg = await ctx.channel.fetch_message(msg.id)
     reaction = discord.utils.get(new_msg.reactions, emoji="🎁")
@@ -439,7 +473,7 @@ async def qosul(ctx):
     else: await ctx.send("❌ Səs kanalında deyiləm!")
 
 @bot.command(name="ayril")
-async def ayril(ctx):
+async def ayril(ctx, *, args=None):
     if ctx.voice_client:
         await ctx.voice_client.disconnect()
         await ctx.send("🔇 Ayrıldım.")
@@ -456,4 +490,4 @@ async def afk(ctx, *, reason="Səbəb yoxdur"):
 token = os.environ.get("DISCORD_TOKEN")
 if token: bot.run(token)
 else: print("XƏTA: DISCORD_TOKEN tapılmadı!")
-            
+        
