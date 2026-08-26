@@ -38,7 +38,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v26.0 [MAXIMUM SERVER PROTECTION & INFO SUITE] - Online"
+    return "Yenilmez OS v27.0 [ULTIMATE PROTECTION & SALAM SYSTEM] - Online"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -67,7 +67,7 @@ SAHIB_ID = 641014966312501259
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ [YENİLMEZ OS v26]: Bütün sistemlər və qoruma modulları aktivdir -> {bot.user.name}')
+    print(f'🛡️ [YENİLMEZ OS v27]: Salamlaşma və Bütün Qoruma sistemləri aktivdir -> {bot.user.name}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="r?yardim | Server Qorunur"))
 
 # ==========================================
@@ -117,11 +117,26 @@ async def on_message(message):
             except:
                 pass
 
+    content = message.content
+    lower_content = content.lower()
+    words = lower_content.split()
+
+    # SALAMLAMA SİSTEMİ (Sa, Slm, Salam)
+    salam_sozleri = ["salam", "sa", "slm", "səlam", "salamun"]
+    if any(word in salam_sozleri for word in words) and "as" not in words:
+        cevaplar = [
+            f"Aleykum salam, {message.author.mention}. Xoş gəldin! 🛡️",
+            f"Salam, {message.author.mention}. Bağlantı quruldu, necəsən? 😎",
+            f"Aleykum salam, {message.author.mention}! Terminala xoş gəldin."
+        ]
+        try:
+            await message.channel.send(random.choice(cevaplar))
+        except:
+            pass
+
     if message.author.guild_permissions.administrator or message.author.id in whitelist:
         await bot.process_commands(message)
         return
-
-    content = message.content
 
     # 1. Link və Reklam Qoruması
     invite_regex = r"(https?://)?(www\.)?(discord\.(gg|io|me|li|club|com/invite)|t\.me|instagram\.com|youtube\.com|steamcommunity\.com/gift|nitro|free-nitro|discord-gifts\.com)/\S+"
@@ -179,7 +194,7 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="🛡️ YENİLMEZ OS // ULTIMATE MASTER PANEL v26",
+        title="🛡️ YENİLMEZ OS // ULTIMATE MASTER PANEL v27",
         description="Serverin idarəetməsi, təhlükəsizliyi və bütün alətlər mərkəzi:",
         color=0x0b0e14
     )
@@ -228,7 +243,7 @@ async def bot_panel(ctx):
         inline=False
     )
     
-    embed.set_footer(text="Yenilmez OS v26.0 • Complete Server Suite & Security")
+    embed.set_footer(text="Yenilmez OS v27.0 • Complete Server Suite & Security")
     await ctx.send(embed=embed)
 
 @bot.command(name="yardim")
@@ -451,4 +466,3 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
-        
