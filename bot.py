@@ -1,4 +1,21 @@
-import discord
+import subprocess
+import sys
+
+# Avtomatik kitabxana yoxlama və yükləmə bloku (Render xətası verməməsi üçün)
+def install_pkg(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+try:
+    import discord
+except ImportError:
+    install_pkg("discord.py")
+    import discord
+
+try:
+    import nacl
+except ImportError:
+    install_pkg("PyNaCl")
+
 from discord.ext import commands
 import os
 import re
@@ -16,7 +33,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez firewall v23.0 [FINAL] - System Online"
+    return "yenilmez firewall v24.0 [ULTRA SECURITY] - System Online"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -44,18 +61,18 @@ SAHIB_ID = 641014966312501259
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ [YENİLMEZ OS]: Kiber şəbəkə tam güclə aktivdir -> {bot.user.name}')
+    print(f'🛡️ [YENİLMEZ OS // ULTRA]: Kiber şəbəkə tam güclə aktivdir -> {bot.user.name}')
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="r?yardim | Server Qorunur"))
 
 # ==========================================
-# TƏHLÜKƏSİZLİK VƏ FİLTER SİSTEMİ
+# TƏHLÜKƏSİZLİK VƏ GÜCLƏNDİRİLMİŞ FİLTER SİSTEMİ
 # ==========================================
 @bot.event
 async def on_member_join(member):
     if member.bot:
         if member.id != bot.user.id:
             try:
-                await member.kick(reason="Sistem Təhlükəsizliyi: İcazəsiz kənar bot inyeksiya cəhdi.")
+                await member.ban(reason="Təhlükəsizlik: İcazəsiz kənar bot inyeksiya cəhdi (Avto-Ban).")
             except:
                 pass
 
@@ -100,13 +117,16 @@ async def on_message(message):
         except:
             pass
 
-    # 2. Reklam və Link Qoruması
-    invite_regex = r"(https?://)?(www\.)?(discord\.(gg|io|me|li|club)|discordapp\.com/invite|t\.me|instagram\.com|youtube\.com)/\S+"
+    # 2. Reklam, Nitro Scammers və Link Qoruması
+    invite_regex = r"(https?://)?(www\.)?(discord\.(gg|io|me|li|club|com/invite)|t\.me|instagram\.com|youtube\.com|steamcommunity\.com/gift|nitro|free-nitro|discord-gifts\.com)/\S+"
     if re.search(invite_regex, content):
         try:
             await message.delete()
-            warn = await message.channel.send(f"⚠️ **{message.author.mention}**, bu şəbəkədə link/reklam paylaşmaq qadağandır!")
-            await asyncio.sleep(4)
+            # Təhlükəsizliyi artıraraq link atanlara birbaşa 1 saatlıq timeout (mute) qoyuruq
+            duration = timedelta(hours=1)
+            await message.author.timeout(duration, reason="Zərərli link və ya reklam paylaşımı")
+            warn = await message.channel.send(f"🚨 **{message.author.mention}**, reklam/link paylaşdığın üçün 1 saatlıq təcrid edildin!")
+            await asyncio.sleep(5)
             await warn.delete()
             return
         except:
@@ -123,23 +143,23 @@ async def on_message(message):
         except:
             pass
 
-    # 4. Spam Qoruması
+    # 4. Gücləndirilmiş Spam / Flood Qoruması
     author_id = message.author.id
     current_time = time.time()
 
     if author_id not in spam_tracker:
         spam_tracker[author_id] = []
 
-    spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 3]
+    spam_tracker[author_id] = [t for t in spam_tracker[author_id] if current_time - t < 4]
     spam_tracker[author_id].append(current_time)
 
-    if len(spam_tracker[author_id]) > 5:
+    if len(spam_tracker[author_id]) > 4:
         spam_tracker[author_id].clear()
         try:
             await message.delete()
-            duration = timedelta(minutes=5)
-            await message.author.timeout(duration, reason="Spam / Flood cəhdi")
-            await message.channel.send(f"🔒 **{message.author.mention}** spam etdiyi üçün 5 dəqiqəlik mute edildi.")
+            duration = timedelta(minutes=10)
+            await message.author.timeout(duration, reason="Həddindən artıq spam / flood hücumu")
+            await message.channel.send(f"🔒 **{message.author.mention}** intensiv spam etdiyi üçün 10 dəqiqəlik mute edildi.")
         except:
             pass
         return
@@ -156,7 +176,7 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="⚡ YENİLMEZ // SAHİB İDARƏETMƏ PANELİ",
+        title="⚡ YENİLMEZ // SAHİB İDARƏETMƏ PANELİ (ULTRA)",
         description="Sənin üçün xüsusi aktiv olan master panel:",
         color=0x000000
     )
@@ -175,7 +195,7 @@ async def bot_panel(ctx):
         value="`r?qosul` • `r?ayril` • `r?afk` • `r?avatar` • `r?profil` • `r?server` • `r?ping`", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS v23 • Owner Only Panel")
+    embed.set_footer(text="Yenilmez OS v24 • Owner Only Panel")
     await ctx.send(embed=embed)
 
 # Ümumi Hamı üçün Yardım Əmri
@@ -381,8 +401,10 @@ async def profil(ctx, member: discord.Member = None):
     await ctx.send(embed=embed)
 
 @bot.command(name="server")
-async def server(ctx):
+async def server(ctx: commands.Context):
     guild = ctx.guild
+    if guild is None:
+        return
     embed = discord.Embed(title=f"🏰 Server: {guild.name}", color=0x111111)
     embed.add_field(name="Üzv", value=guild.member_count, inline=True)
     embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
@@ -396,4 +418,4 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
-    
+
