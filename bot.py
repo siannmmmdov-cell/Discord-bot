@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez firewall v14.0 [CLEAN]"
+    return "yenilmez firewall v15.0 [CLEAN]"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -178,12 +178,17 @@ async def bot_panel(ctx):
         inline=False
     )
     embed.add_field(
-        name="🛠️ 4. Faydalı Alətlər və Özəlliklər",
-        value="`r?afk [səbəb]` — AFK rejiminə keç\n`r?avatar [@istifadəçi]` — Profil şəklini göstər\n`r?yaz [mətn]` — Bot vasitəsilə elan yaz\n`r?say` / `r?say online` / `r?say offline` — Üzv statistikası", 
+        name="🎰 4. Kiber Oyun Zona",
+        value="`r?rulet` — Ölüm-dirim rus ruletkası\n`r?hack [@istifadəçi]` — Hədəf sisteminə sızma\n`r?zar` — Qalib zər döyüşü", 
         inline=False
     )
     embed.add_field(
-        name="⚡ 5. Rol və Sistem",
+        name="🛠️ 5. Faydalı Alətlər və Özəlliklər",
+        value="`r?afk [səbəb]` — AFK rejimi\n`r?avatar [@istifadəçi]` — Profil şəkli\n`r?yaz [mətn]` — Elan yaz\n`r?say` / `r?say online` / `r?say offline` — Üzv statistikası", 
+        inline=False
+    )
+    embed.add_field(
+        name="⚡ 6. Rol və Sistem",
         value="`r?rolver` / `r?rolal` — Rol idarəsi\n`r?profil` — Hədəf analizi\n`r?server` — Server məlumatı\n`r?guvenlik` — Təhlükəsizlik hesabatı\n`r?ping` — Gecikmə", 
         inline=False
     )
@@ -208,7 +213,67 @@ async def ping(ctx):
     embed = discord.Embed(title="⚡ Sistem Gecikməsi", description=f"Cavab müddəti: `{latency}ms`", color=0x111111)
     await ctx.send(embed=embed)
 
-# --- SƏS ƏMRLƏRİ (YENİLƏNDİ VƏ TƏKMİLLƏŞDİRİLDİ) ---
+# --- KİBER OYUNLAR (YENİ) ---
+@bot.command(name="rulet")
+async def rulet(ctx):
+    sonuc = random.choice([1, 0, 0, 0, 0, 0]) # 1/6 şansla patron gəlir
+    if sonuc == 1:
+        embed = discord.Embed(title="💥 BAX! Tapança Partladı!", description=f"**{ctx.author.mention}**, bəxtin gətirmədi, patron tən ortaya dəydi! Sistemdən uzaqlaşdırıldın.", color=0xff0000)
+        await ctx.send(embed=embed)
+        try:
+            await ctx.author.timeout(timedelta(minutes=2), reason="Rus Ruletkası məğlubiyyəti")
+        except:
+            pass
+    else:
+        embed = discord.Embed(title="🎯 Boş Çıxdı!", description=f"**{ctx.author.mention}**, bu dəfə qurtardın, patron boş çıxdı. Sağ qaldın!", color=0x00FF00)
+        await ctx.send(embed=embed)
+
+@bot.command(name="hack")
+async def hack(ctx, member: discord.Member = None):
+    if not member:
+        await ctx.send("❌ Hackləmək üçün bir hədəf qeyd etməlisən: `r?hack @istifadəçi`")
+        return
+    
+    if member.id == ctx.author.id:
+        await ctx.send("❌ Öz sistemini hackləyə bilməzsən!")
+        return
+
+    asamalar = [
+        f"💻 `{member.name}` sisteminə IP ünvanı üzərindən sızılır...",
+        f"🔓 Firewall divarları aşılır...",
+        f"📂 Şəxsi məlumatlar və şifrələr ələ keçirilir...",
+        f"✅ Əməliyyat uğurla tamamlandı! Hədəf tamamilə ələ keçirildi!"
+    ]
+    
+    msg = await ctx.send(asamalar[0])
+    await asyncio.sleep(2)
+    for i in range(1, len(asamalar)):
+        await msg.edit(content=asamalar[i])
+        await asyncio.sleep(2)
+    
+    para = random.randint(100, 5000)
+    embed = discord.Embed(title="🏴‍☠️ HACK REPORT", description=f"**{ctx.author.mention}**, `{member.name}` adlı hədəfi uğurla hacklədin və sistemdən `{para}$` dəyərində məlumat oğurladın!", color=0x050505)
+    await ctx.send(embed=embed)
+
+@bot.command(name="zar")
+async def zar(ctx):
+    bot_zar = random.randint(1, 6)
+    user_zar = random.randint(1, 6)
+    
+    embed = discord.Embed(title="🎲 Kiber Zar Döyüşü", color=0x111111)
+    embed.add_field(name="Sənin Atacağın", value=f"`{user_zar}`", inline=True)
+    embed.add_field(name="Botun Atacağı", value=f"`{bot_zar}`", inline=True)
+    
+    if user_zar > bot_zar:
+        embed.description = f"🎉 Təbriklər, **{ctx.author.mention}**, zərdə qalib gəldin!"
+    elif user_zar < bot_zar:
+        embed.description = f"💀 Təəssüf, sistem (bot) qalib gəldi!"
+    else:
+        embed.description = f"🤝 Heç-heçə! Güclər bərabərdir."
+        
+    await ctx.send(embed=embed)
+
+# --- SƏS ƏMRLƏRİ ---
 @bot.command(name="qosul")
 async def qosul(ctx):
     if not ctx.author.voice:
@@ -413,4 +478,4 @@ if token:
     bot.run(token)
 else:
     print("KİBER XƏTA: DISCORD_TOKEN tapılmadı!")
-    
+        
