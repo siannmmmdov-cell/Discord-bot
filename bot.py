@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Sistem aktivdir və təhlükəsizlik qorunur!"
+    return "yenilmez sistemi aktivdir və qoruyur!"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -27,7 +27,7 @@ intents.message_content = True
 intents.members = True
 intents.guilds = True
 
-# Prefix burada r? olaraq təyin olundu
+# Prefix r? olaraq təyin olundu
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
 # Spam və flood izləmə lüğəti
@@ -35,8 +35,8 @@ spam_tracker = {}
 
 @bot.event
 async def on_ready():
-    print(f'🛡️ TƏHLÜKƏSİZLİK SİSTEMİ AKTİVDİR: {bot.user.name}')
-    await bot.change_presence(activity=discord.Game(name="r?bot | Təhlükəsizlik Aktiv"))
+    print(f'🛡️ YENİLMEZ SİSTEMİ AKTİVDİR: {bot.user.name}')
+    await bot.change_presence(activity=discord.Game(name="r?bot | yenilmez aktivdir"))
 
 @bot.event
 async def on_member_join(member):
@@ -146,8 +146,8 @@ async def on_message(message):
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="🛡️ Təhlükəsizlik və İdarəetmə Paneli",
-        description="Server sistem tərəfindən qorunur. Mövcud əmrlər:",
+        title="👑 yenilmez - Təhlükəsizlik və İdarəetmə Paneli",
+        description="Server yenilmez sistemi tərəfindən qorunur. Mövcud əmrlər:",
         color=discord.Color.dark_theme()
     )
     embed.add_field(name="🔒 Müdafiə Modulları", value="Avtomatik Salam, Link/Reklam, Spam Mute, Caps Lock filtri aktivdir.", inline=False)
@@ -158,8 +158,8 @@ async def bot_panel(ctx):
 @bot.command(name="status")
 async def status(ctx):
     embed = discord.Embed(
-        title="🛡️ Sistem Təhlükəsizlik Statusu",
-        description=f"Server hazırda **Təhlükəsizlik Sistemi** tərəfindən 7/24 idarə olunur.",
+        title="🛡️ yenilmez - Sistem Statusu",
+        description=f"Server hazırda **yenilmez** tərəfindən 7/24 idarə olunur.",
         color=discord.Color.green()
     )
     embed.add_field(name="Vəziyyət", value="🟢 Stabil və İşlək", inline=True)
@@ -169,7 +169,7 @@ async def status(ctx):
 @bot.command(name="ping")
 async def ping(ctx):
     latency = round(bot.latency * 1000)
-    embed = discord.Embed(title="🏓 Bağlantı Sürəti", description=f"Gecikmə dəyəri: `{latency}ms`", color=discord.Color.blue())
+    embed = discord.Embed(title="🏓 yenilmez - Bağlantı Sürəti", description=f"Gecikmə dəyəri: `{latency}ms`", color=discord.Color.blue())
     await ctx.send(embed=embed)
 
 # 1. Mesaj Təmizləmə
@@ -238,12 +238,12 @@ async def mute_error(ctx, error):
 @bot.command(name="zar")
 async def zar(ctx):
     sayi = random.randint(1, 6)
-    await ctx.send(f"🎲 Zər atıldı: **{sayi}**")
+    await ctx.send(f"🎲 yenilmez zər atdı: **{sayi}**")
 
 @bot.command(name="yazıqtura")
 async def yazıqtura(ctx):
     netice = random.choice(["Yazı 🦅", "Tura 🪙"])
-    await ctx.send(f"🪙 Nəticə: **{netice}**")
+    await ctx.send(f"🪙 yenilmez nəticəni açıqlayır: **{netice}**")
 
 @bot.command(name="zarafat")
 async def zarafat(ctx):
@@ -260,4 +260,4 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
-        
+           
