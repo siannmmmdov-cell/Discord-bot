@@ -3,6 +3,7 @@ from discord.ext import commands
 import time
 from datetime import timedelta
 import random
+import asyncio
 import os
 from flask import Flask
 from threading import Thread
@@ -14,7 +15,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v750 Ultimate aktivdir!"
+    return "Yenilmez OS v950 Ultimate aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -48,7 +49,7 @@ SPAM_WINDOW = 3.5
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v750 ULTIMATE MASTER AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v950 ULTIMATE MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
@@ -127,18 +128,19 @@ EMOJI_GRUPLARI = {
     "❤️": ["💖", "💘", "💓", "🖤", "🔥"],
     "💖": ["❤️", "💘", "💓", "✨"],
     "🖤": ["❤️", "🤍", "💜", "🔥"],
+    "💑": ["❤️", "💖", "🔥", "✨"], # Cütlük emojisi
     "😡": ["🤬", "💢", "👊", "🔥"],
     "🤬": ["😡", "💢", "💀", "🔥"],
     "⚔️": ["🛡️", "🔥", "💀", "🏆", "⚡"],
     "🛡️": ["⚔️", "🔥", "💀", "⚡"],
     "👊": ["🔥", "💀", "💢", "👊"],
-    "🫵": ["🔥", "💀", "👑", "💯"]  # Barmaq və bənzərləri üçün
+    "🫵": ["🔥", "💀", "👑", "💯"]
 }
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    # Yalnız sənin ID-ni yoxlayır (Sənə özəldir)
-    if payload.user_id != SAHIB_ID:
+    # Sənin atdığın VƏ YA botun özünün atdığı reaksiyaları izləməsi üçün:
+    if payload.user_id != SAHIB_ID and payload.user_id != bot.user.id:
         return
     
     if payload.guild_id is None:
@@ -153,19 +155,19 @@ async def on_raw_reaction_add(payload):
     except:
         return
 
+    # Əgər reaksiya botun özü tərəfindən atılıbsa və təkrar döngüyə (loop) düşməməsi üçündür
+    if payload.user_id == bot.user.id:
+        return
+
     emoji_str = str(payload.emoji)
-    
-    # Dəri rəngi modifikatorlarını təmizləyir (məsələn: 🫵🏿 -> 🫵 kimi oxuyur)
     temiz_emoji = emoji_str.replace("\U0001fffb", "").replace("\U0001fffc", "").replace("\U0001fffd", "").replace("\U0001fffe", "").replace("\U0001ffff", "")
 
-    # Əgər dəqiq qrupda varsa onları basır, yoxdursa universal auralı emojiləri basır
     hedef_emojiler = []
     if emoji_str in EMOJI_GRUPLARI:
         hedef_emojiler = EMOJI_GRUPLARI[emoji_str]
     elif temiz_emoji in EMOJI_GRUPLARI:
         hedef_emojiler = EMOJI_GRUPLARI[temiz_emoji]
     else:
-        # Dünyadakı istənilən digər naməlum emoji üçün universal dəstək
         hedef_emojiler = ["🔥", "💀", "⚡", "👑"]
 
     for oxsar in hedef_emojiler:
@@ -177,7 +179,7 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 5. MASTER SAHİB PANELİ (TÜND QARA FON) ---
+# --- 5. MASTER SAHİB PANELİ ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -186,13 +188,13 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v750",
+        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v950",
         description="Serverin idarəetmə mərkəzi və xüsusi səlahiyyətli əmrlər siyahısı:",
         color=0x050505
     )
     embed.add_field(
         name="👑 1. Sizin Xüsusi Sahib Əmrləriniz (Özəl)", 
-        value="• `r?elan [mətn]` — Rəsmi elan atır (@everyone)\n• `r?anket [sual]` — Serverdə səsvermə anket açır\n• `r?cekilis [hədiyyə]` — Avtomatik çəkiliş başladır", 
+        value="• `r?elan [mətn]` — Rəsmi elan atır\n• `r?anket [sual]` — Səsvermə anketi açır\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik vaxtlı çəkiliş (Məs: `r?cekilis 3d Promo Nitro`)", 
         inline=False
     )
     embed.add_field(
@@ -202,17 +204,12 @@ async def bot_panel(ctx):
     )
     embed.add_field(
         name="🛡️ 3. Sərt Moderasiya & Təhlükəsizlik", 
-        value="• `r?sil [say]` — Mesajları təmizləyər\n• `r?mute [@istifadəçi]` — İstifadəçini susdurar\n• `r?unmute [@istifadəçi]` — Mute qaldırar\n• `r?ban [@istifadəçi]` — Serverdən qovar\n• `r?kick [@istifadəçi]` — Atar\n• `r?lock` / `r?unlock` — Kanalı bağlar/açar", 
+        value="• `r?sil [say]` — Mesajları təmizləyər\n• `r?mute [@istifadəçi]` — Susdurar\n• `r?ban [@istifadəçi]` — Qovar\n• `r?lock` / `r?unlock` — Kanalı bağlar/açar", 
         inline=False
     )
     embed.add_field(
         name="⚔️ 4. Auralı Oyunlar & Sistemlər", 
-        value="• `r?duel [@istifadəçi]` — Bəhsə girmə / 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Pul atma oyunu\n• `r?hacker [@istifadəçi]` — Gizli IP sızma simulyasiyası\n• `r?kasa` — Gizli server xəzinəsini yoxlama", 
-        inline=False
-    )
-    embed.add_field(
-        name="📊 5. Sistem & Profil Məlumatları", 
-        value="• `r?ping` — Botun anlıq gecikməsi\n• `r?avatar [@istifadəçi]` — Şəkil çəkmə\n• `r?serverbilgi` — Server statları", 
+        value="• `r?duel [@istifadəçi]` — 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Pul atma\n• `r?hacker [@istifadəçi]` — IP sızma simulyasiyası\n• `r?kasa` — Xəzinə kassası", 
         inline=False
     )
     embed.set_footer(text="Yenilmez OS Elite - All Rights Reserved 2026")
@@ -256,7 +253,7 @@ async def leave(ctx):
 
 
 # ==========================================
-# --- 8. SAHİBƏ ÖZƏL: ELAN, ANKET, ÇƏKİLİŞ ---
+# --- 8. SAHİBƏ ÖZƏL: ELAN, ANKET, AVTO-ÇƏKİLİŞ ---
 # ==========================================
 @bot.command(name="elan")
 async def elan(ctx, *, elan_metni: str):
@@ -282,15 +279,69 @@ async def anket(ctx, *, anket_suali: str):
     await msg.add_reaction("👎")
 
 @bot.command(name="cekilis")
-async def cekilis(ctx, *, hediyye: str):
+async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
     if ctx.author.id != SAHIB_ID:
         await ctx.send("❌ Bu əmr yalnız sahibə özəldir!")
         return
     await ctx.message.delete()
-    embed = discord.Embed(title="🎉 BÖYÜK ÇƏKİLİŞ", description=f"Hədiyyə: **{hediyye}**\n\nQatılmaq üçün aşağıdakı emojiye 🎁 bas!", color=0x050505)
-    embed.set_footer(text="Çəkiliş Sistemi")
+
+    saniye = 0
+    try:
+        if vaxt_str.endswith("s"):
+            saniye = int(vaxt_str[:-1])
+        elif vaxt_str.endswith("m"):
+            saniye = int(vaxt_str[:-1]) * 60
+        elif vaxt_str.endswith("h"):
+            saniye = int(vaxt_str[:-1]) * 3600
+        elif vaxt_str.endswith("d"):
+            saniye = int(vaxt_str[:-1]) * 86400
+        else:
+            await ctx.send("⚠️ Vaxt formatı səhvdir! Məsələn: `r?cekilis 3d Promo Nitro` (d=gün, h=saat, m=dəqiqə)")
+            return
+    except:
+        await ctx.send("⚠️ Vaxtı düzgün daxil edin! Məsələn: `3d`, `2h`, `30m`")
+        return
+
+    embed = discord.Embed(
+        title="🎉 BÖYÜK AVTO-ÇƏKİLİŞ", 
+        description=f"Hədiyyə: **{hediyye}**\n\nQatılmaq üçün aşağıdakı 🎁 emojisinə bas!\n⏳ Bitmə müddəti: **{vaxt_str}**", 
+        color=0x050505
+    )
+    embed.set_footer(text="Yenilmez OS Avtomatik Çəkiliş Sistemi")
+    
     msg = await ctx.send(embed=embed)
     await msg.add_reaction("🎁")
+
+    # Vaxtın bitməsini gözləyir
+    await asyncio.sleep(saniye)
+
+    try:
+        msg = await ctx.channel.fetch_message(msg.id)
+    except:
+        return
+
+    istirakcilar = []
+    for reaction in msg.reactions:
+        if str(reaction.emoji) == "🎁":
+            async for user in reaction.users():
+                if not user.bot:
+                    istirakcilar.append(user)
+            break
+
+    if not istirakcilar:
+        no_user_embed = discord.Embed(title="🎉 ÇƏKİLİŞ BİTDİ", description=f"Hədiyyə: **{hediyye}**\n\n⚠️ Təəssüf ki, heç kim 🎁 reaksiyasına basmadığı üçün qalib seçilmədi!", color=0x050505)
+        await ctx.send(embed=no_user_embed)
+        return
+
+    kazanan = random.choice(istirakcilar)
+    
+    win_embed = discord.Embed(
+        title="🏆 ÇƏKİLİŞ BİTDİ & QALİB SEÇİLDİ!", 
+        description=f"Hədiyyə: **{hediyye}**\n\nTəbriklər, {kazanan.mention}! 👑\nSən avtomatik olaraq çəkilişin qalibi oldun! 🎉", 
+        color=0x050505
+    )
+    win_embed.set_footer(text="Yenilmez OS Avtomatik Çəkiliş Sistemi")
+    await ctx.send(embed=win_embed)
 
 
 # ==========================================
@@ -309,23 +360,11 @@ async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
     await member.timeout(timedelta(minutes=dakika))
     await ctx.send(f"🔇 {member.mention} {dakika} dəqiqə mute olundu.")
 
-@bot.command(name="unmute")
-@commands.has_permissions(manage_roles=True)
-async def unmute_cmd(ctx, member: discord.Member):
-    await member.timeout(None)
-    await ctx.send(f"🔊 {member.mention} üçün mute qaldırıldı.")
-
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban_cmd(ctx, member: discord.Member, *, reason=None):
     await member.ban(reason=reason)
     await ctx.send(f"🔨 {member.name} ban olundu!")
-
-@bot.command(name="kick")
-@commands.has_permissions(kick_members=True)
-async def kick_cmd(ctx, member: discord.Member, *, reason=None):
-    await member.kick(reason=reason)
-    await ctx.send(f"👢 {member.name} qovuldu!")
 
 @bot.command(name="lock")
 @commands.has_permissions(manage_channels=True)
@@ -341,7 +380,7 @@ async def unlock(ctx):
 
 
 # ==========================================
-# --- 10. AURALİ & ELİT OYUNLAR ---
+# --- 10. OYUNLAR & MƏLUMAT ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -360,23 +399,19 @@ async def coinflip(ctx, secim: str = None):
     if secim.lower() == netice:
         await ctx.send(f"🪙 Nəticə: **{netice}**. Təbriklər, qazandın! 😎")
     else:
-        await ctx.send(f"🪙 Nəticə: **{netice}**. Uduzdun, bəxtini yenidən sına!")
+        await ctx.send(f"🪙 Nəticə: **{netice}**. Uduzdun!")
 
 @bot.command(name="hacker")
 async def hacker(ctx, user: discord.Member = None):
     target = user if user else ctx.author
     ip = f"{random.randint(40, 200)}.{random.randint(10, 255)}.{random.randint(10, 255)}.{random.randint(10, 255)}"
-    await ctx.send(f"💻 **{target.name}** sisteminə sızıldı! IP: `{ip}` | Əməliyyat uğurludur 🕵️‍♂️")
+    await ctx.send(f"💻 **{target.name}** sisteminə sızıldı! IP: `{ip}` 🕵️‍♂️")
 
 @bot.command(name="kasa")
 async def kasa(ctx):
     qazanc = random.randint(100, 5000)
-    await ctx.send(f"💎 Serverin gizli xəzinə kassası açıldı! İçindən **{qazanc} AZN** dəyərində qənimət çıxdı, {ctx.author.mention}!")
+    await ctx.send(f"💎 Xəzinə kassası açıldı! Qənimət: **{qazanc} AZN**, {ctx.author.mention}!")
 
-
-# ==========================================
-# --- 11. MƏLUMAT VƏ PROFİL ---
-# ==========================================
 @bot.command(name="avatar")
 async def avatar(ctx, member: discord.Member = None):
     member = member or ctx.author
@@ -384,21 +419,12 @@ async def avatar(ctx, member: discord.Member = None):
     embed.set_image(url=member.display_avatar.url)
     await ctx.send(embed=embed)
 
-@bot.command(name="serverbilgi")
-async def serverbilgi(ctx):
-    guild = ctx.guild
-    embed = discord.Embed(title=f"🏰 {guild.name} - Server Statistikası", color=0x050505)
-    embed.add_field(name="👥 Üzvlər", value=guild.member_count, inline=True)
-    embed.add_field(name="👑 Sahib", value=guild.owner, inline=True)
-    embed.add_field(name="📅 Yaradılış", value=str(guild.created_at.date()), inline=True)
-    await ctx.send(embed=embed)
-
 
 # ==========================================
-# --- 12. İŞƏ SALMA ---
+# --- 11. İŞƏ SALMA ---
 # ==========================================
 if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-    
+        
