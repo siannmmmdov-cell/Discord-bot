@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v500 Elite aktivdir!"
+    return "Yenilmez OS v550 Elite aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -33,7 +33,7 @@ intents.message_content = True
 intents.members = True
 intents.guilds = True
 intents.voice_states = True
-intents.reactions = True  # Reaksiyaları oxumaq üçün vacibdir
+intents.reactions = True
 
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
@@ -48,7 +48,7 @@ SPAM_WINDOW = 3.5
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v500 ELITE MASTER AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v550 ELITE MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
@@ -105,15 +105,36 @@ async def on_message(message):
 
 
 # ==========================================
-# --- 4. SƏNƏ ÖZƏL AVTO-REAKSİYA (JOY) SİSTEMİ ---
+# --- 4. SƏNƏ ÖZƏL KATEQORİYALI AVTO-REAKSİYA SİSTEMİ ---
 # ==========================================
+EMOJI_GRUPLARI = {
+    # Gülüş qrupu
+    "🤣": ["😂", "😆", "💀", "😹"],
+    "😂": ["🤣", "😆", "💀", "😹"],
+    "😆": ["🤣", "😂", "💀", "😹"],
+    "💀": ["🤣", "😂", "😆", "🗿"],
+    
+    # At / Heyvan qrupu
+    "🐎": ["🦄", "🐴", "⚡", "🔥"],
+    "🦄": ["🐎", "🐴", "✨", "💫"],
+    "🐴": ["🐎", "🦄", "⚡", "🐾"],
+
+    # Ürək / Sevgi qrupu
+    "❤️": ["💖", "💘", "💓", "🖤"],
+    "💖": ["❤️", "💘", "💓", "✨"],
+    "🖤": ["❤️", "🤍", "💜", "🔥"],
+
+    # Od / Aura qrupu
+    "🔥": ["⚡", "💀", "👑", "💯"],
+    "⚡": ["🔥", "💀", "⭐", "💥"]
+}
+
 @bot.event
 async def on_raw_reaction_add(payload):
-    # Yalnız sənin ID-ni yoxlayır (Yalnız sənə özəldir!)
+    # Yalnız sənin ID-ni yoxlayır (Sənə özəldir)
     if payload.user_id != SAHIB_ID:
         return
     
-    # Botun öz mesajıdısa və ya istənilən mesajdısa
     if payload.guild_id is None:
         return
 
@@ -128,17 +149,13 @@ async def on_raw_reaction_add(payload):
 
     emoji_str = str(payload.emoji)
 
-    # Əgər atdığın emoji gülməli/joy tiplidirsə (🤣, 😂, 😆, 💀 və s.)
-    gulmeli_emojiler = ["🤣", "😂", "😆", "💀", "😹"]
-    
-    if emoji_str in gulmeli_emojiler:
-        # Sənin basdığın emojidən əlavə, avtomatik digər oxşar joy emojilərini də basır
-        for e in gulmeli_emojiler:
-            if e != emoji_str:
-                try:
-                    await message.add_reaction(e)
-                except:
-                    pass
+    # Əgər basdığın emoji qruplarda varsa, həmin qrupun digər oxşarlarını avtomatik basır
+    if emoji_str in EMOJI_GRUPLARI:
+        for oxsar_emoji in EMOJI_GRUPLARI[emoji_str]:
+            try:
+                await message.add_reaction(oxsar_emoji)
+            except:
+                pass
 
 
 # ==========================================
@@ -151,9 +168,9 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v500",
+        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v550",
         description="Serverin idarəetmə mərkəzi və xüsusi səlahiyyətli əmrlər siyahısı:",
-        color=0x050505  # Dərin qara fon effekti
+        color=0x050505
     )
     embed.add_field(
         name="👑 1. Sizin Xüsusi Sahib Əmrləriniz (Özəl)", 
@@ -366,4 +383,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-    
+             
