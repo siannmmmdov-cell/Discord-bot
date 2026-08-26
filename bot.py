@@ -14,7 +14,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "yenilmez firewall v10.0 [ULTRA_SECURE]"
+    return "yenilmez firewall v12.0 [CLEAN]"
 
 def run_server():
     port = int(os.environ.get("PORT", 8080))
@@ -36,7 +36,6 @@ afk_users = {}
 @bot.event
 async def on_ready():
     print(f'🛡️ YENİLMEZ KİBER ŞƏBƏKƏ AKTİVDİR: {bot.user.name}')
-    # Profilin altında görünəcək auralı kiber status
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="root@yenilmez:~# secure_core active"))
 
 @bot.event
@@ -78,15 +77,13 @@ async def on_message(message):
     content = message.content
     lower_content = content.lower()
 
-    # 1. Sərt və Auralı Salamlama Sistemi
+    # 1. Təmiz və Səliqəli Salamlama Sistemi
     words = lower_content.split()
     salam_sozleri = ["salam", "salamun aleykum", "sa", "as", "slm", "səlam"]
     if any(word in salam_sozleri for word in words):
-        server_adi = message.guild.name
         cevaplar = [
-            f"Aleykum salam, {message.author.mention}. `{server_adi}` təhlükəsizlik zonasındasan. Ehtiyatlı ol.",
-            f"Salam, {message.author.mention}. Şəbəkə protokolları aktivdir, hər hərəkətin izlənilir.",
-            f"Aleykum salam, {message.author.mention}. Ərazi yenilmez tərəfindən qorunur."
+            f"Aleykum salam, {message.author.mention}. Yenilmezə xoş gəldin!",
+            f"Salam, {message.author.mention}. Yenilmezə xoş gəldin!"
         ]
         try:
             await message.channel.send(random.choice(cevaplar))
@@ -162,7 +159,7 @@ async def bot_panel(ctx):
     )
     embed.add_field(
         name="🛡️ 1. Firewall və Müdafiə",
-        value="• Avtomatik Sərt Salamlama\n• Qlobal Link / Reklam Filtri\n• @everyone / @here Bloku\n• Ağıllı Spam & 10 Dəqiqəlik Təcrid\n• İcazəsiz Botların Avtomatik Qovulması", 
+        value="• Avtomatik Təmiz Salamlama\n• Qlobal Link / Reklam Filtri\n• @everyone / @here Bloku\n• Ağıllı Spam & 10 Dəqiqəlik Təcrid\n• İcazəsiz Botların Avtomatik Qovulması", 
         inline=False
     )
     embed.add_field(
@@ -185,7 +182,7 @@ async def bot_panel(ctx):
         value="`r?rolver` / `r?rolal` — Rol idarəsi\n`r?profil` — Hədəf analizi\n`r?server` — Server məlumatı\n`r?guvenlik` — Təhlükəsizlik hesabatı\n`r?ping` — Gecikmə", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS v10.0 • Peşəkar İdarəetmə Sistemi")
+    embed.set_footer(text="Yenilmez OS v12.0 • Peşəkar İdarəetmə Sistemi")
     await ctx.send(embed=embed)
 
 @bot.command(name="guvenlik")
@@ -384,4 +381,4 @@ if token:
     bot.run(token)
 else:
     print("KİBER XƏTA: DISCORD_TOKEN tapılmadı!")
-        
+    
