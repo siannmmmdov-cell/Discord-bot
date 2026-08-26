@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-# Avtomatik kitabxana yoxlama və yükləmə bloku (Render xətası verməməsi üçün)
+# Avtomatik kitabxana yoxlama və yükləmə bloku
 def install_pkg(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
@@ -93,7 +93,7 @@ async def on_message(message):
         if mention.id in afk_users:
             reason = afk_users[mention.id]
             try:
-                await message.channel.send(f"💤 **{mention.name}** şu an AFK-dır. Səbəb: `{reason}`")
+                await message.channel.send(f"💤 **{mention.name}** şu an AFK-dır. Səbəb: {reason}")
             except:
                 pass
 
@@ -117,7 +117,7 @@ async def on_message(message):
         except:
             pass
 
-    # 2. Reklam və Link Qoruması (1 saatlıq timeout)
+    # 2. Reklam və Link Qoruması
     invite_regex = r"(https?://)?(www\.)?(discord\.(gg|io|me|li|club|com/invite)|t\.me|instagram\.com|youtube\.com|steamcommunity\.com/gift|nitro|free-nitro|discord-gifts\.com)/\S+"
     if re.search(invite_regex, content):
         try:
@@ -175,31 +175,26 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="⚡ YENİLMEZ OS // ULTIMATE MASTER PANEL",
-        description="**Sistem Statusu:** `ONLINE` 🟢\n**Təhlükəsizlik Səviyyəsi:** `MAXIMUM` 🛡️\nİdarəetmə mərkəzinə xoş gəldin sahib:",
+        title="⚡ YENİLMEZ OS // MASTER PANEL",
+        description="Sənin üçün xüsusi aktiv olan idarəetmə mərkəzi:",
         color=0x050505
     )
     embed.add_field(
         name="🏴‍☠️ Kiber Simulyasiya və Oyunlar",
-        value="• `r?hack [@istifadəçi]` - Hədəf sistemə sızma və pul oğurlamaq\n• `r?cuzdan` - Şəxsi kiber balansını və YNC miqdarını yoxlamaq\n• `r?yazitura` - Sikkə ataraq bəxtini sınamaq\n• `r?slot` - Slot maşını oyunu ilə böyük mükafat qazanmaq\n• `r?rusruleti` - Ölümcül rus ruleti oyunu", 
+        value="• r?hack - Hədəf sistemə sızma\n• r?cuzdan - Balansı yoxlamaq\n• r?yazitura - Sikkə oyunu\n• r?slot - Slot maşını\n• r?rusruleti - Rus ruleti", 
         inline=False
     )
     embed.add_field(
-        name="⚔️ Gelişmiş Moderasiya və Mühafizə",
-        value="• `r?sil [say]` - Kanaldakı mesajları toplu təmizləmək\n• `r?ban [@istifadəçi]` - Zərərli şəxsi serverdən qovmaq\n• `r?at [@istifadəçi]` - İstifadəçiyə kick atmaq\n• `r?mute [@istifadəçi]` - İstifadəçini vaxtlı təcrid etmək\n• `r?lock` / `r?unlock` - Kanalı mesajlara bağlamaq və açmaq\n• `r?nuke` - Kanalı tamamilə sıfırlayıb yenidən qurmaq", 
+        name="⚔️ Moderasiya və Mühafizə",
+        value="• r?sil - Mesajları təmizlə\n• r?ban - İstifadəçini ban et\n• r?at - Serverdən qov\n• r?mute - Təcrid etmək\n• r?lock / r?unlock - Kanalı kilidlə/aç\n• r?nuke - Kanalı sıfırla", 
         inline=False
     )
     embed.add_field(
-        name="🎧 Səs, Profil və Şəbəkə Alətləri",
-        value="• `r?qosul` - Səs kanalına qoşulmaq\n• `r?ayril` - Səs kanalından çıxmaq\n• `r?afk [səbəb]` - AFK rejiminə keçmək\n• `r?avatar [@istifadəçi]` - İstifadəçinin profil şəklini çəkmək\n• `r?profil [@istifadəçi]` - Detallı istifadəçi məlumatları\n• `r?server` - Server haqqında ümumi məlumat\n• `r?ping` - Botun anlıq şəbəkə gecikməsini ölçmək", 
+        name="🎧 Səs və Digər Alətlər",
+        value="• r?qosul / r?ayril - Səs kanalları\n• r?afk - AFK rejimi\n• r?avatar - Profil şəkli\n• r?profil - İstifadəçi məlumatı\n• r?server - Server bilgisi\n• r?ping - Gecikmə ölçmə", 
         inline=False
     )
-    embed.add_field(
-        name="🔧 Təhlükəsizlik Protokolları",
-        value="• Avtomatik bot qoruması aktivdir.\n• Zərərli link və reklam filtresi işləyir.\n• @everyone və @here qadağası qüvvədədir.",
-        inline=False
-    )
-    embed.set_footer(text="Yenilmez OS v24.0 • Ultimate Security Engine • Owner Only")
+    embed.set_footer(text="Yenilmez OS v24.0 • Owner Only")
     await ctx.send(embed=embed)
 
 # Ümumi Hamı üçün Yardım Əmri
@@ -210,13 +205,13 @@ async def yardim(ctx):
         description="Serverin təhlükəsizliyini qoruyan və əyləncə təqdim edən sistem.",
         color=0x111111
     )
-    embed.add_field(name="Əmrlər Siyahısı", value="`r?hack`, `r?cuzdan`, `r?yazitura`, `r?slot`, `r?rusruleti`, `r?qosul`, `r?ayril`, `r?afk`, `r?avatar`, `r?profil`, `r?server`, `r?ping`", inline=False)
+    embed.add_field(name="Əmrlər Siyahısı", value="r?hack, r?cuzdan, r?yazitura, r?slot, r?rusruleti, r?qosul, r?ayril, r?afk, r?avatar, r?profil, r?server, r?ping", inline=False)
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
 async def ping(ctx):
     latency = round(bot.latency * 1000)
-    await ctx.send(f"⚡ Gecikmə müddəti: `{latency}ms`")
+    await ctx.send(f"⚡ Gecikmə müddəti: {latency}ms")
 
 # ==========================================
 # MODERASİYA ƏMRLƏRİ
@@ -228,7 +223,7 @@ async def sil(ctx, amount: int = 10):
         return
     if amount > 100: amount = 100
     await ctx.channel.purge(limit=amount + 1)
-    msg = await ctx.send(f"🗑️ `{amount}` ədəd mesaj təmizləndi.")
+    msg = await ctx.send(f"🗑️ {amount} ədəd mesaj təmizləndi.")
     await msg.delete(delay=3)
 
 @bot.command(name="ban")
@@ -289,14 +284,14 @@ async def nuke(ctx):
 @bot.command(name="hack")
 async def hack(ctx, member: discord.Member = None):
     if not member:
-        await ctx.send("❌ Hədəf qeyd etməlisən: `r?hack @istifadəçi`")
+        await ctx.send("❌ Hədəf qeyd etməlisən: r?hack @istifadəçi")
         return
     if member.id == ctx.author.id:
         await ctx.send("❌ Özünü hackləyə bilməzsən!")
         return
 
     asamalar = [
-        f"💻 `{member.name}` sisteminə sızılır...",
+        f"💻 {member.name} sisteminə sızılır...",
         f"🔓 Firewall mühafizəsi aşılır...",
         f"📂 Verilənlər ələ keçirilir...",
         f"✅ Əməliyyat uğurla başa çatdı!"
@@ -313,20 +308,20 @@ async def hack(ctx, member: discord.Member = None):
         user_wallet[ctx.author.id] = 100
     user_wallet[ctx.author.id] += para
 
-    embed = discord.Embed(title="🏴‍☠️ HACK REPORT", description=f"**{ctx.author.mention}**, `{member.name}` hədəfini hacklədin və `{para} YNC` oğurladın!", color=0x050505)
+    embed = discord.Embed(title="🏴‍☠️ HACK REPORT", description=f"**{ctx.author.mention}**, {member.name} hədəfini hacklədin və {para} YNC oğurladın!", color=0x050505)
     await ctx.send(embed=embed)
 
 @bot.command(name="cuzdan")
 async def cuzdan(ctx):
     uid = ctx.author.id
     balans = user_wallet.get(uid, 100)
-    embed = discord.Embed(title="🪙 Kiber Cüzdan", description=f"**{ctx.author.mention}**, balansın: **`{balans} YNC`**", color=0xffd700)
+    embed = discord.Embed(title="🪙 Kiber Cüzdan", description=f"**{ctx.author.mention}**, balansın: **{balans} YNC**", color=0xffd700)
     await ctx.send(embed=embed)
 
 @bot.command(name="yazitura")
 async def yazitura(ctx, secim: str = None):
     if not secim or secim.lower() not in ["yazı", "tura", "yazi"]:
-        await ctx.send("❌ Doğru istifadə: `r?yazitura yazı` və ya `r?yazitura tura`")
+        await ctx.send("❌ Doğru istifadə: r?yazitura yazı və ya r?yazitura tura")
         return
     neticə = random.choice(["yazı", "tura"])
     secim = "yazı" if secim.lower() == "yazi" else secim.lower()
@@ -373,7 +368,7 @@ async def qosul(ctx):
             await channel.connect()
         await ctx.send(f"🔊 Səs kanalına qoşuldum: **{channel.name}**")
     except Exception as e:
-        await ctx.send(f"❌ Xəta: `{e}`")
+        await ctx.send(f"❌ Xəta: {e}")
 
 @bot.command(name="ayril")
 async def ayril(ctx):
@@ -399,7 +394,7 @@ async def avatar(ctx, member: discord.Member = None):
 async def profil(ctx, member: discord.Member = None):
     member = member or ctx.author
     embed = discord.Embed(title=f"👤 İstifadəçi: {member.name}", color=0x111111)
-    embed.add_field(name="ID", value=member.id, inline=True)
+    embed.add_field(name="ID", value=str(member.id), inline=True)
     embed.add_field(name="Giriş", value=member.joined_at.strftime("%d.%m.%Y"), inline=True)
     embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
     await ctx.send(embed=embed)
@@ -410,7 +405,7 @@ async def server(ctx: commands.Context):
     if guild is None:
         return
     embed = discord.Embed(title=f"🏰 Server: {guild.name}", color=0x111111)
-    embed.add_field(name="Üzv Sayı", value=guild.member_count, inline=True)
+    embed.add_field(name="Üzv Sayı", value=str(guild.member_count), inline=True)
     embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
     await ctx.send(embed=embed)
 
@@ -422,3 +417,4 @@ if token:
     bot.run(token)
 else:
     print("XƏTA: DISCORD_TOKEN tapılmadı!")
+            
