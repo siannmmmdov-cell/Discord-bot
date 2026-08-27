@@ -91,7 +91,7 @@ async def on_message(message):
 
 
 # ==========================================
-# --- EMOJİLƏRƏ AVTO-REAKTİV CAVABLAR ---
+# --- YALNIZ SƏNİN REAKSİYALARINA AVTO-CAVAB ---
 # ==========================================
 EMOJI_GRUPLARI = {
     "🤣": ["😂", "😆", "💀", "😹"],
@@ -104,8 +104,9 @@ EMOJI_GRUPLARI = {
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    if payload.user_id == bot.user.id or payload.guild_id is None:
+    if payload.user_id != SAHIB_ID or payload.guild_id is None:
         return
+        
     channel = bot.get_channel(payload.channel_id)
     if not channel:
         return
@@ -125,12 +126,11 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 💀 MASTER SAHİB PANELİ (ALT-ALTA & İZAHATLI) ---
+# --- 💀 MASTER SAHİB PANELİ (GİZLİ) ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu panelə yalnız baş sahib girə bilər!")
         return
 
     embed = discord.Embed(
@@ -350,7 +350,7 @@ async def hesabla(ctx, *, ifade: str):
 
 
 # ==========================================
-# --- 3. MODERASİYA & TƏHLÜKƏSİZLİK (XƏTA YOXLAYICI İLƏ) ---
+# --- 3. MODERASİYA & TƏHLÜKƏSİZLİK ---
 # ==========================================
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
@@ -478,7 +478,7 @@ async def kanalac(ctx, *, kanal_adi: str):
 
 
 # ==========================================
-# --- 5. OYUNlar & ƏYLƏNCƏ ---
+# --- 5. OYUNLAR & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -538,4 +538,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-                           
+    
