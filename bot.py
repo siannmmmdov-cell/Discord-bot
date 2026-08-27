@@ -15,7 +15,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v2500 Ultimate All-In-One aktivdir!"
+    return "Yenilmez OS v2600 Ultimate aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -48,11 +48,11 @@ start_time = time.time()
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v2500 ULTIMATE ALL-IN-ONE AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v2600 ULTIMATE AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Games & 50+ Commands 🛡️"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Auto-Salam & 50+ Commands 🛡️"))
 
 
 # ==========================================
@@ -69,18 +69,26 @@ async def on_member_join(member):
 
 
 # ==========================================
-# --- 4. SƏRT QORUMA (8 Eyni söz, 7 Şəkil, Flood) ---
+# --- 4. SƏRT QORUMA & AVTO-SALAM SİSTEMİ ---
 # ==========================================
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
 
+    content_lower = message.content.lower()
+
+    # --- KİMSƏ CHAT-DA SALAM YAZANDA AVTOMATİK CAVAB ---
+    if "salam" in content_lower:
+        try:
+            await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəldiniz! 👑")
+        except:
+            pass
+
     if message.author.id == SAHIB_ID:
         await bot.process_commands(message)
         return
 
-    content_lower = message.content.lower()
     author_id = message.author.id
     current_time = time.time()
 
@@ -191,7 +199,7 @@ async def on_message(message):
 
 
 # ==========================================
-# --- 5. EMOJİLƏRƏ REAKTİV CAVABLAR (İLK BASDIĞIN JOY DA BAXIR) ---
+# --- 5. EMOJİLƏRƏ REAKTİV CAVABLAR ---
 # ==========================================
 EMOJI_GRUPLARI = {
     "🤣": ["😂", "😆", "💀", "😹"],
@@ -215,8 +223,6 @@ async def on_raw_reaction_add(payload):
         return
 
     emoji_str = str(payload.emoji)
-    
-    # İstifadəçinin basdığı ilk joy-a (emojiyə) hörmət olaraq əvvəlcə onu qoruyuruş, sonra qrupdakı digərlərini əlavə edirik
     hedef_emojiler = EMOJI_GRUPLARI.get(emoji_str, ["🔥", "💀", "⚡", "👑"])
     for oxsar in hedef_emojiler:
         if oxsar != emoji_str:
@@ -227,7 +233,7 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 6. MASTER SAHİB PANELİ (50+ KOMANDA) ---
+# --- 6. MASTER SAHİB PANELİ ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -236,8 +242,8 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // 50+ ALL-IN-ONE MASTER PANEL",
-        description="Bütün oyunlar, xüsusi sahib əmrləri və server idarəetmə vasitələri:",
+        title="💀 YENİLMEZ OS // ULTIMATE MASTER PANEL",
+        description="Bütün oyunlar, xüsusi sahib əmrləri və idarəetmə mərkəzi:",
         color=0x050505
     )
     embed.add_field(
@@ -265,7 +271,7 @@ async def bot_panel(ctx):
         value="`r?server`, `r?online`, `r?botinfo`, `r?ping`, `r?userinfo`, `r?kanalbilgi`, `r?rolbilgi`, `r?boosters`, `r?ikon`, `r?banner`, `r?hava`, `r?hesabla`, `r?kodla`, `r?base64`, `r?saygac`", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS v2500 Core - 50+ Commands Loaded")
+    embed.set_footer(text="Yenilmez OS v2600 Core - All Rights Reserved")
     await ctx.send(embed=embed)
 
 
@@ -358,7 +364,7 @@ async def duyuru(ctx, *, metin: str):
 @bot.command(name="karliste")
 async def karliste(ctx):
     if ctx.author.id != SAHIB_ID: return
-    await ctx.send("📋 Qara siyahı təmizdir. Heç bir istifadəçi bloklanmayıب.")
+    await ctx.send("📋 Qara siyahı təmizdir. Heç bir istifadəçi bloklanmayıb.")
 
 @bot.command(name="bakim")
 async def bakim(ctx):
@@ -532,4 +538,4 @@ async def nick(ctx, member: discord.Member, *, yeni_ad: str):
     await ctx.send(f"✏️ {member.mention} istifadəçisinin adı dəyişdirildi: **{yeni_ad}**")
 
 @bot.command(name="avatar")
-async def avatar(ctx, member: discord.M
+async def av
