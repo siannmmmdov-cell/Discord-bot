@@ -1,3 +1,4 @@
+
 import discord
 from discord.ext import commands
 import time
@@ -350,7 +351,7 @@ async def hesabla(ctx, *, ifade: str):
 
 
 # ==========================================
-# --- 3. MODERASİYA & TƏHLÜKƏSİZLİK ---
+# --- 3. MODERASİYA & TƏHLÜKƏSİZLİK (XƏTA YOXLAYICI İLƏ) ---
 # ==========================================
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
@@ -362,33 +363,48 @@ async def sil(ctx, say: int = 5):
 @bot.command(name="mute")
 @commands.has_permissions(manage_roles=True)
 async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
-    await member.timeout(timedelta(minutes=dakika))
-    await ctx.send(f"🔇 {member.mention} mute olundu.")
+    try:
+        await member.timeout(timedelta(minutes=dakika))
+        await ctx.send(f"🔇 {member.mention} {dakika} dəqiqəlik mute olundu.")
+    except Exception as e:
+        await ctx.send(f"❌ Mute vermək olmadı! Xəta: `{e}`")
 
 @bot.command(name="unmute")
 @commands.has_permissions(manage_roles=True)
 async def unmute_cmd(ctx, member: discord.Member):
-    await member.timeout(None)
-    await ctx.send(f"🔊 {member.mention} mutesi açıldı.")
+    try:
+        await member.timeout(None)
+        await ctx.send(f"🔊 {member.mention} mutesi açıldı.")
+    except Exception as e:
+        await ctx.send(f"❌ Mute açmaq olmadı! Xəta: `{e}`")
 
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban_cmd(ctx, member: discord.Member, *, reason=None):
-    await member.ban(reason=reason)
-    await ctx.send(f"🔨 {member.name} ban olundu!")
+    try:
+        await member.ban(reason=reason)
+        await ctx.send(f"🔨 {member.name} uğurla ban olundu!")
+    except Exception as e:
+        await ctx.send(f"❌ Ban etmək mümkün olmadı! Xəta: `{e}`")
 
 @bot.command(name="unban")
 @commands.has_permissions(ban_members=True)
 async def unban_cmd(ctx, user_id: int):
-    user = await bot.fetch_user(user_id)
-    await ctx.guild.unban(user)
-    await ctx.send(f"🔓 {user.name} banı açıldı.")
+    try:
+        user = await bot.fetch_user(user_id)
+        await ctx.guild.unban(user)
+        await ctx.send(f"🔓 {user.name} banı açıldı.")
+    except Exception as e:
+        await ctx.send(f"❌ Banı açmaq olmadı! Xəta: `{e}`")
 
 @bot.command(name="kick")
 @commands.has_permissions(kick_members=True)
 async def kick_cmd(ctx, member: discord.Member, *, reason=None):
-    await member.kick(reason=reason)
-    await ctx.send(f"👢 {member.name} atıldı.")
+    try:
+        await member.kick(reason=reason)
+        await ctx.send(f"👢 {member.name} uğurla atıldı!")
+    except Exception as e:
+        await ctx.send(f"❌ Atmaq mümkün olmadı! Xəta: `{e}`")
 
 @bot.command(name="lock")
 @commands.has_permissions(manage_channels=True)
@@ -415,20 +431,29 @@ async def slowmode(ctx, saniye: int = 0):
 @bot.command(name="rolver")
 @commands.has_permissions(manage_roles=True)
 async def rolver(ctx, member: discord.Member, role: discord.Role):
-    await member.add_roles(role)
-    await ctx.send(f"✅ {member.mention} rol verildi.")
+    try:
+        await member.add_roles(role)
+        await ctx.send(f"✅ {member.mention} rol verildi.")
+    except Exception as e:
+        await ctx.send(f"❌ Rol vermək olmadı! Xəta: `{e}`")
 
 @bot.command(name="rolsil")
 @commands.has_permissions(manage_roles=True)
 async def rolsil(ctx, member: discord.Member, role: discord.Role):
-    await member.remove_roles(role)
-    await ctx.send(f"❌ Rol alındı.")
+    try:
+        await member.remove_roles(role)
+        await ctx.send(f"❌ Rol alındı.")
+    except Exception as e:
+        await ctx.send(f"❌ Rol almaq olmadı! Xəta: `{e}`")
 
 @bot.command(name="nick")
 @commands.has_permissions(manage_nicknames=True)
 async def nick(ctx, member: discord.Member, *, yeni_ad: str):
-    await member.edit(nick=yeni_ad)
-    await ctx.send(f"✏️ Ad dəyişdirildi.")
+    try:
+        await member.edit(nick=yeni_ad)
+        await ctx.send(f"✏️ Ad dəyişdirildi.")
+    except Exception as e:
+        await ctx.send(f"❌ Adı dəyişmək olmadı! Xəta: `{e}`")
 
 @bot.command(name="avatar")
 async def avatar(ctx, member: discord.Member = None):
@@ -454,7 +479,7 @@ async def kanalac(ctx, *, kanal_adi: str):
 
 
 # ==========================================
-# --- 5. OYUNLAR & ƏYLƏNCƏ ---
+# --- 5. OYUNlar & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -514,4 +539,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-    
+        
