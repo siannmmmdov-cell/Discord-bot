@@ -42,6 +42,9 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 SAHIB_ID = 641014966312501259
 start_time = time.time()
 
+# Spam qoruması üçün yaddaş (normal üzvləri narahat etməyən ağıllı sistem)
+spam_kontrol = {}
+
 @bot.event
 async def on_ready():
     print(f"YENILMEZ OS v2600 ULTIMATE SECURE AKTİVDİR: {bot.user.name}")
@@ -81,8 +84,27 @@ async def on_message(message):
     if "discord.gg/" in content_lower or "https://" in content_lower or "http://" in content_lower:
         try:
             await message.delete()
-            await message.channel.send(f"⚠️ {message.author.mention}, link paylaşmaq qadağandır!", delete_after=5)
             await message.author.timeout(timedelta(minutes=10), reason="Link paylaşımı")
+        except:
+            pass
+        return
+
+    # Ağıllı Anti-Spam (Normal yazışmalara toxunmur, yalnız həqiqi spamı tutur)
+    author_id = message.author.id
+    simdi = time.time()
+    
+    if author_id not in spam_kontrol:
+        spam_kontrol[author_id] = []
+    
+    # Son 4 saniyədə atılan mesajları yoxlayır
+    spam_kontrol[author_id] = [t for t in spam_kontrol[author_id] if simdi - t < 4]
+    spam_kontrol[author_id].append(simdi)
+    
+    # Əgər kimsə 4 saniyə içində 5-dən çox ardıcıl mesaj atarsa spam sayılır
+    if len(spam_kontrol[author_id]) > 5:
+        try:
+            await message.channel.purge(limit=6, check=lambda m: m.author.id == author_id)
+            await message.author.timeout(timedelta(minutes=5), reason="Spam etmək")
         except:
             pass
         return
@@ -538,4 +560,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-    
+        
