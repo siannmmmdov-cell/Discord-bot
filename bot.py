@@ -80,11 +80,11 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
-    # Link / Reklam Qadağası
-    if "discord.gg/" in content_lower or "https://" in content_lower or "http://" in content_lower:
+    # Yalnız Discord Dəvət Linkləri və Zərərli Reklam Qadağası (Normal linklərə toxunmur)
+    if "discord.gg/" in content_lower or "discord.com/invite/" in content_lower:
         try:
             await message.delete()
-            await message.author.timeout(timedelta(minutes=10), reason="Link paylaşımı")
+            await message.author.timeout(timedelta(minutes=10), reason="İznsiz dəvət linki paylaşımı")
         except:
             pass
         return
@@ -560,4 +560,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-        
+            
