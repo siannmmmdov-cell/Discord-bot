@@ -15,7 +15,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v1500 Ultimate Armor aktivdir!"
+    return "Yenilmez OS v1500 Strict Master aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -39,21 +39,20 @@ intents.presences = True
 
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
-# Yalnız sənin ID-n (Master Sahib)
+# Yalnız və yalnız sənin ID-n (Master Sahib - Başqası heç nə edə bilməz)
 SAHIB_ID = 641014966312501259
 
-# İzləmə lüğətləri (Spam, Eyni söz və Şəkil sayğacları)
 user_trackers = {}
 start_time = time.time()
 
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v1500 ULTIMATE ARMOR AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v1500 STRICT MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Ultimate Security 🛡️"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Strict Security 🛡️"))
 
 
 # ==========================================
@@ -63,7 +62,7 @@ async def on_ready():
 async def on_member_join(member):
     if member.bot and member.id != bot.user.id:
         try:
-            await member.guild.ban(member, reason="Təhlükəsizlik: İznsiz kənar bot girişi aşkarlandı!")
+            await member.guild.ban(member, reason="Təhlükəsizlik: İznsiz kənar bot girişi dərhal bloklandı!")
             return
         except:
             pass
@@ -77,8 +76,8 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # Sahib və Adminlərə qadağalar şamil olunmur
-    if message.author.guild_permissions.administrator or message.author.id == SAHIB_ID:
+    # Yalnız Sahibə heç bir cəza şamil olunmur. Adminlər belə qaydalara tabedir!
+    if message.author.id == SAHIB_ID:
         await bot.process_commands(message)
         return
 
@@ -96,7 +95,6 @@ async def on_message(message):
             pass
         return
 
-    # İstifadəçi qeydiyyatı yoxdursa yaradırıq
     if author_id not in user_trackers:
         user_trackers[author_id] = {
             "last_message": "",
@@ -104,7 +102,7 @@ async def on_message(message):
             "image_count": 0,
             "flood_count": 0,
             "last_time": current_time,
-            "penalty_stage": 0  # 0: Normal, 1: Xəbərdarlıq, 2: Mute (5 dəq), 3: Ban
+            "penalty_stage": 0  # 0: Xəbərdarlıq, 1: Mute (5 dəq), 2: Ban
         }
 
     data = user_trackers[author_id]
@@ -128,7 +126,7 @@ async def on_message(message):
                 await message.channel.send(f"🔇 {message.author.mention}, ardıcıl şəkil spamına görə 5 dəqiqəlik mute olundunuz!", delete_after=5)
             else:
                 try:
-                    await message.guild.ban(message.author, reason="Təkrarolunan şəkil spamı və xəbərdarlığa məhəl qoymama")
+                    await message.guild.ban(message.author, reason="Təkrarolunan şəkil spamı")
                     await message.channel.send(f"🔨 {message.author.mention} serverdən ban olundu!")
                 except:
                     pass
@@ -159,7 +157,7 @@ async def on_message(message):
         else:
             try:
                 await message.guild.ban(message.author, reason="Təkrar olunan eyni mesaj spamı")
-                await message.channel.send(f"🔨 {message.author.mention} qaydalara tabe olmadığı üçün ban olundu!")
+                await message.channel.send(f"🔨 {message.author.mention} ban olundu!")
             except:
                 pass
         return
@@ -233,50 +231,50 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 6. MASTER SAHİB PANELİ (v1500) ---
+# --- 6. MASTER SAHİB PANELİ (YALNIZ SƏN) ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu panel yalnız botun sahibinə məxsusdur!")
+        await ctx.send("❌ Bu panelə giriş yalnız baş sahibə (`SAHIB_ID`) məxsusdur!")
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ULTIMATE ARMOR PANEL v1500",
-        description="Serverin idarəetmə mərkəzi, xüsusi sahib əmrləri və sərt qoruma sistemləri:",
+        title="💀 YENİLMEZ OS // STRICT MASTER PANEL v1500",
+        description="Bütün eksklüziv sahib əmrləri və idarəetmə mərkəzi:",
         color=0x050505
     )
     embed.add_field(
-        name="👑 1. Yalnız Sənin Edə Biləcəyin Sahib Əmrlərin (Özəl)", 
-        value="• `r?elan [mətn]` — @everyone ilə rəsmi elan atır\n• `r?anket [sual]` — Serverdə səsvermə anket açır\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik vaxtlı çəkiliş başladır", 
+        name="👑 1. Yalnız Sənin İşlədə Biləcəyin Əmrlər", 
+        value="• `r?elan [mətn]` — @everyone ilə rəsmi elan\n• `r?anket [sual]` — Səsvermə anketi\n• `r?cekilis [vaxt] [hədiyyə]` — Avtomatik çəkiliş", 
         inline=False
     )
     embed.add_field(
         name="📊 2. Server & Məlumat Sistemləri", 
-        value="• `r?server` — Server haqqında ətraflı məlumat\n• `r?userinfo [@istifadəçi]` — İstifadəçi haqqında dərin məlumat\n• `r?botinfo` — Botun işləmə müddəti", 
+        value="• `r?server` — Server məlumatı\n• `r?userinfo [@istifadəçi]` — İstifadəçi yoxlaması\n• `r?botinfo` — Bot statusu", 
         inline=False
     )
     embed.add_field(
         name="🛡️ 3. Sərt Moderasiya & Təhlükəsizlik", 
-        value="• `r?sil [say]` — Mesajları təmizləyər\n• `r?mute / r?unmute` — Susdurma əməliyyatları\n• `r?ban / r?kick` — Qovma əməliyyatları\n• `r?lock / r?unlock` — Kanalı bağlar/açar", 
+        value="• `r?sil [say]` — Mesaj təmizliyi\n• `r?mute / r?unmute` — Susdurma\n• `r?ban / r?kick` — Qovma\n• `r?lock / r?unlock` — Kanal kilidi", 
         inline=False
     )
     embed.add_field(
         name="⚔️ 4. Oyunlar & Əyləncə", 
-        value="• `r?duel [@istifadəçi]` — 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Qəpik atma\n• `r?slot` — Slot maşını oyunu\n• `r?hacker [@istifadəçi]` — IP simulyasiyası", 
+        value="• `r?duel [@istifadəçi]` — 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Qəpik\n• `r?slot` — Slot maşını\n• `r?hacker [@istifadəçi]` — IP simulyasiyası", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS Armor Core - All Rights Reserved 2026")
+    embed.set_footer(text="Yenilmez OS Strict Core - All Rights Reserved 2026")
     await ctx.send(embed=embed)
 
 
 # ==========================================
-# --- 7. SAHİBƏ ÖZƏL ƏMRLƏR (YALNIZ SƏN) ---
+# --- 7. YALNIZ SAHİBİN İŞLƏDƏ BİLƏCƏYİ ƏMRLƏR ---
 # ==========================================
 @bot.command(name="elan")
 async def elan(ctx, *, elan_metni: str):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmri yalnız botun sahibi işlədə bilər!")
+        await ctx.send("❌ Bu əmri başqası işlədə bilməz! Yalnız baş sahibə məxsusdur.")
         return
     await ctx.message.delete()
     embed = discord.Embed(title="📢 RƏSMİ SERVER ELANI", description=elan_metni, color=0x050505)
@@ -287,7 +285,7 @@ async def elan(ctx, *, elan_metni: str):
 @bot.command(name="anket")
 async def anket(ctx, *, anket_suali: str):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmri yalnız botun sahibi işlədə bilər!")
+        await ctx.send("❌ Bu əmri başqası işlədə bilməz! Yalnız baş sahibə məxsusdur.")
         return
     await ctx.message.delete()
     embed = discord.Embed(title="📊 YENİ ANKET / SƏSVERMƏ", description=anket_suali, color=0x050505)
@@ -299,7 +297,7 @@ async def anket(ctx, *, anket_suali: str):
 @bot.command(name="cekilis")
 async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmri yalnız botun sahibi işlədə bilər!")
+        await ctx.send("❌ Bu əmri başqası işlədə bilməz! Yalnız baş sahibə məxsusdur.")
         return
     await ctx.message.delete()
 
@@ -338,7 +336,7 @@ async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
 
     kazanan = random.choice(istirakcilar)
     win_embed = discord.Embed(title="🏆 ÇƏKİLİŞ QALİBİ!", description=f"Hədiyyə: **{hediyye}**\nTəbriklər, {kazanan.mention}! 🎉", color=0x050505)
-    await ctx.send(embed=win_embed)
+    await ctx.send(win_embed)
 
 
 # ==========================================
@@ -448,4 +446,3 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-                
