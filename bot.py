@@ -70,7 +70,8 @@ async def on_message(message):
 
     content_lower = message.content.lower()
 
-    if "salam" in content_lower:
+    # Əgər mesaj başqası tərəfindən yazılıbsa, reply (istinad) DEYİLSƏ və "salam" varsa cavab ver
+    if message.author.id != SAHIB_ID and message.reference is None and "salam" in content_lower:
         try:
             await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəldiniz! 👑")
         except:
@@ -560,4 +561,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-            
+        
