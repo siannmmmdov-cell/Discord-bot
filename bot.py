@@ -9,13 +9,13 @@ from flask import Flask
 from threading import Thread
 
 # ==========================================
-# --- 1. RENDER ÜÇÜN DİNAMİK PORTLU FLASK ---
+# --- 1. RENDER ÜÇÜN DİNAMİK PORTlu FLASK ---
 # ==========================================
 app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v1500 Monster aktivdir!"
+    return "Yenilmez OS v1500 Ultimate Armor aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -42,18 +42,18 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 # Yalnız sənin ID-n (Master Sahib)
 SAHIB_ID = 641014966312501259
 
-spam_records = {}
-SPAM_WINDOW = 4.0       
+# İzləmə lüğətləri (Spam, Eyni söz və Şəkil sayğacları)
+user_trackers = {}
 start_time = time.time()
 
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v1500 MONSTER MASTER AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v1500 ULTIMATE ARMOR AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Elite Control 🛡️"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Ultimate Security 🛡️"))
 
 
 # ==========================================
@@ -63,60 +63,134 @@ async def on_ready():
 async def on_member_join(member):
     if member.bot and member.id != bot.user.id:
         try:
-            await member.guild.ban(member, reason="İznsiz kənar bot girişi / Raid cəhdi")
+            await member.guild.ban(member, reason="Təhlükəsizlik: İznsiz kənar bot girişi aşkarlandı!")
             return
         except:
             pass
 
 
 # ==========================================
-# --- 4. TƏHLÜKƏSİZLİK & LİNK/SPAM BLOKU ---
+# --- 4. SƏRT QORUMA & İSTƏDİYİN QAYDALAR ---
 # ==========================================
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
 
+    # Sahib və Adminlərə qadağalar şamil olunmur
     if message.author.guild_permissions.administrator or message.author.id == SAHIB_ID:
         await bot.process_commands(message)
         return
 
     content_lower = message.content.lower()
+    author_id = message.author.id
+    current_time = time.time()
 
+    # Link və Reklam Qadağası
     if "discord.gg/" in content_lower or "discord.com/invite/" in content_lower or "http://" in content_lower or "https://" in content_lower:
         try:
             await message.delete()
             await message.channel.send(f"⚠️ {message.author.mention}, serverdə reklam və link paylaşmaq qadağandır!", delete_after=5)
-            await message.author.timeout(timedelta(minutes=10), reason="Serverdə Link/Reklam Paylaşımı")
+            await message.author.timeout(timedelta(minutes=10), reason="Link/Reklam Paylaşımı")
         except:
             pass
         return
 
-    current_time = time.time()
-    author_id = message.author.id
+    # İstifadəçi qeydiyyatı yoxdursa yaradırıq
+    if author_id not in user_trackers:
+        user_trackers[author_id] = {
+            "last_message": "",
+            "same_text_count": 0,
+            "image_count": 0,
+            "flood_count": 0,
+            "last_time": current_time,
+            "penalty_stage": 0  # 0: Normal, 1: Xəbərdarlıq, 2: Mute (5 dəq), 3: Ban
+        }
 
-    if author_id not in spam_records:
-        spam_records[author_id] = {"last_time": current_time, "warns": 0}
+    data = user_trackers[author_id]
+
+    # A) Dalbadal Şəkil Atma Qorunması (7 şəkil)
+    has_image = len(message.attachments) > 0 or "https://images" in content_lower or "cdn.discordapp.com" in content_lower
+    if has_image:
+        data["image_count"] += 1
+        if data["image_count"] >= 7:
+            try:
+                await message.delete()
+            except:
+                pass
+            
+            if data["penalty_stage"] == 0:
+                data["penalty_stage"] = 1
+                await message.channel.send(f"⚠️ {message.author.mention}, ardıcıl çoxlu şəkil atırsınız! Dayanın.", delete_after=5)
+            elif data["penalty_stage"] == 1:
+                data["penalty_stage"] = 2
+                await message.author.timeout(timedelta(minutes=5), reason="Ardıcıl 7 şəkil spamı")
+                await message.channel.send(f"🔇 {message.author.mention}, ardıcıl şəkil spamına görə 5 dəqiqəlik mute olundunuz!", delete_after=5)
+            else:
+                try:
+                    await message.guild.ban(message.author, reason="Təkrarolunan şəkil spamı və xəbərdarlığa məhəl qoymama")
+                    await message.channel.send(f"🔨 {message.author.mention} serverdən ban olundu!")
+                except:
+                    pass
+            return
     else:
-        data = spam_records[author_id]
-        if current_time - data["last_time"] < SPAM_WINDOW:
-            data["last_time"] = current_time
+        data["image_count"] = 0
+
+    # B) 8 Eyni Söz / Mesaj Qorunması
+    if message.content == data["last_message"] and message.content != "":
+        data["same_text_count"] += 1
+    else:
+        data["same_text_count"] = 1
+        data["last_message"] = message.content
+
+    if data["same_text_count"] >= 8:
+        try:
+            await message.delete()
+        except:
+            pass
+
+        if data["penalty_stage"] == 0:
+            data["penalty_stage"] = 1
+            await message.channel.send(f"⚠️ {message.author.mention}, eyni şeyi 8 dəfə yazdınız! Xəbərdarlıq alırsınız.", delete_after=5)
+        elif data["penalty_stage"] == 1:
+            data["penalty_stage"] = 2
+            await message.author.timeout(timedelta(minutes=5), reason="8 dəfə eyni sözü spam etmək")
+            await message.channel.send(f"🔇 {message.author.mention}, eyni sözü təkrar yazdığınız üçün 5 dəqiqəlik mute olundunuz!", delete_after=5)
+        else:
+            try:
+                await message.guild.ban(message.author, reason="Təkrar olunan eyni mesaj spamı")
+                await message.channel.send(f"🔨 {message.author.mention} qaydalara tabe olmadığı üçün ban olundu!")
+            except:
+                pass
+        return
+
+    # C) Dalbadal Fərqli Mesajlar (Flood Qorunması)
+    if current_time - data["last_time"] < 3.0:
+        data["flood_count"] += 1
+        data["last_time"] = current_time
+        if data["flood_count"] >= 8:
             try:
                 await message.delete()
             except:
                 pass
 
-            data["warns"] += 1
-            if data["warns"] >= 2:
+            if data["penalty_stage"] == 0:
+                data["penalty_stage"] = 1
+                await message.channel.send(f"⚠️ {message.author.mention}, çox sürətli mesaj yazırsınız (Flood)!", delete_after=5)
+            elif data["penalty_stage"] == 1:
+                data["penalty_stage"] = 2
+                await message.author.timeout(timedelta(minutes=5), reason="Ardıcıl fərqli mesaj spamı")
+                await message.channel.send(f"🔇 {message.author.mention}, sürətli mesaj spamına görə 5 dəqiqəlik mute olundunuz!", delete_after=5)
+            else:
                 try:
-                    await message.author.timeout(timedelta(minutes=5), reason="Spam")
-                    await message.channel.send(f"🔇 {message.author.mention}, spam etdiyin üçün mute olundun!", delete_after=5)
-                    data["warns"] = 0 
+                    await message.guild.ban(message.author, reason="Davamlı flood spamı")
+                    await message.channel.send(f"🔨 {message.author.mention} ban olundu!")
                 except:
                     pass
             return
-        else:
-            data["last_time"] = current_time
+    else:
+        data["flood_count"] = 0
+        data["last_time"] = current_time
 
     await bot.process_commands(message)
 
@@ -135,9 +209,7 @@ EMOJI_GRUPLARI = {
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    if payload.user_id == bot.user.id:
-        return
-    if payload.guild_id is None:
+    if payload.user_id == bot.user.id or payload.guild_id is None:
         return
 
     channel = bot.get_channel(payload.channel_id)
@@ -170,8 +242,8 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v1500",
-        description="Serverin idarəetmə mərkəzi, xüsusi sahib əmrləri və sistemlər:",
+        title="💀 YENİLMEZ OS // ULTIMATE ARMOR PANEL v1500",
+        description="Serverin idarəetmə mərkəzi, xüsusi sahib əmrləri və sərt qoruma sistemləri:",
         color=0x050505
     )
     embed.add_field(
@@ -194,12 +266,12 @@ async def bot_panel(ctx):
         value="• `r?duel [@istifadəçi]` — 1v1 döyüş\n• `r?coinflip [yazı/tura]` — Qəpik atma\n• `r?slot` — Slot maşını oyunu\n• `r?hacker [@istifadəçi]` — IP simulyasiyası", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS Elite - All Rights Reserved 2026")
+    embed.set_footer(text="Yenilmez OS Armor Core - All Rights Reserved 2026")
     await ctx.send(embed=embed)
 
 
 # ==========================================
-# --- 7. SAHİBƏ ÖZƏL ƏMRLƏR (YALNIZ SƏN EDƏ BİLƏRSƏN) ---
+# --- 7. SAHİBƏ ÖZƏL ƏMRLƏR (YALNIZ SƏN) ---
 # ==========================================
 @bot.command(name="elan")
 async def elan(ctx, *, elan_metni: str):
@@ -376,4 +448,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-        
+                
