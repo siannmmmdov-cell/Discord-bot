@@ -81,7 +81,7 @@ async def on_message(message):
     # --- KİMSƏ CHAT-DA SALAM YAZANDA AVTOMATİK CAVAB ---
     if "salam" in content_lower:
         try:
-            await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəlmisiniz! 👑")
+            await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəldiniz! 👑")
         except:
             pass
 
@@ -537,4 +537,4 @@ async def nick(ctx, member: discord.Member, *, yeni_ad: str):
     await member.edit(nick=yeni_ad)
     await ctx.send(f"✏️ {member.mention} istifadəçisinin adı dəyişdirildi: **{yeni_ad}**")
 
-@bot.com
+@bot.comma
