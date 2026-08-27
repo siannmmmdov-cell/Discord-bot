@@ -15,7 +15,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v1050 Ultimate aktivdir!"
+    return "Yenilmez OS v1100 Ultimate aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -31,11 +31,11 @@ def keep_alive():
 # ==========================================
 intents = discord.Intents.default()
 intents.message_content = True
-intents.members = True
+intents.members = True          # Yeni gələnləri görmək üçün vacibdir
 intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
-intents.presences = True # Üzvlərin aktivlik statusunu görmək üçün vacibdir
+intents.presences = True 
 
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
@@ -50,7 +50,7 @@ SPAM_WINDOW = 4.0
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v1050 ULTIMATE MASTER AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v1100 ULTIMATE MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
@@ -58,7 +58,29 @@ async def on_ready():
 
 
 # ==========================================
-# --- 3. GÜCLƏNDİRİLMİŞ ANTİ-SPAM & RANDOM QORUNMASI ---
+# --- 3. YENİ GƏLƏNLƏR ÜÇÜN SƏRT & CİDDİ SALAMLAMA ---
+# ==========================================
+@bot.event
+async def on_member_join(member):
+    # Əgər serverdə 'salam' və ya 'chat' adında kanal varsa oraya yazır, yoxdursa ümumi sistem kanalına
+    for channel in member.guild.text_channels:
+        if "salam" in channel.name or "chat" in channel.name or "genel" in channel.name or "sohbet" in channel.name:
+            try:
+                await channel.send(f"Salam, xoş gəlmisiz, {member.mention}.")
+                return
+            except:
+                pass
+    
+    # Əgər uyğun kanal tapılmasa, ilk yazılabilən kanala atır
+    if member.guild.system_channel:
+        try:
+            await member.guild.system_channel.send(f"Salam, xoş gəlmisiz, {member.mention}.")
+        except:
+            pass
+
+
+# ==========================================
+# --- 4. GÜCLƏNDİRİLMİŞ ANTİ-SPAM & RANDOM QORUNMASI ---
 # ==========================================
 @bot.event
 async def on_message(message):
@@ -108,7 +130,7 @@ async def on_message(message):
 
 
 # ==========================================
-# --- 4. BÜTÜN EMOJİLƏR ÜÇÜN UNIVERSAL AVTO-REAKTİV SİSTEMİ ---
+# --- 5. BÜTÜN EMOJİLƏR ÜÇÜN UNIVERSAL AVTO-REAKTİV SİSTEMİ ---
 # ==========================================
 EMOJI_GRUPLARI = {
     "🤣": ["😂", "😆", "💀", "😹"],
@@ -180,7 +202,7 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 5. MASTER SAHİB PANELİ (YENİLƏNMİŞ) ---
+# --- 6. MASTER SAHİB PANELİ ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -189,7 +211,7 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v1050",
+        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v1100",
         description="Serverin idarəetmə mərkəzi və xüsusi səlahiyyətli əmrlər siyahısı:",
         color=0x050505
     )
@@ -223,12 +245,8 @@ async def bot_panel(ctx):
 
 
 # ==========================================
-# --- 6. ÜMUMI ƏMRLƏR & SERVER MƏLUMAT (r?server) ---
+# --- 7. ÜMUMI ƏMRLƏR & SERVER MƏLUMAT (r?server) ---
 # ==========================================
-@bot.command(name="salam")
-async def salam(ctx):
-    await ctx.send(f"Aleykum salam, {ctx.author.mention}. Sistem tam gücdə işləyir. 🏴‍☠️")
-
 @bot.command(name="ping")
 async def ping(ctx):
     await ctx.send(f"⚡ Ping: **{round(bot.latency * 1000)}ms**")
@@ -237,7 +255,6 @@ async def ping(ctx):
 async def server_info(ctx):
     guild = ctx.guild
     
-    # Üzvlərin statuslarına görə sayılması
     online_count = sum(1 for m in guild.members if m.status == discord.Status.online)
     idle_count = sum(1 for m in guild.members if m.status == discord.Status.idle)
     dnd_count = sum(1 for m in guild.members if m.status == discord.Status.dnd)
@@ -282,7 +299,7 @@ async def server_info(ctx):
 
 
 # ==========================================
-# --- 7. SƏS KANALI İDARƏSİ ---
+# --- 8. SƏS KANALI İDARƏSİ ---
 # ==========================================
 @bot.command(name="join")
 async def join(ctx):
@@ -306,7 +323,7 @@ async def leave(ctx):
 
 
 # ==========================================
-# --- 8. SAHİBƏ ÖZƏL: ELAN, ANKET, AVTO-ÇƏKİLİŞ ---
+# --- 9. SAHİBƏ ÖZƏL: ELAN, ANKET, AVTO-ÇƏKİLİŞ ---
 # ==========================================
 @bot.command(name="elan")
 async def elan(ctx, *, elan_metni: str):
@@ -397,7 +414,7 @@ async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
 
 
 # ==========================================
-# --- 9. MODERASİYA ---
+# --- 10. MODERASİYA ---
 # ==========================================
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
@@ -444,7 +461,7 @@ async def unlock(ctx):
 
 
 # ==========================================
-# --- 10. OYUNLAR & ƏYLƏNCƏ ---
+# --- 11. OYUNLAR & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -485,7 +502,7 @@ async def avatar(ctx, member: discord.Member = None):
 
 
 # ==========================================
-# --- 11. İŞƏ SALMA ---
+# --- 12. İŞƏ SALMA ---
 # ==========================================
 if __name__ == "__main__":
     keep_alive()
