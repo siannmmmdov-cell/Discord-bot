@@ -40,13 +40,12 @@ intents.presences = True
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
 SAHIB_ID = 641014966312501259
-user_trackers = {}
 start_time = time.time()
 
 @bot.event
 async def on_ready():
     print(f"YENILMEZ OS v2600 ULTIMATE SECURE AKTİVDİR: {bot.user.name}")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | 60+ Commands 🛡️"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Master Panel 🛡️"))
 
 
 # ==========================================
@@ -126,7 +125,7 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 💀 MASTER SAHİB PANELİ (ŞƏKİLDƏKİ KİMİ) ---
+# --- 💀 MASTER SAHİB PANELİ (ALT-ALTA & İZAHATLI) ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -135,15 +134,87 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // STRICT MASTER PANEL v1500",
-        description="Bütün eksklüziv sahib əmrləri və idarəetmə mərkəzi:",
+        title="💀 YENİLMEZ OS // MASTER PANEL v1500",
+        description="Bütün əmrlər və onların izahatları alt-alta sıralanıb:",
         color=0x050505
     )
-    embed.add_field(name="👑 1. Yalnız Sənin İşlədə Biləcəyin Əmrlər", value="`r?elan [mətn]`, `r?anket [sual]`, `r?cekilis [vaxt] [hədiyyə]`, `r?botkurulum`, `r?servertemizle`, `r?duyuru`, `r?bakim`", inline=False)
-    embed.add_field(name="📊 2. Server & Məlumat Sistemləri", value="`r?server`, `r?userinfo`, `r?botinfo`, `r?ping`, `r?online`, `r?kanalbilgi`, `r?rolbilgi`, `r?boosters`, `r?ikon`, `r?banner`, `r?hava`, `r?hesabla`, `r?saygac`", inline=False)
-    embed.add_field(name="🛡️ 3. Sərt Moderasiya & Təhlükəsizlik", value="`r?sil`, `r?mute`, `r?unmute`, `r?ban`, `r?unban`, `r?kick`, `r?lock`, `r?unlock`, `r?slowmode`, `r?temizlemesaj`", inline=False)
-    embed.add_field(name="⚙️ 4. Rol & Üzv İdarəetmə Komandaları", value="`r?rolver`, `r?rolsil`, `r?ver`, `r?al`, `r?nick`, `r?avatar`, `r?rollist`, `r?yetkililer`, `r?seskontrol`, `r?kanalac`", inline=False)
-    embed.add_field(name="⚔️ 5. Oyunlar & Əyləncə (60+ Total)", value="`r?duel`, `r?coinflip`, `r?slot`, `r?hacker`, `r?zar`, `r?qarsilatirma`, `r?magic8ball`, `r?soz`, `r?sevgili`, `r?ascii`", inline=False)
+    
+    embed.add_field(
+        name="👑 1. Yalnız Sənin İşlədə Biləcəyin Əmrlər",
+        value=(
+            "`r?elan [mətn]` - Serverdə rəsmi elan yayır\n"
+            "`r?anket [sual]` - Kanalda səsvermə açır\n"
+            "`r?cekilis [vaxt] [hədiyyə]` - Avtomatik çəkiliş başladır\n"
+            "`r?botkurulum` - Botun təhlükəsizlik divarlarını yoxlayır\n"
+            "`r?servertemizle` - Serveri idarə edir\n"
+            "`r?duyuru [mətn]` - Qısa bildiriş göndərir\n"
+            "`r?bakim` - Botu baxım rejiminə keçirir"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="📊 2. Server & Məlumat Sistemləri",
+        value=(
+            "`r?server` - Server haqqında ümumi məlumat verir\n"
+            "`r?userinfo` - İstifadəçi haqqında detallar göstərir\n"
+            "`r?botinfo` - Botun işləmə müddətini (uptime) göstərir\n"
+            "`r?ping` - Botun sürətini (latency) ölçür\n"
+            "`r?online` - Aktiv üzvlərin sayını göstərir\n"
+            "`r?kanalbilgi` - Cari kanal haqqında məlumat verir\n"
+            "`r?rolbilgi [rol]` - Rol haqqında məlumat göstərir\n"
+            "`r?boosters` - Serveri boost edənləri göstərir\n"
+            "`r?hava [şəhər]` - Seçilən şəhərin hava durumunu göstərir\n"
+            "`r?hesabla [ifadə]` - Riyazi əməlləri hesablayır"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="🛡️ 3. Sərt Moderasiya & Təhlükəsizlik",
+        value=(
+            "`r?sil [say]` - Göstərilən sayda mesajı silir\n"
+            "`r?mute [istifadəçi] [dəqiqə]` - İstifadəçiyə timeout verir\n"
+            "`r?unmute [istifadəçi]` - İstifadəçinin mutesini açır\n"
+            "`r?ban [istifadəçi]` - İstifadəçini serverdən ban edir\n"
+            "`r?unban [id]` - İstifadəçinin banını qaldırır\n"
+            "`r?kick [istifadəçi]` - İstifadəçini serverdən atır\n"
+            "`r?lock` - Kanalı mesaj yazmağa bağlayır\n"
+            "`r?unlock` - Kanalı yenidən açır\n"
+            "`r?slowmode [saniyə]` - Kanala yavaş rejim qoyur"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="⚙️ 4. Rol & Üzv İdarəetmə Komandaları",
+        value=(
+            "`r?rolver [istifadəçi] [rol]` - İstifadəçiyə rol verir\n"
+            "`r?rolsil [istifadəçi] [rol]` - İstifadəçidən rol alır\n"
+            "`r?nick [istifadəçi] [yeni ad]` - Ləqəbi dəyişdirir\n"
+            "`r?avatar [istifadəçi]` - Profil şəklini göstərir\n"
+            "`r?yetkililer` - Serverin adminlərini siyahıya alır\n"
+            "`r?seskontrol` - Səs kanalındakı vəziyyəti göstərir\n"
+            "`r?kanalac [ad]` - Yeni mətn kanalı yaradır"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="⚔️ 5. Oyunlar & Əyləncə",
+        value=(
+            "`r?duel [istifadəçi]` - Dostunla duel atırsan\n"
+            "`r?coinflip [seçim]` - Yazı-tura oyunu oynayırsan\n"
+            "`r?slot` - Slot maşını (jackpot) çevirirsən\n"
+            "`r?hacker [istifadəçi]` - Zarafatla istifadəçini hackləyirsən\n"
+            "`r?zar` - Zər atırsan\n"
+            "`r?magic8ball [sual]` - Sehrli topa sual verirsən\n"
+            "`r?sevgili [istifadəçi]` - Sevgi faizini ölçürsən\n"
+            "`r?ascii [mətn]` - Mətni ASCII formatına çevirir"
+        ),
+        inline=False
+    )
+
     embed.set_footer(text="Yenilmez OS Strict Core - All Rights Reserved 2026")
     await ctx.send(embed=embed)
 
@@ -266,16 +337,6 @@ async def rolbilgi(ctx, role: discord.Role):
 async def boosters(ctx):
     await ctx.send(f"🚀 Boost sayı: **{ctx.guild.premium_subscription_count}**")
 
-@bot.command(name="ikon")
-async def ikon(ctx):
-    if ctx.guild.icon: await ctx.send(f"🖼️ İkon: {ctx.guild.icon.url}")
-    else: await ctx.send("⚠️ İkon yoxdur.")
-
-@bot.command(name="banner")
-async def banner(ctx):
-    if ctx.guild.banner: await ctx.send(f"🖼️ Banner: {ctx.guild.banner.url}")
-    else: await ctx.send("⚠️ Banner yoxdur.")
-
 @bot.command(name="hava")
 async def hava(ctx, *, seher: str = "Baku"):
     await ctx.send(f"🌤️ **{seher}**: 28°C, Günəşli.")
@@ -286,10 +347,6 @@ async def hesabla(ctx, *, ifade: str):
         await ctx.send(f"🔢 Nəticə: `{ifade} = {eval(ifade)}`")
     except:
         await ctx.send("⚠️ Xətalı riyazi ifadə!")
-
-@bot.command(name="saygac")
-async def saygac(ctx):
-    await ctx.send(f"📊 Üzv sayğacı: `{ctx.guild.member_count}`")
 
 
 # ==========================================
@@ -351,12 +408,6 @@ async def slowmode(ctx, saniye: int = 0):
     await ctx.channel.edit(slowmode_delay=saniye)
     await ctx.send(f"⏱️ Slowmode: **{saniye}** san.")
 
-@bot.command(name="temizlemesaj")
-@commands.has_permissions(manage_messages=True)
-async def temizlemesaj(ctx):
-    await ctx.channel.purge(limit=100)
-    await ctx.send("🧹 Təmizləndi!", delete_after=3)
-
 
 # ==========================================
 # --- 4. ROL & ÜZV İDARƏETMƏ ---
@@ -373,18 +424,6 @@ async def rolsil(ctx, member: discord.Member, role: discord.Role):
     await member.remove_roles(role)
     await ctx.send(f"❌ Rol alındı.")
 
-@bot.command(name="ver")
-@commands.has_permissions(manage_roles=True)
-async def ver(ctx, member: discord.Member, role: discord.Role):
-    await member.add_roles(role)
-    await ctx.send(f"➕ Rol verildi.")
-
-@bot.command(name="al")
-@commands.has_permissions(manage_roles=True)
-async def al(ctx, member: discord.Member, role: discord.Role):
-    await member.remove_roles(role)
-    await ctx.send(f"➖ Rol alındı.")
-
 @bot.command(name="nick")
 @commands.has_permissions(manage_nicknames=True)
 async def nick(ctx, member: discord.Member, *, yeni_ad: str):
@@ -396,10 +435,6 @@ async def avatar(ctx, member: discord.Member = None):
     member = member or ctx.author
     if member.avatar: await ctx.send(f"🖼️ Avatar: {member.avatar.url}")
     else: await ctx.send("⚠️ Avatar yoxdur.")
-
-@bot.command(name="rollist")
-async def rollist(ctx):
-    await ctx.send("📋 Rollar siyahısı aktivdir.")
 
 @bot.command(name="yetkililer")
 async def yetkililer(ctx):
@@ -419,7 +454,7 @@ async def kanalac(ctx, *, kanal_adi: str):
 
 
 # ==========================================
-# --- 5. OYUNLAR & ƏYLƏNCƏ (60+ TOTAL) ---
+# --- 5. OYUNLAR & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -455,19 +490,10 @@ async def hacker(ctx, user: discord.Member = None):
 async def zar(ctx):
     await ctx.send(f"🎲 Zərin nəticəsi: **{random.randint(1, 6)}**")
 
-@bot.command(name="qarsilatirma")
-async def qarsilatirma(ctx, item1: str, item2: str):
-    await ctx.send(f"⚖️ Müqayisə: **{random.choice([item1, item2])}** daha üstündür!")
-
 @bot.command(name="magic8ball")
 async def magic8ball(ctx, *, sorğu: str):
     cavablar = ["Bəli, mütləq!", "Xeyr, əsla.", "Bəlkə də.", "Dəqiq bilmirəm."]
     await ctx.send(f"🔮 Sual: {sorğu}\nCavab: **{random.choice(cavablar)}**")
-
-@bot.command(name="soz")
-async def soz(ctx):
-    sozler = ["Həyat 1 gündür.", "Güclü ol.", "Zəfər inananlarındır."]
-    await ctx.send(f"📜 Günün sözü: *{random.choice(sozler)}*")
 
 @bot.command(name="sevgili")
 async def sevgili(ctx, member: discord.Member = None):
@@ -488,3 +514,4 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
+    
