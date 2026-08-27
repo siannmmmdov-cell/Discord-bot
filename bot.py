@@ -52,7 +52,7 @@ async def on_ready():
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | Auto-Salam & 50+ Commands 🛡️"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="r?bot | 60+ Commands & Security 🛡️"))
 
 
 # ==========================================
@@ -81,7 +81,7 @@ async def on_message(message):
     # --- KİMSƏ CHAT-DA SALAM YAZANDA AVTOMATİK CAVAB ---
     if "salam" in content_lower:
         try:
-            await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəldiniz! 👑")
+            await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəlmisiniz! 👑")
         except:
             pass
 
@@ -114,7 +114,7 @@ async def on_message(message):
 
     data = user_trackers[author_id]
 
-    # Dalbadal 7 Şəkil Atma Qorunması
+    # Dalbadal Şəkil Atma Qorunması
     has_image = len(message.attachments) > 0 or "https://images" in content_lower or "cdn.discordapp.com" in content_lower
     if has_image:
         data["image_count"] += 1
@@ -233,7 +233,7 @@ async def on_raw_reaction_add(payload):
 
 
 # ==========================================
-# --- 6. MASTER SAHİB PANELİ ---
+# --- 6. MASTER SAHİB PANELİ (60+ KOMANDA) ---
 # ==========================================
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -242,8 +242,8 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ULTIMATE MASTER PANEL",
-        description="Bütün oyunlar, xüsusi sahib əmrləri və idarəetmə mərkəzi:",
+        title="💀 YENİLMEZ OS // 60+ ULTIMATE MASTER PANEL",
+        description="Bütün eksklüziv sahib əmrləri, oyunlar, moderasiya və alətlər:",
         color=0x050505
     )
     embed.add_field(
@@ -271,7 +271,7 @@ async def bot_panel(ctx):
         value="`r?server`, `r?online`, `r?botinfo`, `r?ping`, `r?userinfo`, `r?kanalbilgi`, `r?rolbilgi`, `r?boosters`, `r?ikon`, `r?banner`, `r?hava`, `r?hesabla`, `r?kodla`, `r?base64`, `r?saygac`", 
         inline=False
     )
-    embed.set_footer(text="Yenilmez OS v2600 Core - All Rights Reserved")
+    embed.set_footer(text="Yenilmez OS v2600 Core - All Rights Reserved 2026")
     await ctx.send(embed=embed)
 
 
@@ -343,7 +343,7 @@ async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
 
     kazanan = random.choice(istirakcilar)
     win_embed = discord.Embed(title="🏆 ÇƏKİLİŞ QALİBİ!", description=f"Hədiyyə: **{hediyye}**\nTəbriklər, {kazanan.mention}! 🎉", color=0x050505)
-    await ctx.send(win_embed)
+    await ctx.send(embed=win_embed)
 
 @bot.command(name="botkurulum")
 async def botkurulum(ctx):
@@ -537,5 +537,4 @@ async def nick(ctx, member: discord.Member, *, yeni_ad: str):
     await member.edit(nick=yeni_ad)
     await ctx.send(f"✏️ {member.mention} istifadəçisinin adı dəyişdirildi: **{yeni_ad}**")
 
-@bot.command(name="avatar")
-async def av
+@bot.com
