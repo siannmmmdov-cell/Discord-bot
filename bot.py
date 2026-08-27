@@ -15,7 +15,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Yenilmez OS v1100 Ultimate aktivdir!"
+    return "Yenilmez OS v1150 Ultimate aktivdir!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -31,7 +31,7 @@ def keep_alive():
 # ==========================================
 intents = discord.Intents.default()
 intents.message_content = True
-intents.members = True          # Yeni gələnləri görmək üçün vacibdir
+intents.members = True          
 intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
@@ -42,15 +42,14 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 # Yalnız sənin ID-n (Master Sahib)
 SAHIB_ID = 641014966312501259
 
-# Gücləndirilmiş Anti-Spam və Random/Simvol Qorunması
+# Tənzimlənmiş Anti-Spam (6 sözdən az olan sürətli random/spamlar üçün)
 spam_records = {}
-SPAM_THRESHOLD = 2      
 SPAM_WINDOW = 4.0       
 
 @bot.event
 async def on_ready():
     print(f"==================================================")
-    print(f" [X] YENILMEZ OS v1100 ULTIMATE MASTER AKTİVDİR!")
+    print(f" [X] YENILMEZ OS v1150 ULTIMATE MASTER AKTİVDİR!")
     print(f" [X] Bot Adı: {bot.user.name}")
     print(f" [X] Sahib ID: {SAHIB_ID}")
     print(f"==================================================")
@@ -62,7 +61,6 @@ async def on_ready():
 # ==========================================
 @bot.event
 async def on_member_join(member):
-    # Əgər serverdə 'salam' və ya 'chat' adında kanal varsa oraya yazır, yoxdursa ümumi sistem kanalına
     for channel in member.guild.text_channels:
         if "salam" in channel.name or "chat" in channel.name or "genel" in channel.name or "sohbet" in channel.name:
             try:
@@ -71,7 +69,6 @@ async def on_member_join(member):
             except:
                 pass
     
-    # Əgər uyğun kanal tapılmasa, ilk yazılabilən kanala atır
     if member.guild.system_channel:
         try:
             await member.guild.system_channel.send(f"Salam, xoş gəlmisiz, {member.mention}.")
@@ -80,7 +77,7 @@ async def on_member_join(member):
 
 
 # ==========================================
-# --- 4. GÜCLƏNDİRİLMİŞ ANTİ-SPAM & RANDOM QORUNMASI ---
+# --- 4. GÜCLƏNDİRİLMİŞ & TƏNZİMLƏNMİŞ ANTİ-SPAM (6 SÖZ QAYDASI) ---
 # ==========================================
 @bot.event
 async def on_message(message):
@@ -92,6 +89,15 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
+    # Mesajdakı söz sayını hesablayırıq
+    soz_sayi = len(message.content.split())
+
+    # Əgər mesaj 6 sözdən uzundursa, normal söhbətdir, spam kimi tutmuruq!
+    if soz_sayi >= 6:
+        await bot.process_commands(message)
+        return
+
+    # 6 sözdən qısadırsa (və ya random simvollardırsa), sürət yoxlanışı edirik
     current_time = time.time()
     author_id = message.author.id
 
@@ -110,13 +116,13 @@ async def on_message(message):
             data["warns"] += 1
             if data["warns"] == 1:
                 try:
-                    await message.channel.send(f"⚠️ {message.author.mention}, random və ya sürətli mesaj (spam) yazmaq qadağandır!", delete_after=4)
+                    await message.channel.send(f"⚠️ {message.author.mention}, qısa/random mesajları ardıcıl yazmaq qadağandır! (Ən azı 6 söz yaz)", delete_after=4)
                 except:
                     pass
             elif data["warns"] >= 2:
                 try:
-                    await message.author.timeout(timedelta(minutes=5), reason="Spam / Random")
-                    await message.channel.send(f"🔇 {message.author.mention}, spam/random cəhdinə görə 5 dəqiqəlik mute olundun!", delete_after=5)
+                    await message.author.timeout(timedelta(minutes=5), reason="Spam / Qısa Random Spam")
+                    await message.channel.send(f"🔇 {message.author.mention}, spam cəhdinə görə 5 dəqiqəlik mute olundun!", delete_after=5)
                     data["warns"] = 0 
                 except:
                     pass
@@ -211,7 +217,7 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v1100",
+        title="💀 YENİLMEZ OS // ELITE MASTER PANEL v1150",
         description="Serverin idarəetmə mərkəzi və xüsusi səlahiyyətli əmrlər siyahısı:",
         color=0x050505
     )
@@ -323,7 +329,7 @@ async def leave(ctx):
 
 
 # ==========================================
-# --- 9. SAHİBƏ ÖZƏL: ELAN, ANKET, AVTO-ÇƏKİLİŞ ---
+# --- 9. SAHİbƏ ÖZƏL: ELAN, ANKET, AVTO-ÇƏKİLİŞ ---
 # ==========================================
 @bot.command(name="elan")
 async def elan(ctx, *, elan_metni: str):
