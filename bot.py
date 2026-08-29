@@ -37,7 +37,7 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 SAHIB_ID = 641014966312501259
 start_time = time.time()
 spam_kontrol = {}
-flood_kontrol = {}
+salam_flood_kontrol = {}
 
 @bot.event
 async def on_ready():
@@ -57,7 +57,7 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    content_lower = message.content.lower()
+    content_lower = message.content.strip().lower()
     author_id = message.author.id
     simdi = time.time()
 
@@ -66,27 +66,24 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
-    # Dalbadal (flood/spam) salam yazanlara sərt xəbərdarlıq
-    if author_id not in flood_kontrol:
-        flood_kontrol[author_id] = []
-    
-    flood_kontrol[author_id] = [t for t in flood_kontrol[author_id] if simdi - t < 10]
-    flood_kontrol[author_id].append(simdi)
+    # Yalnız dəqiq "salam" sözü ardıcıl yazılarsa yoxlanılır
+    if content_lower == "salam":
+        if author_id not in salam_flood_kontrol:
+            salam_flood_kontrol[author_id] = []
+        
+        # Son 15 saniyə içindəki salamlar nəzərə alınır
+        salam_flood_kontrol[author_id] = [t for t in salam_flood_kontrol[author_id] if simdi - t < 15]
+        salam_flood_kontrol[author_id].append(simdi)
 
-    if len(flood_kontrol[author_id]) > 3:
-        try:
-            await message.channel.send(f"{message.author.mention} Anası gehbe az salam yazda")
-            flood_kontrol[author_id] = []
-        except:
-            pass
-        return
-
-    # Normal salam yazanlara cavab (Yalnız başqaları yazanda)
-    if "salam" in content_lower and message.reference is None:
-        try:
-            await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəldiniz, səfa gətirdiniz! 👑 Faydalı vaxt keçirməyiniz diləyi ilə!")
-        except:
-            pass
+        # 3 dəfə dalbadal salam yazanda işə düşür
+        if len(salam_flood_kontrol[author_id]) >= 3:
+            try:
+                await message.delete()
+                await message.channel.send(f"{message.author.mention} Anası gehbe az salam yazda")
+                salam_flood_kontrol[author_id] = []
+            except:
+                pass
+            return
 
     # Link qoruması
     if "discord.gg/" in content_lower or "discord.com/invite/" in content_lower:
@@ -153,7 +150,7 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="👑 MASTER PANEL v3400",
+        title="👑 MASTER PANEL v3401",
         description="Bütün əmrlər (Yalnız sənə məxsusdur):",
         color=0x050505
     )
@@ -292,7 +289,7 @@ async def hesabla(ctx, *, ifade: str):
     except:
         await ctx.send("⚠️ Xətali misal!")
 
-# --- MODERASİYA & GİZLİLİK ƏMRLƏRİ (YALNIZ SƏN - FULL PERM ADMINLƏR BELƏ İSTİFADƏ EDƏ BİLMƏZ) ---
+# --- MODERASİYA & GİZLİLİK ƏMRLƏRİ ---
 
 @bot.command(name="gizle")
 async def gizle(ctx):
@@ -483,7 +480,7 @@ async def seskontrol(ctx):
     if ctx.author.voice:
         await ctx.send(f"🔊 Kanal: **{ctx.author.voice.channel.name}**")
 
-# --- OYUNLAR & ƏYLƏNCƏ ---
+# --- OYUNlar & ƏYLƏNCƏ ---
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
     if member:
@@ -530,4 +527,4 @@ async def ascii_yaz(ctx, *, yazi: str):
 if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("DISCORD_TOKEN"))
-    
+        
