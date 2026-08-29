@@ -548,7 +548,7 @@ async def kanalac(ctx, *, kanal_adi: str):
 
 
 # ==========================================
-# --- 5. OYUNlar & ƏYLƏNCƏ ---
+# --- 5. OYUNLAR & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -581,4 +581,6 @@ async def slot(ctx):
 @bot.command(name="hacker")
 async def hacker(ctx, user: discord.Member = None):
     target = user if user else ctx.author
-    ip = f"{random.randint(10, 255)}.{random.randint(10, 255)}.{random.randint
+    p1 = random.randint(10, 255)
+    p2 = random.randint(10, 255)
+    p3 = ran
