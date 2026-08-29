@@ -66,7 +66,7 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
-    # Yalnız dəqiq "salam" sözü ardıcıl yazılarsa yoxlanılır
+    # Yalnız dəqiq "salam" sözü ardıcıl 3 dəfə yazılarsa yoxlanılır
     if content_lower == "salam":
         if author_id not in salam_flood_kontrol:
             salam_flood_kontrol[author_id] = []
@@ -111,14 +111,39 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# --- YALNIZ SƏNİN ÜÇÜN REAKSİYA SİSTEMİ ---
+# --- YALNIZ SƏNİN ÜÇÜN GENİŞLƏNDİRİLMİŞ REAKSİYA SİSTEMİ ---
 UYGUN_EMOJI_GRUPLARI = {
-    "👍": ["✅", "🔥", "💯", "🎯", "👑", "🚀"],
-    "❤️": ["💖", "😍", "✨", "💞", "💘", "💋"],
-    "🔥": ["⚡", "🚀", "💥", "👑", "🌟", "🔥"],
-    "⭐": ["🌟", "💫", "💎", "✨", "🌠", "🔥"],
-    "😂": ["💀", "🤣", "😹", "🔥", "💀", "💥"],
-    "🎉": ["🎊", "🥳", "🏆", "🌟", "🎈", "🚀"]
+    # Təsdiq və əla reaksiyalar
+    "👍": ["✅", "💯", "🎯", "👑", "🚀", "🔥", "⭐", "💪", "👊"],
+    "👎": ["❌", "⚠️", "⛔", "🛑", "👎"],
+    
+    # Ürəklər və sevgi
+    "❤️": ["💖", "💗", "💓", "💞", "💕", "💘", "💋", "😍", "✨", "🥰", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎"],
+    "🧡": ["❤️", "💛", "💖", "✨", "🦊"],
+    "💛": ["❤️", "🧡", "⭐", "🌟", "✨", "💫"],
+    "💚": ["❤️", "🌲", "🍀", "🍏", "🌿"],
+    "💙": ["❤️", "💎", "🌊", "🔹", "🌐"],
+    "💜": ["❤️", "🔮", "🦄", "🍇", "🟣"],
+    "🖤": ["❤️", "🦇", "🌑", "🖤", "🏴"],
+    
+    # Alov və enerji
+    "🔥": ["⚡", "🚀", "💥", "👑", "🌟", "✨", "💫", "🔥", "💯", "🎯"],
+    "⚡": ["🔥", "🚀", "💥", "⚡", "🌟"],
+    "⭐": ["🌟", "💫", "💎", "✨", "🌠", "🔥", "⭐", "🏆"],
+    "🌟": ["⭐", "💫", "✨", "🌠", "💎"],
+    
+    # Gülüş və əyləncə
+    "😂": ["💀", "🤣", "😹", "😆", "😅", "👻", "💥"],
+    "🤣": ["😂", "💀", "😹", "😆", "😅"],
+    "💀": ["😂", "🤣", "👻", "🏴‍☠️", "💀"],
+    "🎉": ["🎊", "🥳", "🏆", "🌟", "🎈", "🚀", "🎆", "🎇"],
+    
+    # Əllər və jestlər
+    "👏": ["🙌", "🤝", "💪", "🔥", "💯"],
+    "🙌": ["👏", "🎉", "🥳", "✨"],
+    "🙏": ["🤝", "❤️", "✨", "⭐"],
+    "eyes": ["👀", "🔍", "🕵️‍♂️", "🔎"],
+    "👀": ["👀", "🔍", "🔥", "💀"]
 }
 
 @bot.event
@@ -135,13 +160,22 @@ async def on_raw_reaction_add(payload):
         return
 
     emoji_str = str(payload.emoji)
-    secilenler = UYGUN_EMOJI_GRUPLARI.get(emoji_str, ["🔥", "⚡", "⭐", "🎯", "🚀", "💎"])
     
-    for exsar in random.sample(secilenler, min(5, len(secilenler))):
-        try:
-            await message.add_reaction(exsar)
-        except:
-            pass
+    # Əvvəlcə sənin basdığın orijinal emojinin özünü əlavə edirik
+    try:
+        await message.add_reaction(payload.emoji)
+    except:
+        pass
+
+    # Yalnız həmin qrupa aid olan oxşar emojilərdən əlavə edirik
+    if emoji_str in UYGUN_EMOJI_GRUPLARI:
+        secilenler = UYGUN_EMOJI_GRUPLARI[emoji_str]
+        for exsar in random.sample(secilenler, min(4, len(secilenler))):
+            if exsar != emoji_str:
+                try:
+                    await message.add_reaction(exsar)
+                except:
+                    pass
 
 # --- MASTER PANEL ---
 @bot.command(name="bot")
@@ -225,14 +259,6 @@ async def cekilis(ctx, vaxt_str: str, *, hediyye: str):
     except:
         pass
 
-@bot.command(name="botkurulum")
-async def botkurulum(ctx):
-    if ctx.author.id == SAHIB_ID: await ctx.send("🛡️ Qoruma aktivdir!")
-
-@bot.command(name="servertemizle")
-async def servertemizle(ctx):
-    if ctx.author.id == SAHIB_ID: await ctx.send("🧹 Server təmizləndi.")
-
 @bot.command(name="duyuru")
 async def duyuru(ctx, *, metin: str):
     if ctx.author.id == SAHIB_ID:
@@ -266,18 +292,6 @@ async def userinfo(ctx, member: discord.Member = None):
     m = member or ctx.author
     await ctx.send(f"👤 **{m.name}** | ID: `{m.id}` | Qoşulma: `{m.joined_at.strftime('%Y-%m-%d')}`")
 
-@bot.command(name="kanalbilgi")
-async def kanalbilgi(ctx):
-    await ctx.send(f"📁 Kanal: **{ctx.channel.name}** | ID: `{ctx.channel.id}`")
-
-@bot.command(name="rolbilgi")
-async def rolbilgi(ctx, role: discord.Role):
-    await ctx.send(f"🛡️ Rol: **{role.name}** | Üzv: `{len(role.members)}`")
-
-@bot.command(name="boosters")
-async def boosters(ctx):
-    await ctx.send(f"💎 Boost: **{ctx.guild.premium_subscription_count}**")
-
 @bot.command(name="hava")
 async def hava(ctx, *, seher: str = "Baku"):
     await ctx.send(f"🌤️ `{seher}`: 28°C, Günəşli və isti.")
@@ -290,7 +304,6 @@ async def hesabla(ctx, *, ifade: str):
         await ctx.send("⚠️ Xətali misal!")
 
 # --- MODERASİYA & GİZLİLİK ƏMRLƏRİ ---
-
 @bot.command(name="gizle")
 async def gizle(ctx):
     if ctx.author.id != SAHIB_ID: return
@@ -309,9 +322,9 @@ async def sesgizle(ctx):
     if ctx.author.voice and ctx.author.voice.channel:
         channel = ctx.author.voice.channel
         await channel.set_permissions(ctx.guild.default_role, connect=False)
-        await ctx.send(f"🔇 **{channel.name}** səs kanalı hamıdan gizlədildi (bağlandı)!")
+        await ctx.send(f"🔇 **{channel.name}** səs kanalı hamıdan gizlədildi!")
     else:
-        await ctx.send("⚠️ Əvvəlcə gizlətmək istədiyiniz səs kanalına qoşulun!")
+        await ctx.send("⚠️ Əvvəlcə səs kanalına qoşulun!")
 
 @bot.command(name="sesgoster")
 async def sesgoster(ctx):
@@ -321,37 +334,29 @@ async def sesgoster(ctx):
         await channel.set_permissions(ctx.guild.default_role, connect=True)
         await ctx.send(f"🔊 **{channel.name}** səs kanalının gizliliyi açıldı!")
     else:
-        await ctx.send("⚠️ Əvvəlcə açmaq istədiyiniz səs kanalına qoşulun!")
+        await ctx.send("⚠️ Əvvəlcə səs kanalına qoşulun!")
 
 @bot.command(name="tumunugizle")
 async def tumunugizle(ctx):
     if ctx.author.id != SAHIB_ID: return
     for channel in ctx.guild.text_channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, view_channel=False)
-        except:
-            pass
+        try: await channel.set_permissions(ctx.guild.default_role, view_channel=False)
+        except: pass
     for channel in ctx.guild.voice_channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, connect=False)
-        except:
-            pass
-    await ctx.send("🔒 Serverdəki bütün mətn və səs kanalları gizliliyə alındı!")
+        try: await channel.set_permissions(ctx.guild.default_role, connect=False)
+        except: pass
+    await ctx.send("🔒 Bütün kanallar gizliliyə alındı!")
 
 @bot.command(name="tumunugoster")
 async def tumunugoster(ctx):
     if ctx.author.id != SAHIB_ID: return
     for channel in ctx.guild.text_channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, view_channel=True)
-        except:
-            pass
+        try: await channel.set_permissions(ctx.guild.default_role, view_channel=True)
+        except: pass
     for channel in ctx.guild.voice_channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, connect=True)
-        except:
-            pass
-    await ctx.send("🔓 Serverdəki bütün mətn və səs kanallarının gizliliyi açıldı!")
+        try: await channel.set_permissions(ctx.guild.default_role, connect=True)
+        except: pass
+    await ctx.send("🔓 Bütün kanalların gizliliyi açıldı!")
 
 @bot.command(name="sil")
 async def sil(ctx, say: int = 5):
@@ -371,10 +376,8 @@ async def temizle(ctx):
 async def silkanal(ctx, kanal: discord.TextChannel = None):
     if ctx.author.id != SAHIB_ID: return
     k = kanal or ctx.channel
-    try:
-        await k.delete()
-    except Exception as e:
-        await ctx.send(f"❌ Xəta: {e}")
+    try: await k.delete()
+    except Exception as e: await ctx.send(f"❌ Xəta: {e}")
 
 @bot.command(name="kanalac")
 async def kanalac(ctx, *, kanal_adi: str):
@@ -400,13 +403,6 @@ async def ban_cmd(ctx, member: discord.Member, *, reason=None):
     await member.ban(reason=reason)
     await ctx.send(f"🔨 {member.name} banlandı!")
 
-@bot.command(name="unban")
-async def unban_cmd(ctx, user_id: int):
-    if ctx.author.id != SAHIB_ID: return
-    u = await bot.fetch_user(user_id)
-    await ctx.guild.unban(u)
-    await ctx.send(f"🔓 {u.name} banı açıldı.")
-
 @bot.command(name="kick")
 async def kick_cmd(ctx, member: discord.Member, *, reason=None):
     if ctx.author.id != SAHIB_ID: return
@@ -430,20 +426,6 @@ async def slowmode(ctx, saniye: int = 0):
     if ctx.author.id != SAHIB_ID: return
     await ctx.channel.edit(slowmode_delay=saniye)
     await ctx.send(f"⏱️ Slowmode: **{saniye}** san.")
-
-@bot.command(name="sesmute")
-async def sesmute(ctx, member: discord.Member):
-    if ctx.author.id != SAHIB_ID: return
-    if member.voice:
-        await member.edit(mute=True)
-        await ctx.send(f"🔇 {member.mention} susduruldu.")
-
-@bot.command(name="sesunmute")
-async def sesunmute(ctx, member: discord.Member):
-    if ctx.author.id != SAHIB_ID: return
-    if member.voice:
-        await member.edit(mute=False)
-        await ctx.send(f"🔊 {member.mention} səsi açıldı.")
 
 # --- ROL VƏ ÜZV ---
 @bot.command(name="rolver")
@@ -475,12 +457,7 @@ async def yetkililer(ctx):
     staff = [m.name for m in ctx.guild.members if m.guild_permissions.administrator]
     await ctx.send(f"🛡️ Adminlər: {', '.join(staff[:10])}")
 
-@bot.command(name="seskontrol")
-async def seskontrol(ctx):
-    if ctx.author.voice:
-        await ctx.send(f"🔊 Kanal: **{ctx.author.voice.channel.name}**")
-
-# --- OYUNlar & ƏYLƏNCƏ ---
+# --- OYUNLAR & ƏYLƏNCƏ ---
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
     if member:
@@ -509,11 +486,6 @@ async def hacker(ctx, user: discord.Member = None):
 async def zar(ctx):
     await ctx.send(f"🎲 Zər: **{random.randint(1, 6)}**")
 
-@bot.command(name="magic8ball")
-async def magic8ball(ctx, *, sorgu: str):
-    ans = ["Bəli, mütləq.", "Xeyr, asla.", "Bəlkə də.", "Dəqiq bilmirəm."]
-    await ctx.send(f"🔮 {sorgu}\nCavab: **{random.choice(ans)}**")
-
 @bot.command(name="sevgili")
 async def sevgili(ctx, member: discord.Member = None):
     if member:
@@ -527,4 +499,4 @@ async def ascii_yaz(ctx, *, yazi: str):
 if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("DISCORD_TOKEN"))
-        
+    
