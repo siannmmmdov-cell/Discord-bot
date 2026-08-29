@@ -38,7 +38,6 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 SAHIB_ID = 641014966312501259
 start_time = time.time()
 
-# Spam qoruması üçün yaddaş
 spam_kontrol = {}
 
 @bot.event
@@ -548,7 +547,7 @@ async def kanalac(ctx, *, kanal_adi: str):
 
 
 # ==========================================
-# --- 5. OYUNlar & ƏYLƏNCƏ ---
+# --- 5. OYUNLAR & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -585,6 +584,4 @@ async def hacker(ctx, user: discord.Member = None):
     p2 = str(random.randint(10, 255))
     p3 = str(random.randint(10, 255))
     p4 = str(random.randint(10, 255))
-    ip = f"{p1}.{p2}.{p3}.{p4}"
-    await ctx.send(f"💻 **{target.name}** hackləndi! IP: `{ip}` 🚀")
     
