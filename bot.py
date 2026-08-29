@@ -37,6 +37,7 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 SAHIB_ID = 641014966312501259
 start_time = time.time()
 spam_kontrol = {}
+flood_kontrol = {}
 
 @bot.event
 async def on_ready():
@@ -57,17 +58,37 @@ async def on_message(message):
         return
 
     content_lower = message.content.lower()
+    author_id = message.author.id
+    simdi = time.time()
 
-    if message.author.id != SAHIB_ID and message.reference is None and "salam" in content_lower:
-        try:
-            await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəldiniz! 👑")
-        except:
-            pass
-
-    if message.author.id == SAHIB_ID:
+    # Sən (Sahib) yazanda bot heç bir avtomatik cavab verməyəcək
+    if author_id == SAHIB_ID:
         await bot.process_commands(message)
         return
 
+    # Dalbadal (flood/spam) salam yazanlara sərt xəbərdarlıq
+    if author_id not in flood_kontrol:
+        flood_kontrol[author_id] = []
+    
+    flood_kontrol[author_id] = [t for t in flood_kontrol[author_id] if simdi - t < 10]
+    flood_kontrol[author_id].append(simdi)
+
+    if len(flood_kontrol[author_id]) > 3:
+        try:
+            await message.channel.send(f"{message.author.mention} Anası gehbe az salam yazda")
+            flood_kontrol[author_id] = []
+        except:
+            pass
+        return
+
+    # Normal salam yazanlara cavab (Yalnız başqaları yazanda)
+    if "salam" in content_lower and message.reference is None:
+        try:
+            await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəldiniz, səfa gətirdiniz! 👑 Faydalı vaxt keçirməyiniz diləyi ilə!")
+        except:
+            pass
+
+    # Link qoruması
     if "discord.gg/" in content_lower or "discord.com/invite/" in content_lower:
         try:
             await message.delete()
@@ -76,9 +97,7 @@ async def on_message(message):
             pass
         return
 
-    author_id = message.author.id
-    simdi = time.time()
-
+    # Spam tənzimləməsi
     if author_id not in spam_kontrol:
         spam_kontrol[author_id] = []
 
@@ -95,7 +114,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# --- GÜCLƏNDİRİLMİŞ AVTOMATİK REAKSİYA SİSTEMİ (5-6 DƏNƏ VƏ HƏRƏKƏTLİ EMOJİLƏR) ---
+# --- GÜCLƏNDİRİLMİŞ AVTOMATİK REAKSİYA SİSTEMİ ---
 UYGUN_EMOJI_GRUPLARI = {
     "👍": ["✅", "🔥", "💯", "🎯", "👑", "🚀"],
     "❤️": ["💖", "😍", "✨", "💞", "💘", "💋"],
@@ -121,21 +140,20 @@ async def on_raw_reaction_add(payload):
     emoji_str = str(payload.emoji)
     secilenler = UYGUN_EMOJI_GRUPLARI.get(emoji_str, ["🔥", "⚡", "⭐", "🎯", "🚀", "💎"])
     
-    # 5-6 ədəd emoji basması üçün seçimi artırırıq
     for exsar in random.sample(secilenler, min(5, len(secilenler))):
         try:
             await message.add_reaction(exsar)
         except:
             pass
 
-# --- MASTER PANEL (HƏR ƏMRİN AÇIQLAMASI İLƏ) ---
+# --- MASTER PANEL ---
 @bot.command(name="bot")
 async def bot_panel(ctx):
     if ctx.author.id != SAHIB_ID:
         return
 
     embed = discord.Embed(
-        title="👑 MASTER PANEL v2000 (Ətraflı)",
+        title="👑 MASTER PANEL v3100",
         description="Bütün əmrlər və izahatları:",
         color=0x050505
     )
@@ -151,7 +169,7 @@ async def bot_panel(ctx):
     )
     embed.add_field(
         name="🛡️ Moderasiya & Kanal Əmrləri",
-        value="`r?sil` - Mesaj silir\n`r?silkanal` - Kanalı silir\n`r?kanalac` - Yeni kanal açır\n`r?mute` / `r?unmute` - Timeout ver/al\n`r?ban` / `r?kick` - Ban/Atma\n`r?lock` / `r?unlock` - Kanalı kilidlə\n`r?slowmode` - Yavaş rejim",
+        value="`r?sil [say]` - Say ilə mesaj silir\n`r?chattemizle` - Chati təmiz-təmiz təmizləyir\n`r?silkanal` - Kanalı silir\n`r?kanalac` - Yeni kanal açır\n`r?mute` / `r?unmute` - Timeout ver/al\n`r?ban` / `r?kick` - Ban/Atma\n`r?lock` / `r?unlock` - Kanalı kilidlə\n`r?slowmode` - Yavaş rejim",
         inline=False
     )
     embed.add_field(
@@ -276,6 +294,14 @@ async def sil(ctx, say: int = 5):
     await ctx.message.delete()
     deleted = await ctx.channel.purge(limit=say)
     await ctx.send(f"🧹 `{len(deleted)}` mesaj silindi.", delete_after=3)
+
+@bot.command(name="chattemizle")
+@commands.has_permissions(manage_messages=True)
+async def chattemizle(ctx):
+    await ctx.message.delete()
+    # 100 mesajlıq paketi təmizləyərək tər-təmin edir
+    deleted = await ctx.channel.purge(limit=100)
+    await ctx.send(f"✨ Chat tər-təmin təmizləndi! 🧹", delete_after=3)
 
 @bot.command(name="silkanal")
 @commands.has_permissions(manage_channels=True)
@@ -436,6 +462,5 @@ async def ascii_yaz(ctx, *, yazi: str):
 # --- START ---
 if __name__ == "__main__":
     keep_alive()
-    token = os.environ.get("DISCORD_TOKEN")
-    bot.run(token)
-    
+    bot.run(os.environ.get("DISCORD_TOKEN"))
+        
