@@ -584,4 +584,7 @@ async def hacker(ctx, user: discord.Member = None):
     p1 = str(random.randint(10, 255))
     p2 = str(random.randint(10, 255))
     p3 = str(random.randint(10, 255))
-    p4 = str(r
+    p4 = str(random.randint(10, 255))
+    ip = f"{p1}.{p2}.{p3}.{p4}"
+    await ctx.send(f"💻 **{target.name}** hackləndi! IP: `{ip}` 🚀")
+    
