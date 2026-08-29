@@ -38,7 +38,7 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 SAHIB_ID = 641014966312501259
 start_time = time.time()
 
-# Spam qoruması üçün yaddaş (normal üzvləri narahat edən ağıllı sistem)
+# Spam qoruması üçün yaddaş
 spam_kontrol = {}
 
 @bot.event
@@ -54,7 +54,7 @@ async def on_ready():
 async def on_member_join(member):
     if member.bot and member.id != bot.user.id:
         try:
-            await member.guild.ban(member, reason="İnsiz kanar bot girişi!")
+            await member.guild.ban(member, reason="İnsiz kənar bot girişi!")
             return
         except:
             pass
@@ -67,7 +67,6 @@ async def on_message(message):
 
     content_lower = message.content.lower()
 
-    # Əgər mesaj başqası tərəfindən yazılıbsa, reply (istinad) DEYİLSƏ və "salam" varsa cavab ver
     if message.author.id != SAHIB_ID and message.reference is None and "salam" in content_lower:
         try:
             await message.channel.send(f"Aleykum salam, {message.author.mention}! Xoş gəldiniz! 👑")
@@ -78,7 +77,6 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
-    # Yalnız Discord Davat Linkləri və Zərərli Reklam Qadağası (Normal linklərə toxunmur)
     if "discord.gg/" in content_lower or "discord.com/invite/" in content_lower:
         try:
             await message.delete()
@@ -87,18 +85,15 @@ async def on_message(message):
             pass
         return
 
-    # Ağıllı Anti-Spam (Normal yazışmalara toxunmur, yalnız həqiqi spamsı tutur)
     author_id = message.author.id
     simdi = time.time()
 
     if author_id not in spam_kontrol:
         spam_kontrol[author_id] = []
 
-    # Son 4 saniyədə atılan mesajları yoxlayır
     spam_kontrol[author_id] = [t for t in spam_kontrol[author_id] if simdi - t < 4]
     spam_kontrol[author_id].append(simdi)
 
-    # Əgər qısa 4 saniyə içində 5-dən çox ardıcıl mesaj atarsa spam sayılır
     if len(spam_kontrol[author_id]) >= 5:
         try:
             await message.channel.purge(limit=6, check=lambda m: m.author.id == author_id)
@@ -113,7 +108,6 @@ async def on_message(message):
 # ==========================================
 # --- MƏNTİQLİ VƏ UYĞUN REAKSİYA SİSTEMİ ---
 # ==========================================
-# Atılan reaksiyaya və ya məzmuna görə tam uyğun tematik emojilər
 UYGUN_EMOJI_GRUPLARI = {
     "👍": ["✅", "🔥", "💯", "🎯"],
     "❤️": ["💖", "😍", "✨", "💞"],
@@ -137,10 +131,8 @@ async def on_raw_reaction_add(payload):
         return
 
     emoji_str = str(payload.emoji)
-    # Əgər atdığın emoji qrupda varsa ona uyğun olanları, yoxdursa ümumi cool emojilər atır
     secilenler = UYGUN_EMOJI_GRUPLARI.get(emoji_str, ["🔥", "⚡", "⭐", "🎯"])
     
-    # Təkrar eyni emojini atmamaq üçün yoxlayırıq və ya uyğun olanlardan 2 dənə seçib atırıq
     for exsar in random.sample(secilenler, min(2, len(secilenler))):
         try:
             await message.add_reaction(exsar)
@@ -556,7 +548,7 @@ async def kanalac(ctx, *, kanal_adi: str):
 
 
 # ==========================================
-# --- 5. OYUNLAR & ƏYLƏNCƏ ---
+# --- 5. OYUNlar & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -572,4 +564,21 @@ async def coinflip(ctx, secim: str = None):
         await ctx.send("⚠️ Seçim et: `r?coinflip yazı`")
         return
     netice = random.choice(["yazı", "tura"])
-    if secim.lower() ==
+    if secim.lower() == netice:
+        await ctx.send(f"🪙 Nəticə: **{netice}**. Qazandın! 🎉")
+    else:
+        await ctx.send(f"🪙 Nəticə: **{netice}**. Udurdun!")
+
+@bot.command(name="slot")
+async def slot(ctx):
+    simvol = ["🍎", "🍋", "🍒", "💎", "⭐"]
+    r1, r2, r3 = random.choice(simvol), random.choice(simvol), random.choice(simvol)
+    if r1 == r2 == r3:
+        await ctx.send(f"🎰 [ {r1} | {r2} | {r3} ]\n🔥 Jackpot!")
+    else:
+        await ctx.send(f"🎰 [ {r1} | {r2} | {r3} ]\n💀 Udurdun!")
+
+@bot.command(name="hacker")
+async def hacker(ctx, user: discord.Member = None):
+    target = user if user else ctx.author
+    ip = f"{random.randint(10, 255)}.{random.randint(10, 255)}.{random.randint
