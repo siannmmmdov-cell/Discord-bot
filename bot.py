@@ -398,7 +398,7 @@ async def silkanal(ctx, kanal: discord.TextChannel = None):
         await ctx.send(f"❌ Kanalı silmək olmadı! Xəta: {e}")
 
 @bot.command(name="mute")
-@commands.has_permissions(mute_members=True)
+@commands.has_permissions(manage_permissions=True)
 async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
     try:
         await member.timeout(timedelta(minutes=dakika))
@@ -407,7 +407,7 @@ async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
         await ctx.send(f"❌ Mute vermək olmadı! Xəta: `{e}`")
 
 @bot.command(name="unmute")
-@commands.has_permissions(mute_roles=True)
+@commands.has_permissions(manage_permissions=True)
 async def unmute_cmd(ctx, member: discord.Member):
     try:
         await member.timeout(None)
@@ -582,5 +582,4 @@ async def slot(ctx):
 async def hacker(ctx, user: discord.Member = None):
     target = user if user else ctx.author
     p1 = random.randint(10, 255)
-    p2 = random.randint(10, 255)
-    p3 = ran
+    p2 = random.randint(10, 255
