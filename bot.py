@@ -95,6 +95,38 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+# --- AVTOMATİK REAKSİYA SİSTEMİ (SƏN EMOJİ BASANDA) ---
+UYGUN_EMOJI_GRUPLARI = {
+    "👍": ["✅", "🔥", "💯", "🎯"],
+    "❤️": ["💖", "😍", "✨", "💞"],
+    "🔥": ["⚡", "🚀", "💥", "👑"],
+    "⭐": ["🌟", "💫", "💎", "✨"],
+    "😂": ["💀", "🤣", "😹", "🔥"],
+    "🎉": ["🎊", "🥳", "🏆", "🌟"]
+}
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    if payload.user_id != SAHIB_ID or payload.guild_id is None:
+        return
+
+    channel = bot.get_channel(payload.channel_id)
+    if not channel:
+        return
+    try:
+        message = await channel.fetch_message(payload.message_id)
+    except:
+        return
+
+    emoji_str = str(payload.emoji)
+    secilenler = UYGUN_EMOJI_GRUPLARI.get(emoji_str, ["🔥", "⚡", "⭐", "🎯"])
+    
+    for exsar in random.sample(secilenler, min(2, len(secilenler))):
+        try:
+            await message.add_reaction(exsar)
+        except:
+            pass
+
 # --- MASTER PANEL ---
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -117,7 +149,7 @@ async def bot_panel(ctx):
         inline=False
     )
     embed.add_field(
-        name="🛡️ Moderasiya",
+        name="🛡️ Moderasiya (Silmək və s.)",
         value="`r?sil`, `r?silkanal`, `r?mute`, `r?unmute`, `r?ban`, `r?unban`, `r?kick`, `r?lock`, `r?unlock`, `r?slowmode`, `r?sesmute`, `r?sesunmute`",
         inline=False
     )
@@ -236,7 +268,7 @@ async def hesabla(ctx, *, ifade: str):
     except:
         await ctx.send("⚠️ Xətali misal!")
 
-# --- MODERASİYA ---
+# --- MODERASİYA (KANAL SİLMƏ VƏ S.) ---
 @bot.command(name="sil")
 @commands.has_permissions(manage_messages=True)
 async def sil(ctx, say: int = 5):
@@ -248,7 +280,10 @@ async def sil(ctx, say: int = 5):
 @commands.has_permissions(manage_channels=True)
 async def silkanal(ctx, kanal: discord.TextChannel = None):
     k = kanal or ctx.channel
-    await k.delete()
+    try:
+        await k.delete()
+    except Exception as e:
+        await ctx.send(f"❌ Xəta: {e}")
 
 @bot.command(name="mute")
 @commands.has_permissions(moderate_members=True)
@@ -402,4 +437,3 @@ if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("DISCORD_TOKEN")
     bot.run(token)
-                   
