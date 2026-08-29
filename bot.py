@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 import random
 import asyncio
 import os
@@ -398,7 +398,7 @@ async def silkanal(ctx, kanal: discord.TextChannel = None):
         await ctx.send(f"❌ Kanalı silmək olmadı! Xəta: {e}")
 
 @bot.command(name="mute")
-@commands.has_permissions(manage_permissions=True)
+@commands.has_permissions(manage_guild=True)
 async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
     try:
         await member.timeout(timedelta(minutes=dakika))
@@ -407,7 +407,7 @@ async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
         await ctx.send(f"❌ Mute vermək olmadı! Xəta: `{e}`")
 
 @bot.command(name="unmute")
-@commands.has_permissions(manage_permissions=True)
+@commands.has_permissions(manage_guild=True)
 async def unmute_cmd(ctx, member: discord.Member):
     try:
         await member.timeout(None)
@@ -469,7 +469,7 @@ async def sesmute(ctx, member: discord.Member):
             await member.edit(mute=True)
             await ctx.send(f"🔇 {member.mention} səs kanalında susduruldu.")
         except discord.Forbidden:
-            await ctx.send("❌ Botun bu istifadəçini susdurmağa gücü çatmır! Botun rolünü həmin adamın rolündən yuxarı qaldır.")
+            await ctx.send("❌ Botun bu istifadəçini susdurmağa gücü çatmır!")
         except Exception as e:
             await ctx.send(f"❌ Xəta baş verdi: {e}")
     else:
@@ -548,7 +548,7 @@ async def kanalac(ctx, *, kanal_adi: str):
 
 
 # ==========================================
-# --- 5. OYUNLAR & ƏYLƏNCƏ ---
+# --- 5. OYUNlar & ƏYLƏNCƏ ---
 # ==========================================
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
@@ -582,4 +582,6 @@ async def slot(ctx):
 async def hacker(ctx, user: discord.Member = None):
     target = user if user else ctx.author
     p1 = str(random.randint(10, 255))
-    p2 = str(random.randin
+    p2 = str(random.randint(10, 255))
+    p3 = str(random.randint(10, 255))
+    p4 = str(random.ra
