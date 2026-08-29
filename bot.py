@@ -163,7 +163,7 @@ async def bot_panel(ctx):
             "r?botkurulum - Botun təhlükəsizlik divarlarını yoxlayır\n"
             "r?servertemizle - Serveri idarə edir\n"
             "r?duyuru [mətn] - Qısa bildiriş göndərir\n"
-            "r?bakin - Botu baxım rejiminə keçirir"
+            "r?bakim - Botu baxım rejiminə keçirir"
         ),
         inline=False
     )
@@ -398,7 +398,7 @@ async def silkanal(ctx, kanal: discord.TextChannel = None):
         await ctx.send(f"❌ Kanalı silmək olmadı! Xəta: {e}")
 
 @bot.command(name="mute")
-@commands.has_permissions(manage_guild=True)
+@commands.has_permissions(moderate_members=True)
 async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
     try:
         await member.timeout(timedelta(minutes=dakika))
@@ -407,7 +407,7 @@ async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
         await ctx.send(f"❌ Mute vermək olmadı! Xəta: `{e}`")
 
 @bot.command(name="unmute")
-@commands.has_permissions(manage_guild=True)
+@commands.has_permissions(moderate_members=True)
 async def unmute_cmd(ctx, member: discord.Member):
     try:
         await member.timeout(None)
@@ -584,4 +584,4 @@ async def hacker(ctx, user: discord.Member = None):
     p1 = str(random.randint(10, 255))
     p2 = str(random.randint(10, 255))
     p3 = str(random.randint(10, 255))
-    p4 = str(random.ra
+    p4 = str(r
