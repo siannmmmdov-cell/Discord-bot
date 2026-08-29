@@ -126,7 +126,6 @@ UYGUN_EMOJI_GRUPLARI = {
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    # Səndən başqa heç kimin reaksiyası avtoterxiq/avtoemoji yaratmayacaq
     if payload.user_id != SAHIB_ID or payload.guild_id is None:
         return
 
@@ -154,7 +153,7 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="👑 MASTER PANEL v3300",
+        title="👑 MASTER PANEL v3400",
         description="Bütün əmrlər (Yalnız sənə məxsusdur):",
         color=0x050505
     )
@@ -164,8 +163,8 @@ async def bot_panel(ctx):
         inline=False
     )
     embed.add_field(
-        name="🛡️ Mütləq Təhlükəsizlik & Gizlilik",
-        value="`r?gizle` - Bu kanalı gizlədir\n`r?goster` - Bu kanalın gizliliyini açır\n`r?tumunugizle` - Bütün kanalları gizlədir\n`r?tumunugoster` - Bütün kanalları açır",
+        name="🛡️ Mütləq Təhlükəsizlik & Gizlilik (Mətn və Səs)",
+        value="`r?gizle` - Mətn kanalını gizlədir\n`r?goster` - Mətn kanalını açır\n`r?sesgizle` - Səs kanalını gizlədir\n`r?sesgoster` - Səs kanalını açır\n`r?tumunugizle` - Bütün kanalları (mətn+səs) gizlədir\n`r?tumunugoster` - Bütün kanalları açır",
         inline=False
     )
     embed.add_field(
@@ -190,7 +189,7 @@ async def bot_panel(ctx):
     )
     await ctx.send(embed=embed)
 
-# --- SAHİB ƏMRLƏRİ (FULL PERM ADMINLƏR BELƏ İSTİFADƏ EDƏ BİLMƏZ) ---
+# --- SAHİB ƏMRLƏRİ ---
 @bot.command(name="elan")
 async def elan(ctx, *, text: str):
     if ctx.author.id != SAHIB_ID: return
@@ -299,13 +298,33 @@ async def hesabla(ctx, *, ifade: str):
 async def gizle(ctx):
     if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=False)
-    await ctx.send("🔒 Bu kanal hamıdan gizlədildi!")
+    await ctx.send("🔒 Bu mətn kanalı hamıdan gizlədildi!")
 
 @bot.command(name="goster")
 async def goster(ctx):
     if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
-    await ctx.send("🔓 Bu kanalın gizliliyi açıldı!")
+    await ctx.send("🔓 Bu mətn kanalının gizliliyi açıldı!")
+
+@bot.command(name="sesgizle")
+async def sesgizle(ctx):
+    if ctx.author.id != SAHIB_ID: return
+    if ctx.author.voice and ctx.author.voice.channel:
+        channel = ctx.author.voice.channel
+        await channel.set_permissions(ctx.guild.default_role, connect=False)
+        await ctx.send(f"🔇 **{channel.name}** səs kanalı hamıdan gizlədildi (bağlandı)!")
+    else:
+        await ctx.send("⚠️ Əvvəlcə gizlətmək istədiyiniz səs kanalına qoşulun!")
+
+@bot.command(name="sesgoster")
+async def sesgoster(ctx):
+    if ctx.author.id != SAHIB_ID: return
+    if ctx.author.voice and ctx.author.voice.channel:
+        channel = ctx.author.voice.channel
+        await channel.set_permissions(ctx.guild.default_role, connect=True)
+        await ctx.send(f"🔊 **{channel.name}** səs kanalının gizliliyi açıldı!")
+    else:
+        await ctx.send("⚠️ Əvvəlcə açmaq istədiyiniz səs kanalına qoşulun!")
 
 @bot.command(name="tumunugizle")
 async def tumunugizle(ctx):
@@ -315,7 +334,12 @@ async def tumunugizle(ctx):
             await channel.set_permissions(ctx.guild.default_role, view_channel=False)
         except:
             pass
-    await ctx.send("🔒 Serverdəki bütün kanallar gizliliyə alındı!")
+    for channel in ctx.guild.voice_channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, connect=False)
+        except:
+            pass
+    await ctx.send("🔒 Serverdəki bütün mətn və səs kanalları gizliliyə alındı!")
 
 @bot.command(name="tumunugoster")
 async def tumunugoster(ctx):
@@ -325,7 +349,12 @@ async def tumunugoster(ctx):
             await channel.set_permissions(ctx.guild.default_role, view_channel=True)
         except:
             pass
-    await ctx.send("🔓 Serverdəki bütün kanalların gizliliyi açıldı!")
+    for channel in ctx.guild.voice_channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, connect=True)
+        except:
+            pass
+    await ctx.send("🔓 Serverdəki bütün mətn və səs kanallarının gizliliyi açıldı!")
 
 @bot.command(name="sil")
 async def sil(ctx, say: int = 5):
