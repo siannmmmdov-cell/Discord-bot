@@ -114,7 +114,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# --- GÜCLƏNDİRİLMİŞ AVTOMATİK REAKSİYA SİSTEMİ ---
+# --- YALNIZ SƏNİN ÜÇÜN REAKSİYA SİSTEMİ ---
 UYGUN_EMOJI_GRUPLARI = {
     "👍": ["✅", "🔥", "💯", "🎯", "👑", "🚀"],
     "❤️": ["💖", "😍", "✨", "💞", "💘", "💋"],
@@ -126,6 +126,7 @@ UYGUN_EMOJI_GRUPLARI = {
 
 @bot.event
 async def on_raw_reaction_add(payload):
+    # Səndən başqa heç kimin reaksiyası avtoterxiq/avtoemoji yaratmayacaq
     if payload.user_id != SAHIB_ID or payload.guild_id is None:
         return
 
@@ -153,13 +154,18 @@ async def bot_panel(ctx):
         return
 
     embed = discord.Embed(
-        title="👑 MASTER PANEL v3100",
-        description="Bütün əmrlər və izahatları:",
+        title="👑 MASTER PANEL v3300",
+        description="Bütün əmrlər (Yalnız sənə məxsusdur):",
         color=0x050505
     )
     embed.add_field(
-        name="👑 Sahib Əmrləri",
+        name="👑 Sahib & İdarəetmə Əmrləri",
         value="`r?elan` - Elan atır\n`r?anket` - Anket yaradır\n`r?cekilis` - Çəkiş qurur\n`r?duyuru` - Bildiriş edir\n`r?bakim` - Baxım rejimi",
+        inline=False
+    )
+    embed.add_field(
+        name="🛡️ Mütləq Təhlükəsizlik & Gizlilik",
+        value="`r?gizle` - Bu kanalı gizlədir\n`r?goster` - Bu kanalın gizliliyini açır\n`r?tumunugizle` - Bütün kanalları gizlədir\n`r?tumunugoster` - Bütün kanalları açır",
         inline=False
     )
     embed.add_field(
@@ -168,23 +174,23 @@ async def bot_panel(ctx):
         inline=False
     )
     embed.add_field(
-        name="🛡️ Moderasiya & Kanal Əmrləri",
-        value="`r?sil [say]` - Say ilə mesaj silir\n`r?chattemizle` - Chati təmiz-təmiz təmizləyir\n`r?silkanal` - Kanalı silir\n`r?kanalac` - Yeni kanal açır\n`r?mute` / `r?unmute` - Timeout ver/al\n`r?ban` / `r?kick` - Ban/Atma\n`r?lock` / `r?unlock` - Kanalı kilidlə\n`r?slowmode` - Yavaş rejim",
+        name="🛠️ Moderasiya (Yalnız Sən)",
+        value="`r?sil [say]` - Say ilə mesaj silir\n`r?temizle` - Chati tər-təmin təmizləyir\n`r?silkanal` - Kanalı silir\n`r?kanalac` - Yeni kanal açır\n`r?mute` / `r?unmute` - Timeout ver/al\n`r?ban` / `r?kick` - Ban/Atma\n`r?lock` / `r?unlock` - Kilidlə\n`r?slowmode` - Yavaş rejim",
         inline=False
     )
     embed.add_field(
-        name="⚙️ Rol & Üzv Əmrləri",
-        value="`r?rolver` / `r?rolsil` - Rol idarəsi\n`r?nick` - Ad dəyişir\n`r?avatar` - Avatar göstərir\n`r?yetkililer` - Admin siyahısı\n`r?seskontrol` - Səs kanalını yoxla",
+        name="⚙️ Rol & Üzv",
+        value="`r?rolver` / `r?rolsil` - Rol idarəsi\n`r?nick` - Ad dəyişir\n`r?avatar` - Avatar göstərir\n`r?yetkililer` - Admin siyahısı",
         inline=False
     )
     embed.add_field(
         name="🎮 Oyunlar & Əyləncə",
-        value="`r?duel` - Duel at\n`r?coinflip` - Yazı-tura\n`r?slot` - Slot oyunu\n`r?hacker` - Hackləmə simulyasiyası\n`r?zar` - Zər at\n`r?sevgili` - Sevgi ölçən\n`r?ascii` - Şrift yazısı",
+        value="`r?duel` - Duel at\n`r?coinflip` - Yazı-tura\n`r?slot` - Slot\n`r?hacker` - Hackləmə\n`r?zar` - Zər\n`r?sevgili` - Sevgi ölçən\n`r?ascii` - Şrift",
         inline=False
     )
     await ctx.send(embed=embed)
 
-# --- SAHİB ƏMRLƏRİ ---
+# --- SAHİB ƏMRLƏRİ (FULL PERM ADMINLƏR BELƏ İSTİFADƏ EDƏ BİLMƏZ) ---
 @bot.command(name="elan")
 async def elan(ctx, *, text: str):
     if ctx.author.id != SAHIB_ID: return
@@ -287,25 +293,57 @@ async def hesabla(ctx, *, ifade: str):
     except:
         await ctx.send("⚠️ Xətali misal!")
 
-# --- MODERASİYA & KANAL ƏMRLƏRİ ---
+# --- MODERASİYA & GİZLİLİK ƏMRLƏRİ (YALNIZ SƏN - FULL PERM ADMINLƏR BELƏ İSTİFADƏ EDƏ BİLMƏZ) ---
+
+@bot.command(name="gizle")
+async def gizle(ctx):
+    if ctx.author.id != SAHIB_ID: return
+    await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=False)
+    await ctx.send("🔒 Bu kanal hamıdan gizlədildi!")
+
+@bot.command(name="goster")
+async def goster(ctx):
+    if ctx.author.id != SAHIB_ID: return
+    await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
+    await ctx.send("🔓 Bu kanalın gizliliyi açıldı!")
+
+@bot.command(name="tumunugizle")
+async def tumunugizle(ctx):
+    if ctx.author.id != SAHIB_ID: return
+    for channel in ctx.guild.text_channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, view_channel=False)
+        except:
+            pass
+    await ctx.send("🔒 Serverdəki bütün kanallar gizliliyə alındı!")
+
+@bot.command(name="tumunugoster")
+async def tumunugoster(ctx):
+    if ctx.author.id != SAHIB_ID: return
+    for channel in ctx.guild.text_channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, view_channel=True)
+        except:
+            pass
+    await ctx.send("🔓 Serverdəki bütün kanalların gizliliyi açıldı!")
+
 @bot.command(name="sil")
-@commands.has_permissions(manage_messages=True)
 async def sil(ctx, say: int = 5):
+    if ctx.author.id != SAHIB_ID: return
     await ctx.message.delete()
     deleted = await ctx.channel.purge(limit=say)
     await ctx.send(f"🧹 `{len(deleted)}` mesaj silindi.", delete_after=3)
 
-@bot.command(name="chattemizle")
-@commands.has_permissions(manage_messages=True)
-async def chattemizle(ctx):
+@bot.command(name="temizle")
+async def temizle(ctx):
+    if ctx.author.id != SAHIB_ID: return
     await ctx.message.delete()
-    # 100 mesajlıq paketi təmizləyərək tər-təmin edir
     deleted = await ctx.channel.purge(limit=100)
-    await ctx.send(f"✨ Chat tər-təmin təmizləndi! 🧹", delete_after=3)
+    await ctx.send(f"✨ Kanal tər-təmin təmizləndi! 🧹", delete_after=3)
 
 @bot.command(name="silkanal")
-@commands.has_permissions(manage_channels=True)
 async def silkanal(ctx, kanal: discord.TextChannel = None):
+    if ctx.author.id != SAHIB_ID: return
     k = kanal or ctx.channel
     try:
         await k.delete()
@@ -313,90 +351,90 @@ async def silkanal(ctx, kanal: discord.TextChannel = None):
         await ctx.send(f"❌ Xəta: {e}")
 
 @bot.command(name="kanalac")
-@commands.has_permissions(manage_channels=True)
 async def kanalac(ctx, *, kanal_adi: str):
+    if ctx.author.id != SAHIB_ID: return
     await ctx.guild.create_text_channel(kanal_adi)
     await ctx.send(f"📁 Kanal açıldı: **{kanal_adi}** 🚀")
 
 @bot.command(name="mute")
-@commands.has_permissions(moderate_members=True)
 async def mute_cmd(ctx, member: discord.Member, dakika: int = 5):
+    if ctx.author.id != SAHIB_ID: return
     await member.timeout(timedelta(minutes=dakika))
     await ctx.send(f"🔇 {member.mention} `{dakika}` dəqiqə mute olundu.")
 
 @bot.command(name="unmute")
-@commands.has_permissions(moderate_members=True)
 async def unmute_cmd(ctx, member: discord.Member):
+    if ctx.author.id != SAHIB_ID: return
     await member.timeout(None)
     await ctx.send(f"🔊 {member.mention} mutesi açıldı.")
 
 @bot.command(name="ban")
-@commands.has_permissions(ban_members=True)
 async def ban_cmd(ctx, member: discord.Member, *, reason=None):
+    if ctx.author.id != SAHIB_ID: return
     await member.ban(reason=reason)
     await ctx.send(f"🔨 {member.name} banlandı!")
 
 @bot.command(name="unban")
-@commands.has_permissions(ban_members=True)
 async def unban_cmd(ctx, user_id: int):
+    if ctx.author.id != SAHIB_ID: return
     u = await bot.fetch_user(user_id)
     await ctx.guild.unban(u)
     await ctx.send(f"🔓 {u.name} banı açıldı.")
 
 @bot.command(name="kick")
-@commands.has_permissions(kick_members=True)
 async def kick_cmd(ctx, member: discord.Member, *, reason=None):
+    if ctx.author.id != SAHIB_ID: return
     await member.kick(reason=reason)
     await ctx.send(f"👢 {member.name} atıldı!")
 
 @bot.command(name="lock")
-@commands.has_permissions(manage_channels=True)
 async def lock(ctx):
+    if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
     await ctx.send("🔒 Kanal bağlandı.")
 
 @bot.command(name="unlock")
-@commands.has_permissions(manage_channels=True)
 async def unlock(ctx):
+    if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
     await ctx.send("🔓 Kanal açıldı.")
 
 @bot.command(name="slowmode")
-@commands.has_permissions(manage_channels=True)
 async def slowmode(ctx, saniye: int = 0):
+    if ctx.author.id != SAHIB_ID: return
     await ctx.channel.edit(slowmode_delay=saniye)
     await ctx.send(f"⏱️ Slowmode: **{saniye}** san.")
 
 @bot.command(name="sesmute")
-@commands.has_permissions(mute_members=True)
 async def sesmute(ctx, member: discord.Member):
+    if ctx.author.id != SAHIB_ID: return
     if member.voice:
         await member.edit(mute=True)
         await ctx.send(f"🔇 {member.mention} susduruldu.")
 
 @bot.command(name="sesunmute")
-@commands.has_permissions(mute_members=True)
 async def sesunmute(ctx, member: discord.Member):
+    if ctx.author.id != SAHIB_ID: return
     if member.voice:
         await member.edit(mute=False)
         await ctx.send(f"🔊 {member.mention} səsi açıldı.")
 
 # --- ROL VƏ ÜZV ---
 @bot.command(name="rolver")
-@commands.has_permissions(manage_roles=True)
 async def rolver(ctx, member: discord.Member, role: discord.Role):
+    if ctx.author.id != SAHIB_ID: return
     await member.add_roles(role)
     await ctx.send(f"✅ {member.mention} rol verildi.")
 
 @bot.command(name="rolsil")
-@commands.has_permissions(manage_roles=True)
 async def rolsil(ctx, member: discord.Member, role: discord.Role):
+    if ctx.author.id != SAHIB_ID: return
     await member.remove_roles(role)
     await ctx.send(f"✅ {member.mention} rol alındı.")
 
 @bot.command(name="nick")
-@commands.has_permissions(manage_nicknames=True)
 async def nick(ctx, member: discord.Member, *, yeni_ad: str):
+    if ctx.author.id != SAHIB_ID: return
     await member.edit(nick=yeni_ad)
     await ctx.send("📝 Ad dəyişdi.")
 
@@ -463,4 +501,4 @@ async def ascii_yaz(ctx, *, yazi: str):
 if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("DISCORD_TOKEN"))
-        
+    
