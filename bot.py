@@ -30,14 +30,18 @@ intents.members = True
 intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
-intents.presences = True
+intents.presences = True  # Status və aktivlik yoxlaması üçün mütləqdir
 
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
 SAHIB_ID = 641014966312501259
-start_time = time.time()
+START_TIMING = time.time()
 spam_kontrol = {}
 salam_flood_kontrol = {}
+
+# Tənzimlənən gildiya/klan etiket açar sözü
+GUILD_ACAR_SOZU = "yenilmez"  # Statusda və ya etiketdə olması lazım olan söz
+XUSUSI_ROL_ADI = "Yenilməz"    # Etiket olmayanda avtomatik alınacaq rolun adı
 
 @bot.event
 async def on_ready():
@@ -61,21 +65,17 @@ async def on_message(message):
     author_id = message.author.id
     simdi = time.time()
 
-    # Sən (Sahib) yazanda bot heç bir avtomatik cavab verməyəcək
     if author_id == SAHIB_ID:
         await bot.process_commands(message)
         return
 
-    # Yalnız dəqiq "salam" sözü ardıcıl 3 dəfə yazılarsa yoxlanılır
     if content_lower == "salam":
         if author_id not in salam_flood_kontrol:
             salam_flood_kontrol[author_id] = []
         
-        # Son 15 saniyə içindəki salamlar nəzərə alınır
         salam_flood_kontrol[author_id] = [t for t in salam_flood_kontrol[author_id] if simdi - t < 15]
         salam_flood_kontrol[author_id].append(simdi)
 
-        # 3 dəfə dalbadal salam yazanda işə düşür
         if len(salam_flood_kontrol[author_id]) >= 3:
             try:
                 await message.delete()
@@ -85,7 +85,6 @@ async def on_message(message):
                 pass
             return
 
-    # Link qoruması
     if "discord.gg/" in content_lower or "discord.com/invite/" in content_lower:
         try:
             await message.delete()
@@ -94,7 +93,6 @@ async def on_message(message):
             pass
         return
 
-    # Spam tənzimləməsi
     if author_id not in spam_kontrol:
         spam_kontrol[author_id] = []
 
@@ -111,13 +109,33 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# --- YALNIZ SƏNİN ÜÇÜN GENİŞLƏNDİRİLMİŞ REAKSİYA SİSTEMİ ---
+# --- ETİKET VƏ STATUS YOXLAMASI (AVTOMATİK ROL ALMA) ---
+@bot.event
+async def on_member_update(before, after):
+    rol = discord.utils.get(after.guild.roles, name=XUSUSI_ROL_ADI)
+    if not rol or rol not in after.roles:
+        return
+
+    # İstifadəçinin statusunda və ya aktivliklərində həmin etiket/sözün olub-olmadığını yoxlayırıq
+    etiket_varmi = False
+    
+    for activity in after.activities:
+        if isinstance(activity, discord.CustomActivity) and activity.name:
+            if GUILD_ACAR_SOZU.lower() in activity.name.lower():
+                etiket_varmi = True
+                break
+
+    # Əgər statusda və ya etiketdə yoxdursa, dərhal rolu alırıq
+    if not etiket_varmi:
+        try:
+            await after.remove_roles(rol, reason="Statusundan və ya etiketindən gildiya/tag çıxarıldı.")
+        except:
+            pass
+
+# --- REAKSİYA SİSTEMİ ---
 UYGUN_EMOJI_GRUPLARI = {
-    # Təsdiq və əla reaksiyalar
     "👍": ["✅", "💯", "🎯", "👑", "🚀", "🔥", "⭐", "💪", "👊"],
     "👎": ["❌", "⚠️", "⛔", "🛑", "👎"],
-    
-    # Ürəklər və sevgi
     "❤️": ["💖", "💗", "💓", "💞", "💕", "💘", "💋", "😍", "✨", "🥰", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎"],
     "🧡": ["❤️", "💛", "💖", "✨", "🦊"],
     "💛": ["❤️", "🧡", "⭐", "🌟", "✨", "💫"],
@@ -125,24 +143,17 @@ UYGUN_EMOJI_GRUPLARI = {
     "💙": ["❤️", "💎", "🌊", "🔹", "🌐"],
     "💜": ["❤️", "🔮", "🦄", "🍇", "🟣"],
     "🖤": ["❤️", "🦇", "🌑", "🖤", "🏴"],
-    
-    # Alov və enerji
     "🔥": ["⚡", "🚀", "💥", "👑", "🌟", "✨", "💫", "🔥", "💯", "🎯"],
     "⚡": ["🔥", "🚀", "💥", "⚡", "🌟"],
     "⭐": ["🌟", "💫", "💎", "✨", "🌠", "🔥", "⭐", "🏆"],
     "🌟": ["⭐", "💫", "✨", "🌠", "💎"],
-    
-    # Gülüş və əyləncə
     "😂": ["💀", "🤣", "😹", "😆", "😅", "👻", "💥"],
     "🤣": ["😂", "💀", "😹", "😆", "😅"],
     "💀": ["😂", "🤣", "👻", "🏴‍☠️", "💀"],
     "🎉": ["🎊", "🥳", "🏆", "🌟", "🎈", "🚀", "🎆", "🎇"],
-    
-    # Əllər və jestlər
     "👏": ["🙌", "🤝", "💪", "🔥", "💯"],
     "🙌": ["👏", "🎉", "🥳", "✨"],
     "🙏": ["🤝", "❤️", "✨", "⭐"],
-    "eyes": ["👀", "🔍", "🕵️‍♂️", "🔎"],
     "👀": ["👀", "🔍", "🔥", "💀"]
 }
 
@@ -161,13 +172,11 @@ async def on_raw_reaction_add(payload):
 
     emoji_str = str(payload.emoji)
     
-    # Əvvəlcə sənin basdığın orijinal emojinin özünü əlavə edirik
     try:
         await message.add_reaction(payload.emoji)
     except:
         pass
 
-    # Yalnız həmin qrupa aid olan oxşar emojilərdən əlavə edirik
     if emoji_str in UYGUN_EMOJI_GRUPLARI:
         secilenler = UYGUN_EMOJI_GRUPLARI[emoji_str]
         for exsar in random.sample(secilenler, min(4, len(secilenler))):
@@ -194,28 +203,18 @@ async def bot_panel(ctx):
         inline=False
     )
     embed.add_field(
-        name="🛡️ Mütləq Təhlükəsizlik & Gizlilik (Mətn və Səs)",
-        value="`r?gizle` - Mətn kanalını gizlədir\n`r?goster` - Mətn kanalını açır\n`r?sesgizle` - Səs kanalını gizlədir\n`r?sesgoster` - Səs kanalını açır\n`r?tumunugizle` - Bütün kanalları (mətn+səs) gizlədir\n`r?tumunugoster` - Bütün kanalları açır",
+        name="🛡️ Mütləq Təhlükəsizlik & Gizlilik",
+        value="`r?gizle` / `r?goster` - Mətn kanalı\n`r?sesgizle` / `r?sesgoster` - Səs kanalı\n`r?tumunugizle` / `r?tumunugoster` - Bütün kanallar",
         inline=False
     )
     embed.add_field(
         name="📋 Məlumat Əmrləri",
-        value="`r?server` - Server bilgisi\n`r?userinfo` - İstifadəçi məlumatı\n`r?botinfo` - Botun işləmə müddəti\n`r?ping` - Gecikmə müddəti\n`r?online` - Aktiv üzvlər\n`r?hava` - Hava durumu\n`r?hesabla` - Riyazi hesab",
+        value="`r?server` | `r?online` | `r?ping` | `r?botinfo` | `r?userinfo` | `r?hava` | `r?hesabla`",
         inline=False
     )
     embed.add_field(
-        name="🛠️ Moderasiya (Yalnız Sən)",
-        value="`r?sil [say]` - Say ilə mesaj silir\n`r?temizle` - Chati tər-təmin təmizləyir\n`r?silkanal` - Kanalı silir\n`r?kanalac` - Yeni kanal açır\n`r?mute` / `r?unmute` - Timeout ver/al\n`r?ban` / `r?kick` - Ban/Atma\n`r?lock` / `r?unlock` - Kilidlə\n`r?slowmode` - Yavaş rejim",
-        inline=False
-    )
-    embed.add_field(
-        name="⚙️ Rol & Üzv",
-        value="`r?rolver` / `r?rolsil` - Rol idarəsi\n`r?nick` - Ad dəyişir\n`r?avatar` - Avatar göstərir\n`r?yetkililer` - Admin siyahısı",
-        inline=False
-    )
-    embed.add_field(
-        name="🎮 Oyunlar & Əyləncə",
-        value="`r?duel` - Duel at\n`r?coinflip` - Yazı-tura\n`r?slot` - Slot\n`r?hacker` - Hackləmə\n`r?zar` - Zər\n`r?sevgili` - Sevgi ölçən\n`r?ascii` - Şrift",
+        name="🛠️ Moderasiya",
+        value="`r?sil` | `r?temizle` | `r?silkanal` | `r?kanalac` | `r?mute` | `r?unmute` | `r?ban` | `r?kick` | `r?lock` | `r?unlock` | `r?slowmode`",
         inline=False
     )
     await ctx.send(embed=embed)
@@ -269,7 +268,7 @@ async def duyuru(ctx, *, metin: str):
 async def bakim(ctx):
     if ctx.author.id == SAHIB_ID: await ctx.send("🛠️ Bot baxımdadır.")
 
-# --- MƏLUMAT ƏMRLƏRİ ---
+# --- MƏLUMAT & MODERASİYA ƏMRLƏRİ ---
 @bot.command(name="server")
 async def server_info(ctx):
     await ctx.send(f"🛡️ **{ctx.guild.name}** | Üzv: `{ctx.guild.member_count}` | Sahib: `{ctx.guild.owner}`")
@@ -285,7 +284,7 @@ async def ping(ctx):
 
 @bot.command(name="botinfo")
 async def botinfo(ctx):
-    await ctx.send(f"⏱️ Uptime: `{str(timedelta(seconds=int(time.time() - start_time)))}`")
+    await ctx.send(f"⏱️ Uptime: `{str(timedelta(seconds=int(time.time() - START_TIMING)))}`")
 
 @bot.command(name="userinfo")
 async def userinfo(ctx, member: discord.Member = None):
@@ -303,7 +302,6 @@ async def hesabla(ctx, *, ifade: str):
     except:
         await ctx.send("⚠️ Xətali misal!")
 
-# --- MODERASİYA & GİZLİLİK ƏMRLƏRİ ---
 @bot.command(name="gizle")
 async def gizle(ctx):
     if ctx.author.id != SAHIB_ID: return
@@ -315,48 +313,6 @@ async def goster(ctx):
     if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
     await ctx.send("🔓 Bu mətn kanalının gizliliyi açıldı!")
-
-@bot.command(name="sesgizle")
-async def sesgizle(ctx):
-    if ctx.author.id != SAHIB_ID: return
-    if ctx.author.voice and ctx.author.voice.channel:
-        channel = ctx.author.voice.channel
-        await channel.set_permissions(ctx.guild.default_role, connect=False)
-        await ctx.send(f"🔇 **{channel.name}** səs kanalı hamıdan gizlədildi!")
-    else:
-        await ctx.send("⚠️ Əvvəlcə səs kanalına qoşulun!")
-
-@bot.command(name="sesgoster")
-async def sesgoster(ctx):
-    if ctx.author.id != SAHIB_ID: return
-    if ctx.author.voice and ctx.author.voice.channel:
-        channel = ctx.author.voice.channel
-        await channel.set_permissions(ctx.guild.default_role, connect=True)
-        await ctx.send(f"🔊 **{channel.name}** səs kanalının gizliliyi açıldı!")
-    else:
-        await ctx.send("⚠️ Əvvəlcə səs kanalına qoşulun!")
-
-@bot.command(name="tumunugizle")
-async def tumunugizle(ctx):
-    if ctx.author.id != SAHIB_ID: return
-    for channel in ctx.guild.text_channels:
-        try: await channel.set_permissions(ctx.guild.default_role, view_channel=False)
-        except: pass
-    for channel in ctx.guild.voice_channels:
-        try: await channel.set_permissions(ctx.guild.default_role, connect=False)
-        except: pass
-    await ctx.send("🔒 Bütün kanallar gizliliyə alındı!")
-
-@bot.command(name="tumunugoster")
-async def tumunugoster(ctx):
-    if ctx.author.id != SAHIB_ID: return
-    for channel in ctx.guild.text_channels:
-        try: await channel.set_permissions(ctx.guild.default_role, view_channel=True)
-        except: pass
-    for channel in ctx.guild.voice_channels:
-        try: await channel.set_permissions(ctx.guild.default_role, connect=True)
-        except: pass
-    await ctx.send("🔓 Bütün kanalların gizliliyi açıldı!")
 
 @bot.command(name="sil")
 async def sil(ctx, say: int = 5):
@@ -427,7 +383,6 @@ async def slowmode(ctx, saniye: int = 0):
     await ctx.channel.edit(slowmode_delay=saniye)
     await ctx.send(f"⏱️ Slowmode: **{saniye}** san.")
 
-# --- ROL VƏ ÜZV ---
 @bot.command(name="rolver")
 async def rolver(ctx, member: discord.Member, role: discord.Role):
     if ctx.author.id != SAHIB_ID: return
@@ -457,16 +412,15 @@ async def yetkililer(ctx):
     staff = [m.name for m in ctx.guild.members if m.guild_permissions.administrator]
     await ctx.send(f"🛡️ Adminlər: {', '.join(staff[:10])}")
 
-# --- OYUNLAR & ƏYLƏNCƏ ---
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
     if member:
         await ctx.send(f"⚔️ Qalib: **{random.choice([ctx.author, member]).name}** 🏆")
 
 @bot.command(name="coinflip")
-async def coinflip(ctx, secim: str = "yazı"):
+async def coinflip(ctx, ctx_secim: str = "yazı"):
     netice = random.choice(["yazı", "tura"])
-    win = "Qazandın! 🎉" if secim.lower() == netice else "Udurdun!"
+    win = "Qazandın! 🎉" if ctx_secim.lower() == netice else "Udurdun!"
     await ctx.send(f"🪙 Nəticə: **{netice}**. {win}")
 
 @bot.command(name="slot")
