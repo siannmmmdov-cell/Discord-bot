@@ -38,6 +38,8 @@ SAHIB_ID = 641014966312501259
 START_TIMING = time.time()
 spam_kontrol = {}
 salam_flood_kontrol = {}
+user_xp = {}
+ticket_spam_kontrol = {}
 
 GUILD_ACAR_SOZU = "yenilmez"
 XUSUSI_ROL_ADI = "Yenilməz"
@@ -56,7 +58,7 @@ async def on_member_join(member):
         except:
             pass
 
-# --- GÜCLƏNDİRİLMİŞ SPAM, RANDOM VƏ SALAM QORUMASI ---
+# --- GÜCLƏNDİRİLMİŞ SPAM, RANDOM, SALAM VƏ XP QORUMASI ---
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -66,6 +68,18 @@ async def on_message(message):
     content_lower = content.lower()
     author_id = message.author.id
     simdi = time.time()
+
+    # XP Sistemi
+    if author_id not in user_xp:
+        user_xp[author_id] = {"xp": 0, "level": 1}
+    
+    user_xp[author_id]["xp"] += random.randint(10, 25)
+    gerekli_xp = user_xp[author_id]["level"] * 100
+    
+    if user_xp[author_id]["xp"] >= gerekli_xp:
+        user_xp[author_id]["level"] += 1
+        user_xp[author_id]["xp"] = 0
+        await message.channel.send(f"🎉 Təbriklər {message.author.mention}! Səviyyə atladın: **{user_xp[author_id]['level']}** səviyyə oldun! 🚀")
 
     if author_id == SAHIB_ID:
         await bot.process_commands(message)
@@ -186,23 +200,47 @@ async def on_raw_reaction_add(payload):
                         pass
             break
 
-# --- MASTER PANEL ---
+# --- MASTER PANEL (İzahlı Versiya) ---
 @bot.command(name="bot")
 async def bot_panel(ctx):
     if ctx.author.id != SAHIB_ID:
         return
 
     embed = discord.Embed(
-        title="👑 MASTER PANEL v3500 (55+ Komut)",
-        description="Bütün gücləndirilmiş əmrlər və qoruma sistemləri:",
+        title="👑 MASTER PANEL v3500 (Bütün Komutlar və İzahları)",
+        description="Botun bütün gücləndirilmiş əmrləri və funksiyaları:",
         color=0x050505
     )
-    embed.add_field(name="👑 Sahib & İdarəetmə", value="`r?elan`, `r?anket`, `r?cekilis`, `r?duyuru`, `r?bakim`", inline=False)
-    embed.add_field(name="🛡️ Təhlükəsizlik & Gizlilik", value="`r?gizle`, `r?goster`, `r?sesgizle`, `r?sesgoster`, `r?tumunugizle`, `r?tumunugoster`", inline=False)
-    embed.add_field(name="📋 Məlumat & Statistikalar", value="`r?server`, `r?userinfo`, `r?botinfo`, `r?ping`, `r?online`, `r?hava`, `r?hesabla`, `r?rolbilgi`, `r?kanalbilgi`", inline=False)
-    embed.add_field(name="🛠️ Moderasiya & İdarə", value="`r?sil`, `r?temizle`, `r?silkanal`, `r?kanalac`, `r?mute`, `r?unmute`, `r?ban`, `r?unban`, `r?kick`, `r?lock`, `r?unlock`, `r?slowmode`, `r?temizlemesaj`, `r?nuke`, `r?reklamver`", inline=False)
-    embed.add_field(name="⚙️ Rol & Üzv İdarəsi", value="`r?rolver`, `r?rolsil`, `r?rolac`, `r?rolsil_komanda`, `r?nick`, `r?avatar`, `r?yetkililer`, `r?botsay`, `r?uyeara`, `r?sesdesan`", inline=False)
-    embed.add_field(name="🎮 Oyunlar & Əyləncə", value="`r?duel`, `r?coinflip`, `r?slot`, `r?hacker`, `r?zar`, `r?sevgili`, `r?ascii`, `r?iq`, `r?rip`, `r?soz`, `r?8ball`, `r?istilik`, `r?afk`, `r?tapsir`, `r?balıq`", inline=False)
+    embed.add_field(
+        name="👑 Sahib & İdarəetmə", 
+        value="`r?elan` - Elan atır (@everyone)\n`r?anket` - Səsvermə yaradır\n`r?cekilis` - Çəkiliş keçirir\n`r?duyuru` - Bildiriş paylaşır\n`r?bakim` - Baxım mesajı atır\n`r?ticketpanel` - Dəstək panelini açır", 
+        inline=False
+    )
+    embed.add_field(
+        name="🛡️ Təhlükəsizlik & Gizlilik", 
+        value="`r?gizle` / `r?goster` - Kanalı gizlədir/açır\n`r?sesgizle` / `r?sesgoster` - Səs kanalını idarə edir\n`r?tumunugizle` / `r?tumunugoster` - Bütün kanalları bağlayır/açır", 
+        inline=False
+    )
+    embed.add_field(
+        name="📋 Məlumat & Statistikalar", 
+        value="`r?server` - Server məlumatı\n`r?online` - Aktiv üzvlər\n`r?ping` - Gecikmə (ms)\n`r?botinfo` - İşləmə müddəti\n`r?userinfo` - İstifadəçi bilgisi\n`r?level` - Səviyyə/XP yoxlayır\n`r?hava` - Hava proqnozu\n`r?hesabla` - Riyazi hesab\n`r?rolbilgi` / `r?kanalbilgi` - Rol və kanal məlumatı", 
+        inline=False
+    )
+    embed.add_field(
+        name="🛠️ Moderasiya & İdarə", 
+        value="`r?sil` / `r?temizle` - Mesaj silir\n`r?silkanal` / `r?kanalac` - Kanal idarəsi\n`r?mute` / `r?unmute` - Timeout verir\n`r?ban` / `r?unban` / `r?kick` - Cəza əmrləri\n`r?lock` / `r?unlock` - Kanalı kilidləyir\n`r?slowmode` - Yavaş rejim\n`r?temizlemesaj` - Şəxsin mesajlarını silir\n`r?nuke` - Kanalı sıfırlayır\n`r?reklamver` - Reklam embedi atır", 
+        inline=False
+    )
+    embed.add_field(
+        name="⚙️ Rol & Üzv İdarəsi", 
+        value="`r?rolver` / `r?rolsil` - Rol verir/alır\n`r?rolac` / `r?rolsil_komanda` - Rol yaradır/silir\n`r?nick` - Ləqəb dəyişir\n`r?avatar` - Profil şəklini atır\n`r?yetkililer` - Adminləri göstərir\n`r?botsay` - Bot sayını yazır\n`r?uyeara` - İstifadəçi axtarır\n`r?sesdesan` - Səsdəki adamları sayır", 
+        inline=False
+    )
+    embed.add_field(
+        name="🎮 Oyunlar & Əyləncə", 
+        value="`r?duel` - Duel atır\n`r?coinflip` - Yazı-tura\n`r?slot` - Slot oyunu\n`r?hacker` - Hack zarafatı\n`r?zar` - Zər atır\n`r?sevgili` - Uyğunluq yoxlayır\n`r?ascii` - ASCII yazı\n`r?iq` - IQ ölçür\n`r?rip` - Məzar şəkli\n`r?soz` - Günün sözü\n`r?8ball` - Sehrli 8 topu\n`r?istilik` - Hava istiliyi\n`r?afk` - AFK rejimi\n`r?tapsir` - Tapşırıq verir\n`r?balıq` - Balıq tutur", 
+        inline=False
+    )
     await ctx.send(embed=embed)
 
 # --- 1. SAHİB & İDARƏETMƏ ---
@@ -324,6 +362,12 @@ async def userinfo(ctx, member: discord.Member = None):
     m = member or ctx.author
     roles = [r.name for r in m.roles if r.name != "@everyone"]
     await ctx.send(f"👤 **{m.name}** | ID: `{m.id}` | Qoşulma: `{m.joined_at.strftime('%Y-%m-%d')}`\nRollar: {', '.join(roles[:5])}")
+
+@bot.command(name="level")
+async def level_cmd(ctx, member: discord.Member = None):
+    m = member or ctx.author
+    data = user_xp.get(m.id, {"xp": 0, "level": 1})
+    await ctx.send(f"📊 **{m.name}** | Səviyyə: **{data['level']}** | XP: **{data['xp']}/{data['level'] * 100}**")
 
 @bot.command(name="hava")
 async def hava(ctx, *, seher: str = "Baku"):
@@ -479,117 +523,4 @@ async def nick(ctx, member: discord.Member, *, yeni_ad: str):
     await ctx.send("📝 Ad dəyişdi.")
 
 @bot.command(name="avatar")
-async def avatar(ctx, member: discord.Member = None):
-    m = member or ctx.author
-    if m.avatar: await ctx.send(f"🖼️ {m.avatar.url}")
-
-@bot.command(name="yetkililer")
-async def yetkililer(ctx):
-    staff = [m.name for m in ctx.guild.members if m.guild_permissions.administrator]
-    await ctx.send(f"🛡️ Adminlər: {', '.join(staff[:10])}")
-
-@bot.command(name="botsay")
-async def botsay(ctx):
-    c = sum(1 for m in ctx.guild.members if m.bot)
-    await ctx.send(f"🤖 Serverdəki bot sayı: **{c}**")
-
-@bot.command(name="uyeara")
-async def uyeara(ctx, *, ad: str):
-    bulunanlar = [m.name for m in ctx.guild.members if ad.lower() in m.name.lower()]
-    await ctx.send(f"🔍 Tapılanlar ({len(bulunanlar)}): {', '.join(bulunanlar[:10])}")
-
-@bot.command(name="sesdesan")
-async def sesdesan(ctx):
-    toplam = sum(len(c.members) for c in ctx.guild.voice_channels)
-    await ctx.send(f"🔊 Səs kanallarındakı ümumi adam sayı: **{toplam}**")
-
-# --- 6. OYUNLAR & ƏYLƏNCƏ ---
-@bot.command(name="duel")
-async def duel(ctx, member: discord.Member = None):
-    if member: 
-        secilen = random.choice([ctx.author, member])
-        await ctx.send(f"⚔️ Qalib: **{secilen.name}** 🏆")
-
-@bot.command(name="coinflip")
-async def coinflip(ctx, ctx_secim: str = "yazı"):
-    netice = random.choice(["yazı", "tura"])
-    win = "Qazandın! 🎉" if ctx_secim.lower() == netice else "Udurdun!"
-    await ctx.send(f"🪙 Nəticə: **{netice}**. {win}")
-
-@bot.command(name="slot")
-async def slot(ctx):
-    s = ["🍎", "🍋", "🍒", "💎", "⭐"]
-    r1, r2, r3 = random.choice(s), random.choice(s), random.choice(s)
-    res = "🔥 Jackpot!" if r1 == r2 == r3 else "💀 Udurdun!"
-    await ctx.send(f"🎰 [ {r1} | {r2} | {r3} ]\n{res}")
-
-@bot.command(name="hacker")
-async def hacker(ctx, user: discord.Member = None):
-    target = user or ctx.author
-    ip = f"{random.randint(10,255)}.{random.randint(10,255)}.{random.randint(10,255)}.{random.randint(10,255)}"
-    await ctx.send(f"💻 **{target.name}** hackləndi! IP: `{ip}` 🚀")
-
-@bot.command(name="zar")
-async def zar(ctx):
-    await ctx.send(f"🎲 Zər: **{random.randint(1, 6)}**")
-
-@bot.command(name="sevgili")
-async def sevgili(ctx, member: discord.Member = None):
-    if member: await ctx.send(f"💖 Uyğunluq: **%{random.randint(0, 100)}** 💕")
-
-@bot.command(name="ascii")
-async def ascii_yaz(ctx, *, yazi: str):
-    await ctx.send(f"```fix\n{yazi.upper()}\n```")
-
-@bot.command(name="iq")
-async def iq(ctx, member: discord.Member = None):
-    target = member or ctx.author
-    await ctx.send(f"🧠 **{target.name}** IQ səviyyəsi: **{random.randint(40, 160)}** 📊")
-
-@bot.command(name="rip")
-async def rip(ctx, member: discord.Member = None):
-    target = member or ctx.author
-    await ctx.send(f"🪦 RİP **{target.name}**\n*2026 - 2026*\nRest in Peace... 🕯️")
-
-@bot.command(name="soz")
-async def soz(ctx):
-    sozler = [
-        "Həyat sınaqlarla doludur, əsas odur ki, yıxılanda yenidən qalxasan!",
-        "Yenilməzlər heç vaxt təslim olmazlar!",
-        "Gələcək bu gün nə etdiyindən asılıdır.",
-        "Məqsədinə çatmaq üçün hər zaman irəli bax!"
-    ]
-    await ctx.send(f"💬 **Günün Sözü:** *{random.choice(sozler)}*")
-
-@bot.command(name="8ball")
-async def eight_ball(ctx, *, soru: str):
-    cavablar = ["Bəli", "Xeyr", "Əlbəttə ki!", "Mümkünsüzdür", "Bəlkə də", "Gələcək qaranlıqdır"]
-    await ctx.send(f"🔮 Sual: **{soru}**\n✨ Cavab: **{random.choice(cavablar)}**")
-
-@bot.command(name="istilik")
-async def istilik(ctx):
-    await ctx.send(f"🌡️ Hava istiliyi: **{random.randint(20, 38)}°C** 🔥")
-
-@bot.command(name="afk")
-async def afk(ctx, *, sebeb: str = "Məşğul"):
-    await ctx.send(f"💤 {ctx.author.mention} AFK rejiminə keçdi. Səbəb: **{sebeb}**")
-
-@bot.command(name="tapsir")
-async def tapsir(ctx):
-    gorevler = ["10 dəfə şınc vur", "Stəkan su iç", "Bir mahnı oxu", "Discord profilini dəyiş"]
-    await ctx.send(f"🎯 Sənin tapşırığın: **{random.choice(gorevler)}** 💪")
-
-@bot.command(name="balıq")
-async def baliq(ctx):
-    tutulanlar = ["Qızıl balıq 🐠", "Külək balığı 🐟", "Köpək balığı 🦈", "Çəkmə 🥾 (Udurdun)"]
-    await ctx.send(f"🎣 Tilmeci atdın və tutdun: **{random.choice(tutulanlar)}**")
-
-# --- START ---
-if __name__ == "__main__":
-    keep_alive()
-    token = os.environ.get("TOKEN")
-    if not token:
-        print("XƏTA: TOKEN tapılmadı! Render mühitində (Environment Variables) TOKEN əlavə etdiyinizdən əmin olun.")
-    else:
-        bot.run(token)
-    
+async def avata
