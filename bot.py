@@ -44,7 +44,7 @@ spam_takip = {}
 @bot.event
 async def on_ready():
     print(f"🔥 Bot uğurla işə düşdü: {bot.user.name} 🔥")
-    await bot.change_presence(activity=discord.Game(name="r?yardim | DEADAZE v5000 👑"))
+    await bot.change_presence(activity=discord.Game(name="r?bot | YENİLMEZ v6000 👑"))
     stats_update.start()
     voice_xp_loop.start()
 
@@ -205,61 +205,72 @@ async def on_raw_reaction_add(payload):
         print(f"Reaction xətası: {e}")
 
 # ==============================================================================
-# 👑 YARDIM VƏ BÜTÜN MƏLUMAT KOMANDALARI
+# 👑 BÜTÜN KOMANDALAR VƏ MƏLUMAT PANELİ (r?bot)
 # ==============================================================================
 
-@bot.command(name="yardim")
-async def yardim(ctx):
+@bot.command(name="bot")
+async def bot_komanda(ctx):
     embed = discord.Embed(
-        title="👑 MASTER PANEL v5000 (Bütün Komutlar)",
-        description="Bütün gücləndirilmiş əmrlər və onların açıqlamaları:",
+        title="👑 YENİLMEZ v6000 - Əmr və Məlumat Mərkəzi",
+        description="Botun bütün gücləndirilmiş imkanları və hər bir komandanın izahı:",
         color=0xffa200
     )
     
     sahib_desc = (
-        "`r?elan` - Serverdə xüsusi elan paylaşırsan.\n"
-        "`r?anket` - Səsvermə anketi yaradırsan.\n"
-        "`r?cekilis [vaxt] [ödül]` - Avtomatik çəkiliş başladır (Məs: `r?cekilis 2d Nitro`).\n"
-        "`r?duyuru` - Rəsmi duyuru elan edirsən.\n"
-        "`r?bakim` - Botu baxım rejiminə alırsan.\n"
-        "`r?ticket` - Xüsusi kanalda yazılaraq gizli dəstək kanalı açır."
+        "`r?elan [mətn]` - Serverdə diqqət çəkən xüsusi elan paylaşırsan.\n"
+        "`r?anket [sual]` - Üzvlər üçün 👍/👎 reaksiyalı səsvermə anketi yaradırsan.\n"
+        "`r?cekilis [vaxt] [ödül]` - Avtomatik vaxtlı çəkiliş başladır (Məs: `r?cekilis 2d Nitro`).\n"
+        "`r?duyuru [mətn]` - Rəsmi server duyurusu edirsən.\n"
+        "`r?bakim [açıq/bağlı]` - Botu baxım rejiminə keçirirsən.\n"
+        "`r?ticket` - Xüsusi kanalda yazılaraq şəxsi, gizli dəstək kanalı açır."
     )
     embed.add_field(name="👑 Sahib & İdarəetmə Komutları", value=sahib_desc, inline=False)
 
     kanal_desc = (
-        "`r?gizle` / `r?goster` - Yazı kanalını gizlədir/açır.\n"
-        "`r?sesgizle` / `r?sesgoster` - Səs kanalını bağlayır/açır."
+        "`r?gizle` - Yazı kanalını hər kəs üçün gizlədir.\n"
+        "`r?goster` - Yazı kanalını yenidən hamıya açır.\n"
+        "`r?sesgizle` - Səs kanalını girişə bağlayır.\n"
+        "`r?sesgoster` - Səs kanalını girişə açır."
     )
     embed.add_field(name="🛡️ Kanal İdarəsi Komutları", value=kanal_desc, inline=False)
 
     stat_desc = (
-        "`r?server` - Server məlumatı.\n"
-        "`r?userinfo` - İstifadəçi məlumatı.\n"
-        "`r?botinfo` - Bot versiyası.\n"
-        "`r?ping` - Gecikməni ölçür.\n"
-        "`r?level` - Səviyyəni göstərir."
+        "`r?server` - Serverin ümumi məlumatlarını və üzv sayını göstərir.\n"
+        "`r?userinfo [@istifadəçi]` - Qeyd edilən istifadəçi haqqında məlumat verir.\n"
+        "`r?botinfo` - Botun versiya və altyapı məlumatını göstərir.\n"
+        "`r?ping` - Botun anlıq internet gecikməsini (ms) ölçür.\n"
+        "`r?online` - Serverdəki aktiv (onlayn) üzvlərin sayını göstərir.\n"
+        "`r?level [@istifadəçi]` - Sənin və ya başqasının səviyyə və XP dəyərini göstərir."
     )
     embed.add_field(name="📋 Məlumat & Statistika Komutları", value=stat_desc, inline=False)
 
     mod_desc = (
-        "`r?sil` - Mesaj silir.\n"
-        "`r?mute` / `r?unmute` - Səssizləşdirir/açır.\n"
-        "`r?ban` / `r?kick` - Banlayır/qovur.\n"
-        "`r?nuke` - Kanalı sıfırlayır."
+        "`r?sil [say]` - Göstərilən miqdarda mesajı təmizləyir.\n"
+        "`r?mute [@istifadəçi]` - İstifadəçini səssizləşdirir.\n"
+        "`r?unmute [@istifadəçi]` - İstifadəçinin səs cəzasını qaldırır.\n"
+        "`r?ban [@istifadəçi]` - İstifadəçini serverdən uzaqlaşdırır (ban).\n"
+        "`r?kick [@istifadəçi]` - İstifadəçini serverdən qovur.\n"
+        "`r?nuke` - Kanalı tamamilə sıfırlayıb təzədən yaradır."
     )
     embed.add_field(name="🛠️ Moderasiya Komutları", value=mod_desc, inline=False)
 
     oyun_desc = (
-        "`r?duel`, `r?coinflip`, `r?slot`, `r?iq`, `r?balıq` - Əyləncə oyunları."
+        "`r?duel [@istifadəçi]` - Dostunla döyüş dueli atırsan.\n"
+        "`r?coinflip` - Yazı-tura atır.\n"
+        "`r?slot` - Slot maşını oyunu oynayıb şansını yoxlayırsan.\n"
+        "`r?iq [@istifadəçi]` - Zarafat məqsədli IQ səviyyənizi ölçür.\n"
+        "`r?balıq` - Virtual olaraq balıq tutmağa çalışırsan.\n"
+        "`r?hava [şəhər]` - Seçilən şəhərin hava məlumatını göstərir.\n"
+        "`r?hesabla [riyazi əməl]` - İstənilən riyazi hesablamanı həyata keçirir."
     )
-    embed.add_field(name="🎮 Əyləncə Komutları", value=oyun_desc, inline=False)
+    embed.add_field(name="🎮 Əyləncə & Alətlər", value=oyun_desc, inline=False)
 
-    embed.set_footer(text="DEADAZE Security Systems | v5000 Pro Max")
+    embed.set_footer(text="YENİLMEZ Security Systems | v6000 Pro Max")
     await ctx.send(embed=embed)
 
 @bot.command(name="botinfo")
 async def botinfo(ctx):
-    await ctx.send("🤖 **Bot Sürümü:** `v5000 Ultra Pro Max` | Python & Discord.py ⚡")
+    await ctx.send("🤖 **Bot Sürümü:** `YENİLMEZ v6000 Ultra Pro Max` | Python & Discord.py ⚡")
 
 @bot.command(name="server")
 async def server(ctx):
@@ -502,29 +513,4 @@ class TicketKapatView(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(label="Ticket-i Bağla", emoji="🔒", style=discord.ButtonStyle.red, custom_id="ticket_kapat_buton")
-    async def ticket_kapat(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("🔒 Dəstək kanalı 3 saniyəyə silinir...", ephemeral=True)
-        await asyncio.sleep(3)
-        await interaction.channel.delete()
-
-@bot.command(name="ticket")
-async def ticket(ctx):
-    # Yalnız təyin olunmuş xüsusi kanalda işləməsi üçün yoxlama:
-    if ctx.channel.id != XUSUSI_KANAL_ID:
-        await ctx.message.delete()
-        await ctx.send(f"❌ {ctx.author.mention}, bu komandanı yalnız <#{XUSUSI_KANAL_ID}> kanalında istifadə edə bilərsən!", delete_after=5)
-        return
-
-    await ctx.message.delete()  # İstifadəçinin yazdığı r?ticket mesajını dərhal silir
-    guild = ctx.guild
-    author = ctx.author
-    sindi = time.time()
-
-    # Spam qoruması: 30 saniyədə 3-dən çox ticket açmağa icazə vermir
-    if author.id != SAHIB_ID:
-        if author.id not in ticket_span_kontrol:
-            ticket_span_kontrol[author.id] = []
-        ticket_span_kontrol[author.id] = [t for t in ticket_span_kontrol[author.id] if sindi - t < 30]
-        ticket_span_kontrol[author.id].append(sindi)
-        if len(ticket_span_kontrol[author.id]) >= 3:
-            await 
+    async def ticket_kapat(self, interaction: discord.Interaction, button: discord.ui.Bu
