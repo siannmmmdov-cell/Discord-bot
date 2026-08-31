@@ -524,3 +524,12 @@ async def nick(ctx, member: discord.Member, *, yeni_ad: str):
 
 @bot.command(name="avatar")
 async def avata
+# --- START ---
+if __name__ == "__main__":
+    keep_alive()
+    token = os.environ.get("TOKEN")
+    if not token:
+        print("XƏTA: TOKEN tapılmadı! Render mühitində (Environment Variables) TOKEN əlavə etdiyinizdən əmin olun.")
+    else:
+        bot.run(token)
+        
