@@ -73,7 +73,7 @@ async def on_message(message):
 
     # 1. Ağıllı Salam Sistemi
     salam_kaliplari = ["salam", "s.a", "sa", "selam", "salamun aleykum", "salamlayıram"]
-    if any(salam_kaliplari in content_lower for salam_kaliplari in ["salam", "selam", "s.a", "sa"]):
+    if any(k in content_lower for k in salam_kaliplari):
         if author_id not in salam_flood_kontrol:
             salam_flood_kontrol[author_id] = []
         
@@ -146,21 +146,18 @@ async def on_member_update(before, after):
         except:
             pass
 
-# --- TƏKMİLLƏŞDİRİLMİŞ ANBAAN (İLK BASANDA) REAKSİYA SİSTEMİ ---
+# --- TƏKMİLLƏŞDİRİLMİŞ REAKSİYA SİSTEMİ ---
 UYGUN_EMOJI_GRUPLARI = {
     "👍": ["✅", "💯", "🎯", "👑", "🚀", "🔥", "⭐", "💪", "👊"],
     "👎": ["❌", "⚠️", "⛔", "🛑", "👎"],
     "❤️": ["💖", "💗", "💓", "💞", "💕", "💘", "💋", "😍", "✨", "🥰", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎"],
     "🔥": ["⚡", "🚀", "💥", "👑", "🌟", "✨", "💫", "🔥", "💯", "🎯"],
-    "😂": ["💀", "🤣", "😹", "😆", "😅", "👻", "💥", "😁", " Rofl"],
-    "🎉": ["🎊", "🥳", "🏆", "🌟", "🎈", "🚀", "🎆", "🎇"],
-    "kahkaha": ["🤣", "💀", "😹", "😆"],
-    "sad": ["😢", "😭", "💔", "😞"]
+    "😂": ["💀", "🤣", "😹", "😆", "😅", "👻", "💥", "😁"],
+    "🎉": ["🎊", "🥳", "🏆", "🌟", "🎈", "🚀", "🎆", "🎇"]
 }
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    # Yalnız sən (SAHİB_ID) basanda dərhal işə düşür
     if payload.user_id != SAHIB_ID or payload.guild_id is None:
         return
 
@@ -174,13 +171,11 @@ async def on_raw_reaction_add(payload):
 
     emoji_str = str(payload.emoji)
     
-    # Sənin basdığın emojini bot dərhal özü də təkrar edir (əgər hələ basmayıbsa)
     try:
         await message.add_reaction(payload.emoji)
     except:
         pass
 
-    # Emojiyə uyğun qrupdakı digər emojiləri dərhal ardıcıl əlavə edir
     for qrup_adi, emojiler in UYGUN_EMOJI_GRUPLARI.items():
         if emoji_str == qrup_adi or emoji_str in emojiler:
             for exsar in random.sample(emojiler, min(4, len(emojiler))):
@@ -191,7 +186,7 @@ async def on_raw_reaction_add(payload):
                         pass
             break
 
-# --- MASTER PANEL (55+ KOMUT İLƏ) ---
+# --- MASTER PANEL ---
 @bot.command(name="bot")
 async def bot_panel(ctx):
     if ctx.author.id != SAHIB_ID:
@@ -202,36 +197,12 @@ async def bot_panel(ctx):
         description="Bütün gücləndirilmiş əmrlər və qoruma sistemləri:",
         color=0x050505
     )
-    embed.add_field(
-        name="👑 Sahib & İdarəetmə (5)",
-        value="`r?elan`, `r?anket`, `r?cekilis`, `r?duyuru`, `r?bakim`",
-        inline=False
-    )
-    embed.add_field(
-        name="🛡️ Təhlükəsizlik & Gizlilik (6)",
-        value="`r?gizle`, `r?goster`, `r?sesgizle`, `r?sesgoster`, `r?tumunugizle`, `r?tumunugoster`",
-        inline=False
-    )
-    embed.add_field(
-        name="📋 Məlumat & Statistikalar (9)",
-        value="`r?server`, `r?userinfo`, `r?botinfo`, `r?ping`, `r?online`, `r?hava`, `r?hesabla`, `r?rolbilgi`, `r?kanalbilgi`",
-        inline=False
-    )
-    embed.add_field(
-        name="🛠️ Moderasiya & İdarə (15)",
-        value="`r?sil`, `r?temizle`, `r?silkanal`, `r?kanalac`, `r?mute`, `r?unmute`, `r?ban`, `r?unban`, `r?kick`, `r?lock`, `r?unlock`, `r?slowmode`, `r?temizlemesaj`, `r?nuke`, `r?reklamver`",
-        inline=False
-    )
-    embed.add_field(
-        name="⚙️ Rol & Üzv İdarəsi (10)",
-        value="`r?rolver`, `r?rolsil`, `r?rolac`, `r?rolsil_komanda`, `r?nick`, `r?avatar`, `r?yetkililer`, `r?botsay`, `r?uyeara`, `r?sesdesan`",
-        inline=False
-    )
-    embed.add_field(
-        name="🎮 Oyunlar & Əyləncə (15)",
-        value="`r?duel`, `r?coinflip`, `r?slot`, `r?hacker`, `r?zar`, `r?sevgili`, `r?ascii`, `r?iq`, `r?rip`, `r?soz`, `r?8ball`, `r?istilik`, `r?afk`, `r?tapsir`, `r?balıq`",
-        inline=False
-    )
+    embed.add_field(name="👑 Sahib & İdarəetmə", value="`r?elan`, `r?anket`, `r?cekilis`, `r?duyuru`, `r?bakim`", inline=False)
+    embed.add_field(name="🛡️ Təhlükəsizlik & Gizlilik", value="`r?gizle`, `r?goster`, `r?sesgizle`, `r?sesgoster`, `r?tumunugizle`, `r?tumunugoster`", inline=False)
+    embed.add_field(name="📋 Məlumat & Statistikalar", value="`r?server`, `r?userinfo`, `r?botinfo`, `r?ping`, `r?online`, `r?hava`, `r?hesabla`, `r?rolbilgi`, `r?kanalbilgi`", inline=False)
+    embed.add_field(name="🛠️ Moderasiya & İdarə", value="`r?sil`, `r?temizle`, `r?silkanal`, `r?kanalac`, `r?mute`, `r?unmute`, `r?ban`, `r?unban`, `r?kick`, `r?lock`, `r?unlock`, `r?slowmode`, `r?temizlemesaj`, `r?nuke`, `r?reklamver`", inline=False)
+    embed.add_field(name="⚙️ Rol & Üzv İdarəsi", value="`r?rolver`, `r?rolsil`, `r?rolac`, `r?rolsil_komanda`, `r?nick`, `r?avatar`, `r?yetkililer`, `r?botsay`, `r?uyeara`, `r?sesdesan`", inline=False)
+    embed.add_field(name="🎮 Oyunlar & Əyləncə", value="`r?duel`, `r?coinflip`, `r?slot`, `r?hacker`, `r?zar`, `r?sevgili`, `r?ascii`, `r?iq`, `r?rip`, `r?soz`, `r?8ball`, `r?istilik`, `r?afk`, `r?tapsir`, `r?balıq`", inline=False)
     await ctx.send(embed=embed)
 
 # --- 1. SAHİB & İDARƏETMƏ ---
@@ -333,7 +304,7 @@ async def tumunugoster(ctx):
 # --- 3. MƏLUMAT & STATİSTİKALAR ---
 @bot.command(name="server")
 async def server_info(ctx):
-    await ctx.send(f"🛡️ **{ctx.guild.name}** | Üzv: `{ctx.guild.member_count}` | Sahib: `{ctx.guild.owner}` | Kanal sayıs: `{len(ctx.guild.channels)}`")
+    await ctx.send(f"🛡️ **{ctx.guild.name}** | Üzv: `{ctx.guild.member_count}` | Sahib: `{ctx.guild.owner}` | Kanal sayı: `{len(ctx.guild.channels)}`")
 
 @bot.command(name="online")
 async def online_stats(ctx):
@@ -352,7 +323,7 @@ async def botinfo(ctx):
 async def userinfo(ctx, member: discord.Member = None):
     m = member or ctx.author
     roles = [r.name for r in m.roles if r.name != "@everyone"]
-    await ctx.send(f"👤 **{m.name}** | ID: `{m.id}` | Qoşulma: `{m.joined_at.strftime('%Y-%m-%d')}`\nロールar: {', '.join(roles[:5])}")
+    await ctx.send(f"👤 **{m.name}** | ID: `{m.id}` | Qoşulma: `{m.joined_at.strftime('%Y-%m-%d')}`\nRollar: {', '.join(roles[:5])}")
 
 @bot.command(name="hava")
 async def hava(ctx, *, seher: str = "Baku"):
@@ -535,7 +506,9 @@ async def sesdesan(ctx):
 # --- 6. OYUNLAR & ƏYLƏNCƏ ---
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member = None):
-    if member: await ctx.send(f"⚔️ Qalib: **{random.choice([ctx.author, member]).name}** 🏆")
+    if member: 
+        secilen = random.choice([ctx.author, member])
+        await ctx.send(f"⚔️ Qalib: **{secilen.name}** 🏆")
 
 @bot.command(name="coinflip")
 async def coinflip(ctx, ctx_secim: str = "yazı"):
@@ -544,3 +517,79 @@ async def coinflip(ctx, ctx_secim: str = "yazı"):
     await ctx.send(f"🪙 Nəticə: **{netice}**. {win}")
 
 @bot.command(name="slot")
+async def slot(ctx):
+    s = ["🍎", "🍋", "🍒", "💎", "⭐"]
+    r1, r2, r3 = random.choice(s), random.choice(s), random.choice(s)
+    res = "🔥 Jackpot!" if r1 == r2 == r3 else "💀 Udurdun!"
+    await ctx.send(f"🎰 [ {r1} | {r2} | {r3} ]\n{res}")
+
+@bot.command(name="hacker")
+async def hacker(ctx, user: discord.Member = None):
+    target = user or ctx.author
+    ip = f"{random.randint(10,255)}.{random.randint(10,255)}.{random.randint(10,255)}.{random.randint(10,255)}"
+    await ctx.send(f"💻 **{target.name}** hackləndi! IP: `{ip}` 🚀")
+
+@bot.command(name="zar")
+async def zar(ctx):
+    await ctx.send(f"🎲 Zər: **{random.randint(1, 6)}**")
+
+@bot.command(name="sevgili")
+async def sevgili(ctx, member: discord.Member = None):
+    if member: await ctx.send(f"💖 Uyğunluq: **%{random.randint(0, 100)}** 💕")
+
+@bot.command(name="ascii")
+async def ascii_yaz(ctx, *, yazi: str):
+    await ctx.send(f"```fix\n{yazi.upper()}\n```")
+
+@bot.command(name="iq")
+async def iq(ctx, member: discord.Member = None):
+    target = member or ctx.author
+    await ctx.send(f"🧠 **{target.name}** IQ səviyyəsi: **{random.randint(40, 160)}** 📊")
+
+@bot.command(name="rip")
+async def rip(ctx, member: discord.Member = None):
+    target = member or ctx.author
+    await ctx.send(f"🪦 RİP **{target.name}**\n*2026 - 2026*\nRest in Peace... 🕯️")
+
+@bot.command(name="soz")
+async def soz(ctx):
+    sozler = [
+        "Həyat sınaqlarla doludur, əsas odur ki, yıxılanda yenidən qalxasan!",
+        "Yenilməzlər heç vaxt təslim olmazlar!",
+        "Gələcək bu gün nə etdiyindən asılıdır.",
+        "Məqsədinə çatmaq üçün hər zaman irəli bax!"
+    ]
+    await ctx.send(f"💬 **Günün Sözü:** *{random.choice(sozler)}*")
+
+@bot.command(name="8ball")
+async def eight_ball(ctx, *, soru: str):
+    cavablar = ["Bəli", "Xeyr", "Əlbəttə ki!", "Mümkünsüzdür", "Bəlkə də", "Gələcək qaranlıqdır"]
+    await ctx.send(f"🔮 Sual: **{soru}**\n✨ Cavab: **{random.choice(cavablar)}**")
+
+@bot.command(name="istilik")
+async def istilik(ctx):
+    await ctx.send(f"🌡️ Hava istiliyi: **{random.randint(20, 38)}°C** 🔥")
+
+@bot.command(name="afk")
+async def afk(ctx, *, sebeb: str = "Məşğul"):
+    await ctx.send(f"💤 {ctx.author.mention} AFK rejiminə keçdi. Səbəb: **{sebeb}**")
+
+@bot.command(name="tapsir")
+async def tapsir(ctx):
+    gorevler = ["10 dəfə şınc vur", "Stəkan su iç", "Bir mahnı oxu", "Discord profilini dəyiş"]
+    await ctx.send(f"🎯 Sənin tapşırığın: **{random.choice(gorevler)}** 💪")
+
+@bot.command(name="balıq")
+async def baliq(ctx):
+    tutulanlar = ["Qızıl balıq 🐠", "Külək balığı 🐟", "Köpək balığı 🦈", "Çəkmə 🥾 (Udurdun)"]
+    await ctx.send(f"🎣 Tilmeci atdın və tutdun: **{random.choice(tutulanlar)}**")
+
+# --- START ---
+if __name__ == "__main__":
+    keep_alive()
+    token = os.environ.get("TOKEN")
+    if not token:
+        print("XƏTA: TOKEN tapılmadı! Render mühitində (Environment Variables) TOKEN əlavə etdiyinizdən əmin olun.")
+    else:
+        bot.run(token)
+    
