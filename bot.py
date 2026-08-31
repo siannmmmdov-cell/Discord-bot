@@ -43,7 +43,7 @@ warn_sistemi = {}
 @bot.event
 async def on_ready():
     print(f"🔥 Bot işə düşdü: {bot.user.name} 🔥")
-    await bot.change_presence(activity=discord.Game(name="r?bot | 60+ Əmr Aktivdir 👑"))
+    await bot.change_presence(activity=discord.Game(name="r?bot | 70+ Əmr Aktivdir 👑"))
     stats_update.start()
     voice_xp_loop.start()
 
@@ -93,7 +93,6 @@ async def voice_xp_loop():
 async def on_message(message):
     if message.author.bot: return
 
-    # Sənin gülüşlərinə emoji atma
     if message.author.id == SAHIB_ID:
         if any(g in message.content.lower() for g in ["xd", "asds", "guly", "kara", "hf", "latifə", "😂", "🤣", "💀"]):
             try:
@@ -108,7 +107,10 @@ async def on_message(message):
     if user_xp[aid]["xp"] >= user_xp[aid]["level"] * 100:
         user_xp[aid]["level"] += 1
         user_xp[aid]["xp"] = 0
-        try: await message.channel.send(f"🎉 Təbriklər {message.author.mention}, Səviyyə **{user_xp[aid]['level']}**!"): pass
+        try: 
+            await message.channel.send(f"🎉 Təbriklər {message.author.mention}, Səviyyə **{user_xp[aid]['level']}**!")
+        except: 
+            pass
 
     if aid != SAHIB_ID:
         if aid not in spam_takip: spam_takip[aid] = []
@@ -118,7 +120,7 @@ async def on_message(message):
             try:
                 await message.delete()
                 await message.author.timeout(discord.utils.utcnow() + discord.timedelta(seconds=30), reason="Spam")
-                await message.channel.send(f"⚠️ {message.author.mention}, spamagörə 30 san mute aldın!", delete_after=5)
+                await message.channel.send(f"⚠️ {message.author.mention}, spama görə 30 san mute aldın!", delete_after=5)
                 return
             except: pass
 
@@ -147,76 +149,87 @@ class TicketAc(discord.ui.View):
         await interaction.response.send_message(f"✅ Kanal açıldı: {ch.mention}", ephemeral=True)
 
 # ==============================================================================
-# 👑 `r?bot` - 60+ KOMUT HAQQINDA MƏLUMAT MƏRKƏZİ
+# 👑 `r?bot` - 70+ KOMUT MƏLUMAT MƏRKƏZİ
 # ==============================================================================
 @bot.command(name="bot")
 async def bot_komanda(ctx):
     if ctx.author.id != SAHIB_ID: return
     
     embed1 = discord.Embed(
-        title="👑 YENİLMEZ v6000 - Əmr Məlumatları (Hissə 1 / Sahib & Moderasiya)",
-        description="Botdakı bütün komutların izahları:",
+        title="👑 YENİLMEZ v6000 - Əmr Məlumatları (Hissə 1)",
+        description="Botdakı bütün sahib və moderasiya əmrləri:",
         color=0xffa200
     )
-    embed1.add_field(name="👑 Sahib Komutları", value=(
-        "`r?bot` - Botun əmrlər panelini açır.\n"
+    embed1.add_field(name="👑 Sahib Əmrləri", value=(
+        "`r?bot` - Bütün əmrlər panelini açır.\n"
         "`r?ticketpanel` - Xüsusi kanalda ticket açma düyməsi yaradır.\n"
         "`r?elan` - Serverdə xüsusi elan mətni yayımlayır.\n"
         "`r?anket` - 👍/👎 reaksiyalı anket qurur.\n"
         "`r?cekilis` - Vaxtlı hədiyyə çəkilişi başladır.\n"
-        "`r?duyuru` - Rəsmi duyuru mesajı atır.\n"
+        "`r?duyuru` - Rəsmi duyuru mesajı göndərir.\n"
         "`r?bakim` - Baxım rejimini dəyişir.\n"
         "`r?slowmode` - Chatda yavaş mod tənzimləyir.\n"
         "`r?sayac` - Üzv hədəf sayğacını yeniləyir.\n"
-        "`r?rolver / r?rolal` - İstifadəçiyə rol verir/alır.\n"
-        "`r?botdurdur` - Botu təhlükəsiz dayandırır."
+        "`r?rolver` - İstifadəçiyə istəപ്പെli rolu verir.\n"
+        "`r?rolal` - İstifadəçidən rolu geri alır.\n"
+        "`r?botdurdur` - Botu təhlükəsiz şəkildə dayandırır."
     ), inline=False)
     
-    embed1.add_field(name="🛡️ Moderasiya Komutları", value=(
+    embed1.add_field(name="🛡️ Moderasiya Əmrləri", value=(
         "`r?sil` - Kanaldakı mesajları toplu təmizləyir.\n"
-        "`r?mute / r?unmute` - İstifadəçinin səsini alır/açır.\n"
-        "`r?ban / r?unban` - İstifadəçini banlayır/banı açır.\n"
+        "`r?mute` - İstifadəçinin səsini müvəqqəti alır.\n"
+        "`r?unmute` - İstifadəçinin səs qadağasını qaldırır.\n"
+        "`r?ban` - İstifadəçini serverdən tamamilə banlayır.\n"
+        "`r?unban` - Banlanmış istifadəçinin qadağasını açır.\n"
         "`r?kick` - İstifadəçini serverdən qovur.\n"
         "`r?nuke` - Kanalı tamamilə sıfırlayıb təzələyir.\n"
-        "`r?warn / r?warnings` - Xəbərdarlıq verir və baxır.\n"
-        "`r?temizlewarn` - Xəbərdarlıqları sıfırlayır.\n"
-        "`r?lock / r?unlock` - Kanalı yazışmaya bağlayır/açır."
+        "`r?warn` - İstifadəçiyə xəbərdarlıq verir.\n"
+        "`r?warnings` - İstifadəçinin xəbərdarlıq sayına baxır.\n"
+        "`r?temizlewarn` - Xəbərdarlıqları tamamilə sıfırlayır.\n"
+        "`r?lock` - Kanalı yazışmaya bağlayır.\n"
+        "`r?unlock` - Kanalı yenidən yazışmaya açır."
     ), inline=False)
 
     embed2 = discord.Embed(
-        title="📊 YENİLMEZ v6000 - Əmr Məlumatları (Hissə 2 / Statistika & Oyunlar)",
+        title="👑 YENİLMEZ v6000 - Əmr Məlumatları (Hissə 2)",
+        description="Statistika və əyləncə əmrləri:",
         color=0x00aaff
     )
-    embed2.add_field(name="📋 Statistika Komutları", value=(
+    embed2.add_field(name="📊 Statistika & Məlumat Əmrləri", value=(
         "`r?server` - Serverin ümumi məlumatlarını göstərir.\n"
         "`r?userinfo` - İstifadəçinin profil məlumatını verir.\n"
         "`r?botinfo` - Botun texniki versiyasını göstərir.\n"
         "`r?ping` - İnternet gecikmə sürətini (ms) yoxlayır.\n"
-        "`r?online` - Onlayn üzvlərin sayını göstərir.\n"
-        "`r?level` - Cari səviyyə və XP-ni göstərir.\n"
-        "`r?rolbilgi` - Rol haqqında məlumat verir.\n"
+        "`r?online` - Onlayn üzvlərin dəqiq sayını göstərir.\n"
+        "`r?level` - Cari səviyyə və XP dəyərini göstərir.\n"
+        "`r?rolbilgi` - Rol haqqında ətraflı məlumat verir.\n"
         "`r?kanalbilgi` - Kanalın ID və növünü göstərir.\n"
-        "`r?boosters` - Serveri boostlayanları göstərir.\n"
-        "`r?avatar / r?banner` - Profil şəklini və banneri açır.\n"
-        "`r?emojisay` - Toplam emoji sayını göstərir."
+        "`r?boosters` - Serverə boost verənləri siyahılayır.\n"
+        "`r?avatar` - İstifadəçinin profil şəklini böyük açır.\n"
+        "`r?banner` - İstifadəçinin banner şəklini göstərir.\n"
+        "`r?emojisay` - Serverdəki toplam emoji sayını göstərir.\n"
+        "`r?servericon` - Serverin ikon şəklini atır.\n"
+        "`r?botping` - Botun daxili cavab sürətini yoxlayır."
     ), inline=False)
 
-    embed2.add_field(name="🎮 Əyləncə & Oyun Komutları", value=(
-        "`r?duel` - Dostunla duel atır.\n"
-        "`r?coinflip` - Yazı-tura atır.\n"
-        "`r?slot` - Slot kazino oyunu oynadır.\n"
+    embed2.add_field(name="🎮 Oyunlar & Əyləncə Əmrləri", value=(
+        "`r?duel` - Dostunla virtual duel oyununa girirsən.\n"
+        "`r?coinflip` - Yazı-tura ataraq bəxtini sınayırsan.\n"
+        "`r?slot` - Slot kazino oyunu oynayırsan.\n"
         "`r?iq` - Zarafatla IQ səviyyənizi ölçür.\n"
-        "`r?balıq` - Virtual balıq tutma simulyasiyası.\n"
-        "`r?hava` - Şəhər hava proqnozunu göstərir.\n"
-        "`r?hesabla` - Riyazi hesablamalar aparır.\n"
-        "`r?tassaxla` - Zər atma oyunu.\n"
-        "`r?sec` - Seçimlər arasında botun seçim etməsi.\n"
-        "`r?8ball` - Sehrli cavab kürəsi.\n"
-        "`r?sevgi` - Sevgi faizini hesablayır.\n"
-        "`r?hackle` - Zarafatla hackləmə simulyasiyası.\n"
-        "`r?soz` - Motivasiya sözləri göndərir.\n"
-        "`r?cat` - Pişik faktı bölüşür.\n"
-        "`r?joke` - Gülməli zarafatlar edir."
+        "`r?balıq` - Virtual olaraq balıq tutma simulyasiyası.\n"
+        "`r?hava` - Şəhər hava proqnozunu öyrənirsən.\n"
+        "`r?hesabla` - Bot vasitəsilə riyazi hesablamalar aparırsan.\n"
+        "`r?tassaxla` - Zər atma oyunu oynayırsan.\n"
+        "`r?sec` - Verilən seçimlər arasında bot seçim edir.\n"
+        "`r?8ball` - Sehrli cavab kürəsinə sual verirsən.\n"
+        "`r?sevgi` - İki nəfər arasında sevgi faizini hesablayır.\n"
+        "`r?hackle` - Zarafatla dostunu hackləmə simulyasiyası.\n"
+        "`r?soz` - Motivasiyaedici dəyərli sözlər göndərir.\n"
+        "`r?cat` - Maraqlı pişik faktları bölüşür.\n"
+        "`r?joke` - Birbirindən gülməli zarafatlar edir.\n"
+        "`r?cmk` - Daş, kağız, qayçı oyunu oynayır.\n"
+        "`r?ters` - Yazdığın mətni tərsinə çevirir."
     ), inline=False)
 
     await ctx.send(embed=embed1)
@@ -416,6 +429,10 @@ async def banner(ctx, m: discord.Member = None):
     await ctx.send(u.banner.url if u.banner else "Banner yoxdur.")
 @bot.command(name="emojisay")
 async def emojisay(ctx): await ctx.send(f"😀 Emoji sayı: {len(ctx.guild.emojis)}")
+@bot.command(name="servericon")
+async def servericon(ctx): await ctx.send(ctx.guild.icon.url if ctx.guild.icon else "İkon yoxdur.")
+@bot.command(name="botping")
+async def botping(ctx): await ctx.send(f"⚡ Bot daxili gecikmə: {round(bot.latency * 1000)}ms")
 
 # ==============================================================================
 # OYUNLAR & ƏYLƏNCƏ (HAMI ÜÇÜN)
@@ -448,16 +465,4 @@ async def eightball(ctx, *, s): await ctx.send(f"🔮 {random.choice(['Bəli', '
 @bot.command(name="sevgi")
 async def sevgi(ctx, m: discord.Member): await ctx.send(f"❤️ Uyğunluq: %{random.randint(10, 100)}")
 @bot.command(name="hackle")
-async def hackle(ctx, m: discord.Member): await ctx.send(f"💻 {m.mention} hackləndi! Parol: `12345`")
-@bot.command(name="soz")
-async def soz(ctx): await ctx.send(f"📜 {random.choice(['Uğur qətiyyətlidir.', 'Həlak olmamaq üçün çalış!'])}")
-@bot.command(name="cat")
-async def cat(ctx): await ctx.send("🐱 Pişik faktı: Günü yatmaqla keçirirlər.")
-@bot.command(name="joke")
-async def joke(ctx): await ctx.send("🎭 Müəllim və şagird zarafatı...")
-
-if __name__ == "__main__":
-    keep_alive()
-    token = os.environ.get("TOKEN")
-    if token: bot.run(token)
-        
+async def hackle(ctx, m: discord.M
