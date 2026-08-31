@@ -4,7 +4,23 @@ import asyncio
 import os
 import random
 import time
-from keep_alive import keep_alive
+from flask import Flask
+from threading import Thread
+
+# --- KÜÇÜK FLASK SERVER (Render üçün) ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "Bot onlayndır!"
+
+def run():
+    app.run(host='0.0.0.0', port=10000)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+# ----------------------------------------
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -55,7 +71,7 @@ async def on_message(message):
 
     # Sahib üçün qoruma istisnası
     if author_id != SAHIB_ID:
-        # Ağıllı Spam/Flood Yoxlaması (Normal söhbətə mane olmur, ardıcıl 8-10 dənə tez-tez random/spam atılarsa işə düşür)
+        # Ağıllı Spam/Flood Yoxlaması (Normal söhbətə mane olmur, ardıcıl tez-tez random/spam atılarsa işə düşür)
         if author_id not in spam_takip:
             spam_takip[author_id] = []
         
@@ -66,7 +82,6 @@ async def on_message(message):
         if len(spam_takip[author_id]) >= 9:
             try:
                 await message.delete()
-                # İstifadəçiyə avtomatik mute (timeout) vermək üçün Discord-un vaxt aşımı funksiyası
                 muteli_vaxt = discord.utils.utcnow() + discord.timedelta(seconds=30)
                 await message.author.timeout(muteli_vaxt, reason="Həddindən artıq spam / random atmaq")
                 await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq spam/random yazdığın üçün 30 saniyəlik vaxt aşımı (mute) aldın!", delete_after=5)
@@ -456,4 +471,4 @@ if __name__ == "__main__":
         print("❌ XƏTA: Token tapılmadı!")
     else:
         bot.run(token)
-        
+    
