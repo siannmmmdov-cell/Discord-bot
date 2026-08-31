@@ -43,13 +43,24 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="r?yardim | DEADAZE v5000 👑"))
 
 # ==============================================================================
-# 🛡️ AĞILLI SPAM VƏ XP SİSTEMİ
+# 🛡️ AĞILLI SPAM, XP VƏ GÜLÜŞ SİSTEMİ
 # ==============================================================================
 
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
+
+    # Gülüş detektoru (Gülüş simvolları və ya emojilər varsa 3 fərqli emoji basır)
+    gulus_sozleri = ["xd", "asds", "guly", "kara", "hf", "latifə", "😂", "🤣", "💀", "😹", "😆"]
+    if any(g in message.content.lower() for g in gulus_sozleri):
+        try:
+            gulmeli_emojiler = ["😂", "🤣", "💀", "😹", "😆", "🫠"]
+            secilenler = random.sample(gulmeli_emojiler, 3)
+            for emj in secilenler:
+                await message.add_reaction(emj)
+        except:
+            pass
 
     author_id = message.author.id
     sindi = time.time()
@@ -90,12 +101,11 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # ==============================================================================
-# ✨ EMOJI MIRROR (Yalnız sənə özəl) VƏ AĞILLI GÜLÜŞ SİSTEMİ
+# ✨ EMOJI MIRROR (Yalnız sənə özəl)
 # ==============================================================================
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    # Bu reaksiya sistemi yalnız SƏN (SAHIB_ID) emoji basanda işləyəcək
     if payload.user_id != SAHIB_ID:
         return
     
@@ -106,76 +116,14 @@ async def on_raw_reaction_add(payload):
     except Exception as e:
         print(f"Reaction xətası: {e}")
 
-@bot.event
-async def on_message_reactions(message):
-    pass
-
-# Gülüş reaksiyası üçün ayrıca on_message yoxlaması (Sözün içində gülüş varsa və ya gülüş emojisi atılıbsa)
-@bot.event
-async def on_message_gulmeli(message):
-    pass # on_message yuxarıdadır, gülüş funksiyasını birbaşa əsas on_message-ə əlavə edirik:
-
-# Köhnə on_message funksiyasının içinə gülüş detektoru əlavə olundu:
-@bot.event
-async def on_message(message):
-    if message.author.bot:
-        return
-
-    # Gülüş detektoru (Mesajda gülüş simvolları və ya emojilər varsa 2-3 fərqli gülməli emoji basır)
-    gulus_sozleri = ["xd", "asds", "guly", "kara", "hf", "hfds", "latifə", "😂", "🤣", "💀", "😹", "hsds"]
-    if any(g in message.content.lower() for g in gulus_sozleri):
-        try:
-            gulmeli_emojiler = ["😂", "🤣", "💀", "😹", "😆", "🫠"]
-            secilenler = random.sample(gulmeli_emojiler, 3) # 3 fərqli emoji seçir
-            for emj in secilenler:
-                await message.add_reaction(emj)
-        except:
-            pass
-
-    author_id = message.author.id
-    sindi = time.time()
-
-    if author_id not in user_xp:
-        user_xp[author_id] = {"xp": 0, "level": 1}
-    
-    user_xp[author_id]["xp"] += 10
-    gerekli_xp = user_xp[author_id]["level"] * 100
-
-    if user_xp[author_id]["xp"] >= gerekli_xp:
-        user_xp[author_id]["level"] += 1
-        user_xp[author_id]["xp"] = 0
-        try:
-            await message.channel.send(f"🎉 Təbriklər {message.author.mention}! Yeni səviyyəyə yüksəldin: **Səviyyə {user_xp[author_id]['level']}** 🚀")
-        except:
-            pass
-
-    if author_id != SAHIB_ID:
-        if author_id not in spam_takip:
-            spam_takip[author_id] = []
-        
-        spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 3]
-        spam_takip[author_id].append(sindi)
-
-        if len(spam_takip[author_id]) >= 9:
-            try:
-                await message.delete()
-                muteli_vaxt = discord.utils.utcnow() + discord.timedelta(seconds=30)
-                await message.author.timeout(muteli_vaxt, reason="Həddindən artıq spam / random atmaq")
-                await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq spam/random yazdığın üçün 30 saniyəlik vaxt aşımı (mute) aldın!", delete_after=5)
-                return
-            except Exception as e:
-                print(f"Spam cəza xətası: {e}")
-
-    await bot.process_commands(message)
-
 # ==============================================================================
-# 👑 YARDIM VƏ BÜTÜN MƏLUMAT KOMANDALARI (Məlumatları ilə birlikdə)
+# 👑 YARDIM VƏ BÜTÜN MƏLUMAT KOMANDALARI
 # ==============================================================================
 
 @bot.command(name="yardim")
 async def yardim(ctx):
     embed = discord.Embed(
-        title="👑 MASTER PANEL v5000 (Bütün Komutlar və Məlumatlar)",
+        title="👑 MASTER PANEL v5000 (Bütün Komutlar)",
         description="Bütün gücləndirilmiş əmrlər və onların açıqlamaları:",
         color=0xffa200
     )
@@ -524,4 +472,44 @@ async def balıq(ctx):
 
 @bot.command(name="sifre")
 async def sifre(ctx, uzunluk: int = 10):
-    chars = "abcdefghijklmnopqrstuvwxyzABCDE
+    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$"
+    res = "".join(random.choice(chars) for _ in range(uzunluk))
+    await ctx.send(f"🔑 Sənin üçün yaradılan şifrə: `{res}`")
+
+# ==============================================================================
+# 🎫 TICKET SİSTEMİ
+# ==============================================================================
+
+class TicketKapatView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Ticket-i Bağla", emoji="🔒", style=discord.ButtonStyle.red, custom_id="ticket_kapat_buton")
+    async def ticket_kapat(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("🔒 Dəstək kanalı 3 saniyəyə silinir...", ephemeral=True)
+        await asyncio.sleep(3)
+        await interaction.channel.delete()
+
+class TicketButton(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Ticket Aç", emoji="📩", style=discord.ButtonStyle.green, custom_id="ticket_ac_buton")
+    async def ticket_ac(self, interaction: discord.Interaction, button: discord.ui.Button):
+        guild = interaction.guild
+        author = interaction.user
+        sindi = time.time()
+
+        if author.id != SAHIB_ID:
+            if author.id not in ticket_span_kontrol:
+                ticket_span_kontrol[author.id] = []
+            ticket_span_kontrol[author.id] = [t for t in ticket_span_kontrol[author.id] if sindi - t < 30]
+            ticket_span_kontrol[author.id].append(sindi)
+            if len(ticket_span_kontrol[author.id]) >= 3:
+                await interaction.response.send_message("⚠️ Çox sürətli ticket açmağa çalışırsan!", ephemeral=True)
+                return
+
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            author: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_messages=True),
+            guild.me: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_messa
