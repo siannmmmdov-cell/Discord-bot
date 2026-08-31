@@ -19,6 +19,7 @@ SAHIB_ID = 1391781251390451713
 # Yaddaş Sistemləri
 ticket_span_kontrol = {}
 user_xp = {}
+spam_takip = {}
 
 @bot.event
 async def on_ready():
@@ -26,7 +27,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="r?yardim | DEADAZE v5000 👑"))
 
 # ==============================================================================
-# 🛡️ XP VƏ MESAJ SİSTEMİ (Spam qoruması tamamilə silindi, heç kimə mute düşmür)
+# 🛡️ AĞILLI SPAM VƏ XP SİSTEMİ (Normal yazana toxunmur, əsl spamı tutur)
 # ==============================================================================
 
 @bot.event
@@ -35,8 +36,9 @@ async def on_message(message):
         return
 
     author_id = message.author.id
+    sindi = time.time()
 
-    # Level & XP Sistemi
+    # 1. Level & XP Sistemi
     if author_id not in user_xp:
         user_xp[author_id] = {"xp": 0, "level": 1}
     
@@ -50,6 +52,27 @@ async def on_message(message):
             await message.channel.send(f"🎉 Təbriklər {message.author.mention}! Yeni səviyyəyə yüksəldin: **Səviyyə {user_xp[author_id]['level']}** 🚀")
         except:
             pass
+
+    # Sahib üçün qoruma istisnası
+    if author_id != SAHIB_ID:
+        # Ağıllı Spam/Flood Yoxlaması (Normal söhbətə mane olmur, ardıcıl 8-10 dənə tez-tez random/spam atılarsa işə düşür)
+        if author_id not in spam_takip:
+            spam_takip[author_id] = []
+        
+        # Son 3 saniyədə atılan mesajları izləyirik
+        spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 3]
+        spam_takip[author_id].append(sindi)
+
+        if len(spam_takip[author_id]) >= 9:
+            try:
+                await message.delete()
+                # İstifadəçiyə avtomatik mute (timeout) vermək üçün Discord-un vaxt aşımı funksiyası
+                muteli_vaxt = discord.utils.utcnow() + discord.timedelta(seconds=30)
+                await message.author.timeout(muteli_vaxt, reason="Həddindən artıq spam / random atmaq")
+                await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq spam/random yazdığın üçün 30 saniyəlik vaxt aşımı (mute) aldın!", delete_after=5)
+                return
+            except Exception as e:
+                print(f"Spam cəza xətası: {e}")
 
     await bot.process_commands(message)
 
@@ -433,4 +456,4 @@ if __name__ == "__main__":
         print("❌ XƏTA: Token tapılmadı!")
     else:
         bot.run(token)
-    
+        
