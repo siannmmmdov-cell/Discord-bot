@@ -43,7 +43,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="r?yardim | DEADAZE v5000 👑"))
 
 # ==============================================================================
-# 🛡️ AĞILLI SPAM VƏ XP SİSTEMİ (Normal yazana toxunmur, əsl spamı tutur)
+# 🛡️ AĞILLI SPAM VƏ XP SİSTEMİ
 # ==============================================================================
 
 @bot.event
@@ -71,11 +71,9 @@ async def on_message(message):
 
     # Sahib üçün qoruma istisnası
     if author_id != SAHIB_ID:
-        # Ağıllı Spam/Flood Yoxlaması (Normal söhbətə mane olmur, ardıcıl tez-tez random/spam atılarsa işə düşür)
         if author_id not in spam_takip:
             spam_takip[author_id] = []
         
-        # Son 3 saniyədə atılan mesajları izləyirik
         spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 3]
         spam_takip[author_id].append(sindi)
 
@@ -92,12 +90,13 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # ==============================================================================
-# ✨ EMOJI MIRROR SİSTEMİ (Kim emoji bassa, bot da basacaq)
+# ✨ EMOJI MIRROR (Yalnız sənə özəl) VƏ AĞILLI GÜLÜŞ SİSTEMİ
 # ==============================================================================
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    if payload.user_id == bot.user.id:
+    # Bu reaksiya sistemi yalnız SƏN (SAHIB_ID) emoji basanda işləyəcək
+    if payload.user_id != SAHIB_ID:
         return
     
     try:
@@ -107,22 +106,141 @@ async def on_raw_reaction_add(payload):
     except Exception as e:
         print(f"Reaction xətası: {e}")
 
+@bot.event
+async def on_message_reactions(message):
+    pass
+
+# Gülüş reaksiyası üçün ayrıca on_message yoxlaması (Sözün içində gülüş varsa və ya gülüş emojisi atılıbsa)
+@bot.event
+async def on_message_gulmeli(message):
+    pass # on_message yuxarıdadır, gülüş funksiyasını birbaşa əsas on_message-ə əlavə edirik:
+
+# Köhnə on_message funksiyasının içinə gülüş detektoru əlavə olundu:
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    # Gülüş detektoru (Mesajda gülüş simvolları və ya emojilər varsa 2-3 fərqli gülməli emoji basır)
+    gulus_sozleri = ["xd", "asds", "guly", "kara", "hf", "hfds", "latifə", "😂", "🤣", "💀", "😹", "hsds"]
+    if any(g in message.content.lower() for g in gulus_sozleri):
+        try:
+            gulmeli_emojiler = ["😂", "🤣", "💀", "😹", "😆", "🫠"]
+            secilenler = random.sample(gulmeli_emojiler, 3) # 3 fərqli emoji seçir
+            for emj in secilenler:
+                await message.add_reaction(emj)
+        except:
+            pass
+
+    author_id = message.author.id
+    sindi = time.time()
+
+    if author_id not in user_xp:
+        user_xp[author_id] = {"xp": 0, "level": 1}
+    
+    user_xp[author_id]["xp"] += 10
+    gerekli_xp = user_xp[author_id]["level"] * 100
+
+    if user_xp[author_id]["xp"] >= gerekli_xp:
+        user_xp[author_id]["level"] += 1
+        user_xp[author_id]["xp"] = 0
+        try:
+            await message.channel.send(f"🎉 Təbriklər {message.author.mention}! Yeni səviyyəyə yüksəldin: **Səviyyə {user_xp[author_id]['level']}** 🚀")
+        except:
+            pass
+
+    if author_id != SAHIB_ID:
+        if author_id not in spam_takip:
+            spam_takip[author_id] = []
+        
+        spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 3]
+        spam_takip[author_id].append(sindi)
+
+        if len(spam_takip[author_id]) >= 9:
+            try:
+                await message.delete()
+                muteli_vaxt = discord.utils.utcnow() + discord.timedelta(seconds=30)
+                await message.author.timeout(muteli_vaxt, reason="Həddindən artıq spam / random atmaq")
+                await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq spam/random yazdığın üçün 30 saniyəlik vaxt aşımı (mute) aldın!", delete_after=5)
+                return
+            except Exception as e:
+                print(f"Spam cəza xətası: {e}")
+
+    await bot.process_commands(message)
+
 # ==============================================================================
-# 👑 YARDIM VƏ BÜTÜN MƏLUMAT KOMANDALARI
+# 👑 YARDIM VƏ BÜTÜN MƏLUMAT KOMANDALARI (Məlumatları ilə birlikdə)
 # ==============================================================================
 
 @bot.command(name="yardim")
 async def yardim(ctx):
     embed = discord.Embed(
-        title="👑 MASTER PANEL v5000 (Bütün Komutlar)",
-        description="Bütün gücləndirilmiş əmrlər və idarəetmə sistemləri:",
+        title="👑 MASTER PANEL v5000 (Bütün Komutlar və Məlumatlar)",
+        description="Bütün gücləndirilmiş əmrlər və onların açıqlamaları:",
         color=0xffa200
     )
-    embed.add_field(name="👑 Sahib & İdarəetmə", value="`r?elan`, `r?anket`, `r?cekilis`, `r?duyuru`, `r?bakim`, `r?ticketpanel`", inline=False)
-    embed.add_field(name="🛡️ Kanal İdarəsi", value="`r?gizle`, `r?goster`, `r?sesgizle`, `r?sesgoster`, `r?tumunugizle`, `r?tumunugoster`", inline=False)
-    embed.add_field(name="📋 Məlumat & Statistika", value="`r?server`, `r?userinfo`, `r?botinfo`, `r?ping`, `r?online`, `r?hava`, `r?hesabla`, `r?level`", inline=False)
-    embed.add_field(name="🛠️ Moderasiya & Rol", value="`r?sil`, `r?temizle`, `r?silkanal`, `r?kanalac`, `r?mute`, `r?unmute`, `r?ban`, `r?unban`, `r?kick`, `r?lock`, `r?unlock`, `r?rolver`, `r?rolsil`, `r?nuke`", inline=False)
-    embed.add_field(name="🎮 Oyunlar & Əyləncə", value="`r?duel`, `r?coinflip`, `r?slot`, `r?hacker`, `r?zar`, `r?sevgili`, `r?iq`, `r?balıq`, `r?sifre`", inline=False)
+    
+    sahib_desc = (
+        "`r?elan` - Serverdə xüsusi elan paylaşırsan.\n"
+        "`r?anket` - Səsvermə anketi yaradırsan.\n"
+        "`r?cekilis` - Serverdə hədiyyə çəkilişi başladır.\n"
+        "`r?duyuru` - Rəsmi duyuru elan edirsən.\n"
+        "`r?bakim` - Botu baxım rejiminə alırsan.\n"
+        "`r?ticketpanel` - Dəstək (ticket) paneli qurursan."
+    )
+    embed.add_field(name="👑 Sahib & İdarəetmə Komutları", value=sahib_desc, inline=False)
+
+    kanal_desc = (
+        "`r?gizle` - Yazı kanalını hər kəsə gizlədir.\n"
+        "`r?goster` - Yazı kanalını hər kəsə açır.\n"
+        "`r?sesgizle` - Səs kanalını girişə bağlayır.\n"
+        "`r?sesgoster` - Səs kanalını girişə açır.\n"
+        "`r?tumunugizle` - Serverdəki bütün kanalları gizlədir.\n"
+        "`r?tumunugoster` - Serverdəki bütün kanalları açır."
+    )
+    embed.add_field(name="🛡️ Kanal İdarəsi Komutları", value=kanal_desc, inline=False)
+
+    stat_desc = (
+        "`r?server` - Server haqqında ümumi məlumat verir.\n"
+        "`r?userinfo` - İstifadəçi haqqında detalları göstərir.\n"
+        "`r?botinfo` - Botun sürəti və versiyasını deyir.\n"
+        "`r?ping` - Botun internet gecikməsini (ms) ölçür.\n"
+        "`r?online` - Onlayn olan üzvlərin sayını göstərir.\n"
+        "`r?hava` - Seçilən şəhərin hava durumunu göstərir.\n"
+        "`r?hesabla` - Riyazi əməliyyatları hesablayır.\n"
+        "`r?level` - Səviyyə və XP statusunu göstərir."
+    )
+    embed.add_field(name="📋 Məlumat & Statistika Komutları", value=stat_desc, inline=False)
+
+    mod_desc = (
+        "`r?sil` - Göstərilən sayda mesajı təmizləyir.\n"
+        "`r?temizle` - Kanaldakı son 100 mesajı silir.\n"
+        "`r?silkanal` - Olduğun kanalı tamamilə silir.\n"
+        "`r?kanalac` - Yeni yazı kanalı yaradır.\n"
+        "`r?mute` - İstifadəçiyə səssizləşdirmə verir.\n"
+        "`r?unmute` - İstifadəçinin səsini açır.\n"
+        "`r?ban` - İstifadəçini serverdən uzaqlaşdırır.\n"
+        "`r?unban` - Banı ləğv edir.\n"
+        "`r?kick` - İstifadəçini qovur.\n"
+        "`r?lock` / `r?unlock` - Kanalı mesajlara bağlayır/açır.\n"
+        "`r?rolver` / `r?rolsil` - Rol verir və ya alır.\n"
+        "`r?nuke` - Kanalı sıfırlayıb təzədən yaradır."
+    )
+    embed.add_field(name="🛠️ Moderasiya & Rol Komutları", value=mod_desc, inline=False)
+
+    oyun_desc = (
+        "`r?duel` - Dostunla duelə girirsən.\n"
+        "`r?coinflip` - Yazı-tura atırsan.\n"
+        "`r?slot` - Slot oyunu oynayırsan.\n"
+        "`r?hacker` - Zarafatla haker simulyasiyası edirsən.\n"
+        "`r?zar` - Zər atırsan.\n"
+        "`r?sevgili` - Sevgi faizini yoxlayırsan.\n"
+        "`r?iq` - IQ səviyyəni ölçür.\n"
+        "`r?balıq` - Balıq tutur, bəxtini sınayırsan.\n"
+        "`r?sifre` - Təsadüfi güclü şifrə yaradır."
+    )
+    embed.add_field(name="🎮 Oyunlar & Əyləncə Komutları", value=oyun_desc, inline=False)
+
     embed.set_footer(text="DEADAZE Security Systems | v5000 Pro Max")
     await ctx.send(embed=embed)
 
@@ -406,69 +524,4 @@ async def balıq(ctx):
 
 @bot.command(name="sifre")
 async def sifre(ctx, uzunluk: int = 10):
-    chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$"
-    res = "".join(random.choice(chars) for _ in range(uzunluk))
-    await ctx.send(f"🔑 Sənin üçün yaradılan şifrə: `{res}`")
-
-# ==============================================================================
-# 🎫 TICKET SİSTEMİ (Düyməli və Emojili)
-# ==============================================================================
-
-class TicketKapatView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-
-    @discord.ui.button(label="Ticket-i Bağla", emoji="🔒", style=discord.ButtonStyle.red, custom_id="ticket_kapat_buton")
-    async def ticket_kapat(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("🔒 Dəstək kanalı 3 saniyəyə silinir...", ephemeral=True)
-        await asyncio.sleep(3)
-        await interaction.channel.delete()
-
-class TicketButton(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-
-    @discord.ui.button(label="Ticket Aç", emoji="📩", style=discord.ButtonStyle.green, custom_id="ticket_ac_buton")
-    async def ticket_ac(self, interaction: discord.Interaction, button: discord.ui.Button):
-        guild = interaction.guild
-        author = interaction.user
-        sindi = time.time()
-
-        if author.id != SAHIB_ID:
-            if author.id not in ticket_span_kontrol:
-                ticket_span_kontrol[author.id] = []
-            ticket_span_kontrol[author.id] = [t for t in ticket_span_kontrol[author.id] if sindi - t < 30]
-            ticket_span_kontrol[author.id].append(sindi)
-            if len(ticket_span_kontrol[author.id]) >= 3:
-                await interaction.response.send_message("⚠️ Çox sürətli ticket açmağa çalışırsan!", ephemeral=True)
-                return
-
-        overwrites = {
-            guild.default_role: discord.PermissionOverwrite(view_channel=False),
-            author: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_messages=True),
-            guild.me: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_messages=True)
-        }
-
-        channel = await guild.create_text_channel(f"ticket-{author.name.lower()}", overwrites=overwrites)
-        await channel.send(embed=discord.Embed(title="📩 Dəstək Mərkəzi", description="Səlahiyyətli şəxslər cavab verəcək.", color=0x00ff00), view=TicketKapatView())
-        await interaction.response.send_message(f"✅ Ticket kanalınız yaradıldı: {channel.mention}", ephemeral=True)
-
-@bot.command(name="ticketpanel")
-async def ticketpanel(ctx):
-    if ctx.author.id != SAHIB_ID: return
-    await ctx.message.delete()
-    embed = discord.Embed(title="📩 Dəstək Paneli", description="Kömək üçün aşağıdakı düyməyə basın!", color=0x00aaff)
-    await ctx.send(embed=embed, view=TicketButton())
-
-# ==============================================================================
-# 🚀 BOTU BAŞLAT
-# ==============================================================================
-
-if __name__ == "__main__":
-    keep_alive()
-    token = os.environ.get("TOKEN")
-    if not token:
-        print("❌ XƏTA: Token tapılmadı!")
-    else:
-        bot.run(token)
-    
+    chars = "abcdefghijklmnopqrstuvwxyzABCDE
