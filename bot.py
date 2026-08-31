@@ -38,7 +38,7 @@ warn_sistemi = {}
 @bot.event
 async def on_ready():
     print(f"🔥 Bot işə düşdü: {bot.user.name} 🔥")
-    await bot.change_presence(activity=discord.Game(name="r?bot | 80+ Əmr Aktivdir 👑"))
+    await bot.change_presence(activity=discord.Game(name="r?bot | Aktivdir 👑"))
     stats_update.start()
     voice_xp_loop.start()
 
@@ -121,13 +121,13 @@ async def on_message(message):
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
-        return  # Səhv və ya tapılmayan əmrlərdə bot çökməsin, səssiz ötürsün
+        return
     elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(f"❌ Əksik arqument! Əmri düzgün istifadə etdiyindən əmin ol. (Məsələn: `r?mute @istifadəçi`)", delete_after=6)
+        await ctx.send(f"❌ Əksik arqument! Əmri düzgün istifadə et.", delete_after=6)
     elif isinstance(error, commands.MissingPermissions):
-        await ctx.send("❌ Bu əmri işlətmək üçün yetərli səlahiyyətin yoxdur!", delete_after=6)
+        await ctx.send("❌ Səlahiyyətin çatmır!", delete_after=6)
     else:
-        print(f"Xəta baş verdi: {error}")
+        pass
 
 class TicketKapat(discord.ui.View):
     @discord.ui.button(label="🔒 Ticketi Bağla", style=discord.ButtonStyle.danger, custom_id="t_kapat")
@@ -155,29 +155,29 @@ async def bot_komanda(ctx):
     if ctx.author.id != SAHIB_ID: return
     
     embed1 = discord.Embed(
-        title="👑 YENİLMEZ v6000 - Genişləndirilmiş Panel (Hissə 1)",
-        description="Bütün əmrlər tam aktiv və qorunur:",
+        title="👑 YENİLMEZ v6000 - Əmr Paneli (Hissə 1)",
+        description="Bütün əmrlər aktivdir:",
         color=0xffa200
     )
     embed1.add_field(name="👑 Sahib & İdarəetmə", value=(
         "`r?bot` - Əmr panelini açır.\n"
-        "`r?ticketpanel` - Ticket sistemi qurur.\n"
+        "`r?ticketpanel` - Ticket sistemi.\n"
         "`r?elan` - Elan verir.\n"
         "`r?anket` - Səsvermə açır.\n"
         "`r?cekilis` - Çəkiliş başladır.\n"
-        "`r?duyuru` - Rəsmi duyuru atır.\n"
+        "`r?duyuru` - Duyuru atır.\n"
         "`r?bakim` - Baxım rejimi.\n"
-        "`r?slowmode` (və ya r?yavas) - Yavaş mod.\n"
-        "`r?sayac` - Üzv sayğacını yeniləyir.\n"
+        "`r?slowmode` (r?yavas) - Yavaş mod.\n"
+        "`r?sayac` - Üzv sayğacı.\n"
         "`r?rolver` / `r?rolal` - Rol əməliyyatları.\n"
         "`r?botdurdur` - Botu bağlayır."
     ), inline=False)
     
-    embed1.add_field(name="🛡️ Moderasiya & Qoruma", value=(
+    embed1.add_field(name="🛡️ Moderasiya", value=(
         "`r?sil` - Mesaj silir.\n"
         "`r?mute` / `r?unmute` - Səs qadağası.\n"
         "`r?ban` / `r?unban` - Ban əməliyyatları.\n"
-        "`r?kick` - Serverdən qovur.\n"
+        "`r?kick` - Qovur.\n"
         "`r?nuke` - Kanalı yeniləyir.\n"
         "`r?warn` / `r?warnings` - Xəbərdarlıqlar.\n"
         "`r?temizlewarn` - Warn silir.\n"
@@ -185,8 +185,8 @@ async def bot_komanda(ctx):
     ), inline=False)
 
     embed2 = discord.Embed(
-        title="👑 YENİLMEZ v6000 - Genişləndirilmiş Panel (Hissə 2)",
-        description="Statistika, İnfo və Əyləncə:",
+        title="👑 YENİLMEZ v6000 - Əmr Paneli (Hissə 2)",
+        description="Statistika və Əyləncə:",
         color=0x00aaff
     )
     embed2.add_field(name="📊 Statistika & Məlumat", value=(
@@ -195,14 +195,14 @@ async def bot_komanda(ctx):
         "`r?botinfo` - Bot versiyası.\n"
         "`r?ping` / `r?botping` - Gecikmə.\n"
         "`r?online` - Onlayn sayı.\n"
-        "`r?level` - XP və səviyyə.\n"
+        "`r?level` - Səviyyə.\n"
         "`r?rolbilgi` / `r?kanalbilgi` - Detallar.\n"
         "`r?boosters` - Boost edənlər.\n"
         "`r?avatar` / `r?banner` - Şəkillər.\n"
         "`r?emojisay` / `r?servericon` - İkon və emojilər."
     ), inline=False)
 
-    embed2.add_field(name="🎮 Oyunlar & Əyləncə (80+ Əmr)", value=(
+    embed2.add_field(name="🎮 Oyunlar & Əyləncə", value=(
         "`r?duel` - Duel at.\n"
         "`r?coinflip` - Yazı-tura.\n"
         "`r?slot` - Kazino.\n"
@@ -218,7 +218,7 @@ async def bot_komanda(ctx):
         "`r?soz` / `r?cat` / `r?joke` - Maraqlı sözlər.\n"
         "`r?cmk` - Daş-kağız-qayçı.\n"
         "`r?ters` - Mətni tərsinə çevir.\n"
-        "`r?rozet` / `r?sohbet` / `r?tarix` - Əlavə əyləncələr."
+        "`r?sohbet` / `r?rozet` / `r?tarix` - Əlavələr."
     ), inline=False)
 
     await ctx.send(embed=embed1)
@@ -518,4 +518,10 @@ async def sohbet(ctx): await ctx.send("💬 Necəsən, qardaş? İşlər necə g
 async def rozet(ctx): await ctx.send("🏆 Sən bu serverin əfsanəvi sahibisən!")
 
 @bot.command(name="tarix")
-async def tarix(ctx): await ctx.send(f"📅 Bu gün: {time.s
+async def tarix(ctx): await ctx.send(f"📅 Bu gün: {time.strftime('%d.%m.%Y')}")
+
+if __name__ == "__main__":
+    keep_alive()
+    token = os.environ.get("TOKEN")
+    if token: bot.run(token)
+            
