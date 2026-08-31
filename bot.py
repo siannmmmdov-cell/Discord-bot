@@ -30,7 +30,7 @@ intents.voice_states = True
 
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
-# 👑 SƏNİN DİSCORD İD-N (Xüsusi sahib səlahiyyətləri üçün) 👑
+# 👑 SƏNİN SƏHİH DİSCORD İD-N 👑
 SAHIB_ID = 641014966312501259
 
 # 🎯 TICKET ÜÇÜN XÜSUSİ KANALIN ID-Sİ
@@ -126,8 +126,8 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # Gülüş sözlərinə emoji atma sistemi (Yalnız SƏNƏ aid olması üçün ID yoxlanışı əlavə olundu)
-    if message.author.id == SAHIB_ID:641014966312501259
+    # Gülüş sözlərinə emoji atma sistemi (Yalnız SƏNƏ aid)
+    if message.author.id == SAHIB_ID:
         gulus_sozleri = ["xd", "asds", "guly", "kara", "hf", "latifə", "😂", "🤣", "💀", "😹", "😆"]
         if any(g in message.content.lower() for g in gulus_sozleri):
             try:
@@ -168,7 +168,6 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# Mesaja reaksiya atma sistemi (Yalnız Sənə aid)
 @bot.event
 async def on_raw_reaction_add(payload):
     if payload.user_id != SAHIB_ID:
@@ -227,7 +226,7 @@ class TicketBaslatView(discord.ui.View):
 
 @bot.command(name="bot")
 async def bot_komanda(ctx):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     embed = discord.Embed(
         title="👑 YENİLMEZ v6000 - Əmr və Məlumat Mərkəzi",
         description="Botun bütün gücləndirilmiş imkanları:",
@@ -243,7 +242,7 @@ async def bot_komanda(ctx):
 
 @bot.command(name="ticketpanel")
 async def ticketpanel(ctx):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     if ctx.channel.id != XUSUSI_KANAL_ID:
         await ctx.message.delete()
         await ctx.send(f"❌ Bu komandanı yalnız <#{XUSUSI_KANAL_ID}> kanalında işlədə bilərsən!", delete_after=5)
@@ -259,13 +258,13 @@ async def ticketpanel(ctx):
 
 @bot.command(name="elan")
 async def elan(ctx, *, metin: str):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await ctx.message.delete()
     await ctx.send(embed=discord.Embed(title="📢 ELAN", description=metin, color=0xffaa00))
 
 @bot.command(name="anket")
 async def anket(ctx, *, soru: str):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await ctx.message.delete()
     msg = await ctx.send(embed=discord.Embed(title="📊 ANKET", description=soru, color=0x00ffcc))
     await msg.add_reaction("👍")
@@ -273,7 +272,7 @@ async def anket(ctx, *, soru: str):
 
 @bot.command(name="cekilis")
 async def cekilis(ctx, sure: str, *, odul: str):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await ctx.message.delete()
     try:
         birim = sure[-1]
@@ -299,74 +298,74 @@ async def cekilis(ctx, sure: str, *, odul: str):
 
 @bot.command(name="duyuru")
 async def duyuru(ctx, *, metin: str):
-    if ctx.author.id != SAHIB_ID:641014966312501259 
+    if ctx.author.id != SAHIB_ID: return
     await ctx.message.delete()
     await ctx.send(f"🔔 **DUYURU:** {metin}")
 
 @bot.command(name="bakim")
 async def bakim(ctx, durum: str = "açıq"):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await ctx.send(f"🛠️ Baxım rejimi: **{durum}**")
 
 @bot.command(name="gizle")
 async def gizle(ctx):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=False)
     await ctx.send("🔒 Kanal gizlədildi!")
 
 @bot.command(name="goster")
 async def goster(ctx):
-    if ctx.author.id != SAHIB_ID: 641014966312501259 
+    if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
     await ctx.send("🔓 Kanal açıldı!")
 
 @bot.command(name="sesgizle")
 async def sesgizle(ctx):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, connect=False)
     await ctx.send("🔴 Səs kanalı bağlandı!")
 
 @bot.command(name="sesgoster")
 async def sesgoster(ctx):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await ctx.channel.set_permissions(ctx.guild.default_role, connect=True)
     await ctx.send("🟢 Səs kanalı açıldı!")
 
 @bot.command(name="sil")
 async def sil(ctx, amount: int = 5):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await ctx.channel.purge(limit=amount + 1)
     await ctx.send(f"🧹 {amount} mesaj silindi!", delete_after=3)
 
 @bot.command(name="mute")
 async def mute(ctx, member: discord.Member):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     role = discord.utils.get(ctx.guild.roles, name="Muted") or await ctx.guild.create_role(name="Muted")
     await member.add_roles(role)
     await ctx.send(f"🔇 {member.mention} səssizləşdirildi!")
 
 @bot.command(name="unmute")
 async def unmute(ctx, member: discord.Member):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     role = discord.utils.get(ctx.guild.roles, name="Muted")
     if role: await member.remove_roles(role)
     await ctx.send(f"🔊 {member.mention} səsi açıldı!")
 
 @bot.command(name="ban")
 async def ban(ctx, member: discord.Member, *, reason=None):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await member.ban(reason=reason)
     await ctx.send(f"🔨 {member.name} banlandı!")
 
 @bot.command(name="kick")
 async def kick(ctx, member: discord.Member, *, reason=None):
-    if ctx.author.id != SAHIB_ID:641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     await member.kick(reason=reason)
     await ctx.send(f"👢 {member.name} qovuldu!")
 
 @bot.command(name="nuke")
 async def nuke(ctx):
-    if ctx.author.id != SAHIB_ID: 641014966312501259
+    if ctx.author.id != SAHIB_ID: return
     pos = ctx.channel.position
     yeni = await ctx.channel.clone()
     await ctx.channel.delete()
