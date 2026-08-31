@@ -33,6 +33,9 @@ bot = commands.Bot(command_prefix="r?", intents=intents)
 # 👑 SƏNİN DİSCORD İD-N 👑
 SAHIB_ID = 1391781251390451713
 
+# 🎯 TICKET ÜÇÜN XÜSUSİ KANALIN ID-Sİ
+XUSUSI_KANAL_ID = 1544056308787974294 
+
 # Yaddaş Sistemləri
 ticket_span_kontrol = {}
 user_xp = {}
@@ -219,7 +222,7 @@ async def yardim(ctx):
         "`r?cekilis [vaxt] [ödül]` - Avtomatik çəkiliş başladır (Məs: `r?cekilis 2d Nitro`).\n"
         "`r?duyuru` - Rəsmi duyuru elan edirsən.\n"
         "`r?bakim` - Botu baxım rejiminə alırsan.\n"
-        "`r?ticket` - Sənin üçün avtomatik dəstək kanalı yaradır."
+        "`r?ticket` - Xüsusi kanalda yazılaraq gizli dəstək kanalı açır."
     )
     embed.add_field(name="👑 Sahib & İdarəetmə Komutları", value=sahib_desc, inline=False)
 
@@ -491,7 +494,7 @@ async def balıq(ctx):
     await ctx.send(f"🎣 Tutduğun əşya: **{random.choice(fishes)}**")
 
 # ==============================================================================
-# 🎫 BİRBAŞA r?ticket YAZANDA KANAL YARADAN SİSTEM
+# 🎫 XÜSUSİ KANALDA r?ticket YAZARAQ AÇILAN SİSTEM
 # ==============================================================================
 
 class TicketKapatView(discord.ui.View):
@@ -506,24 +509,22 @@ class TicketKapatView(discord.ui.View):
 
 @bot.command(name="ticket")
 async def ticket(ctx):
-    await ctx.message.delete()  # İstifadəçinin yazdığı r?ticket mesajını silir ki, kanal təmiz qalsın
+    # Yalnız təyin olunmuş xüsusi kanalda işləməsi üçün yoxlama:
+    if ctx.channel.id != XUSUSI_KANAL_ID:
+        await ctx.message.delete()
+        await ctx.send(f"❌ {ctx.author.mention}, bu komandanı yalnız <#{XUSUSI_KANAL_ID}> kanalında istifadə edə bilərsən!", delete_after=5)
+        return
+
+    await ctx.message.delete()  # İstifadəçinin yazdığı r?ticket mesajını dərhal silir
     guild = ctx.guild
     author = ctx.author
     sindi = time.time()
 
+    # Spam qoruması: 30 saniyədə 3-dən çox ticket açmağa icazə vermir
     if author.id != SAHIB_ID:
         if author.id not in ticket_span_kontrol:
             ticket_span_kontrol[author.id] = []
         ticket_span_kontrol[author.id] = [t for t in ticket_span_kontrol[author.id] if sindi - t < 30]
         ticket_span_kontrol[author.id].append(sindi)
         if len(ticket_span_kontrol[author.id]) >= 3:
-            await ctx.send(f"⚠️ {author.mention}, çox sürətli ticket açmağa çalışırsan!", delete_after=5)
-            return
-
-    overwrites = {
-        guild.default_role: discord.PermissionOverwrite(view_channel=False),
-        author: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_messages=True),
-        guild.me: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_messages=True)
-    }
-
-    channel = awai
+            await 
