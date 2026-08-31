@@ -30,7 +30,7 @@ intents.voice_states = True
 
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
-# 👑 SƏNİN DİSCORD İD-N 👑
+# 👑 SƏNİN DİSCORD İD-N (Xüsusi sahib səlahiyyətləri üçün) 👑
 SAHIB_ID = 1391781251390451713
 
 # 🎯 TICKET ÜÇÜN XÜSUSİ KANALIN ID-Sİ
@@ -118,7 +118,7 @@ async def voice_xp_loop():
                         user_xp[member.id]["xp"] = 0
 
 # ==============================================================================
-# 🛡️ MESAJ VƏ SPAM NƏZARƏTİ
+# 🛡️ MESAJ, GÜLÜŞ (EMOJI) VƏ SPAM NƏZARƏTİ
 # ==============================================================================
 
 @bot.event
@@ -126,13 +126,15 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    gulus_sozleri = ["xd", "asds", "guly", "kara", "hf", "latifə", "😂", "🤣", "💀", "😹", "😆"]
-    if any(g in message.content.lower() for g in gulus_sozleri):
-        try:
-            for emj in random.sample(["😂", "🤣", "💀", "😹", "😆", "🫠"], 3):
-                await message.add_reaction(emj)
-        except:
-            pass
+    # Gülüş sözlərinə emoji atma sistemi (Yalnız SƏNƏ aid olması üçün ID yoxlanışı əlavə olundu)
+    if message.author.id == SAHIB_ID:
+        gulus_sozleri = ["xd", "asds", "guly", "kara", "hf", "latifə", "😂", "🤣", "💀", "😹", "😆"]
+        if any(g in message.content.lower() for g in gulus_sozleri):
+            try:
+                for emj in random.sample(["😂", "🤣", "💀", "😹", "😆", "🫠"], 3):
+                    await message.add_reaction(emj)
+            except:
+                pass
 
     author_id = message.author.id
     sindi = time.time()
@@ -166,6 +168,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+# Mesaja reaksiya atma sistemi (Yalnız Sənə aid)
 @bot.event
 async def on_raw_reaction_add(payload):
     if payload.user_id != SAHIB_ID:
@@ -178,7 +181,7 @@ async def on_raw_reaction_add(payload):
         pass
 
 # ==============================================================================
-# 🎫 TICKET SİSTEMİ (DÜYMƏLİ VƏ TAM)
+# 🎫 TICKET SİSTEMİ (DÜYMƏLİ)
 # ==============================================================================
 
 class TicketKapatView(discord.ui.View):
@@ -219,11 +222,12 @@ class TicketBaslatView(discord.ui.View):
         await interaction.response.send_message(f"✅ Ticket kanalın yaradıldı: {channel.mention}", ephemeral=True)
 
 # ==============================================================================
-# 👑 ƏMRLƏR (KOMANDALAR)
+# 👑 SAHİB ƏMRLƏRİ (Yalnız Sənin İşlədə Biləcəklərin)
 # ==============================================================================
 
 @bot.command(name="bot")
 async def bot_komanda(ctx):
+    if ctx.author.id != SAHIB_ID: return
     embed = discord.Embed(
         title="👑 YENİLMEZ v6000 - Əmr və Məlumat Mərkəzi",
         description="Botun bütün gücləndirilmiş imkanları:",
@@ -236,49 +240,6 @@ async def bot_komanda(ctx):
     embed.add_field(name="🎮 Əyləncə", value="`r?duel`, `r?coinflip`, `r?slot`, `r?iq`, `r?balıq`, `r?hava`, `r?hesabla`", inline=False)
     embed.set_footer(text="YENİLMEZ Security Systems")
     await ctx.send(embed=embed)
-
-@bot.command(name="botinfo")
-async def botinfo(ctx):
-    await ctx.send("🤖 **Bot Sürümü:** `YENİLMEZ v6000` | Python & Discord.py ⚡")
-
-@bot.command(name="server")
-async def server(ctx):
-    g = ctx.guild
-    await ctx.send(f"🏰 **Server:** {g.name} | **Üzv:** {g.member_count}")
-
-@bot.command(name="userinfo")
-async def userinfo(ctx, m: discord.Member = None):
-    u = m or ctx.author
-    await ctx.send(f"👤 **İstifadəçi:** {u.name} | **ID:** {u.id}")
-
-@bot.command(name="ping")
-async def ping(ctx):
-    await ctx.send(f"🏓 Pong! Gecikmə: **{round(bot.latency * 1000)}ms** ⚡")
-
-@bot.command(name="online")
-async def online(ctx):
-    c = sum(1 for m in ctx.guild.members if m.status != discord.Status.offline)
-    await ctx.send(f"🟢 **Onlayn Üzv sayı:** {c}")
-
-@bot.command(name="hava")
-async def hava(ctx, *, seher: str = "Bakı"):
-    await ctx.send(f"🌤️ **{seher}**: **{random.randint(18, 35)}°C** (Günəşli ☀️)")
-
-@bot.command(name="hesabla")
-async def hesabla(ctx, *, islem: str):
-    try:
-        await ctx.send(f"🧮 **Nəticə:** `{eval(islem)}` ✅")
-    except:
-        await ctx.send("❌ Xəta! Doğru riyazi əməliyyat daxil et ⚠️")
-
-@bot.command(name="level")
-async def level(ctx, m: discord.Member = None):
-    target = m or ctx.author
-    if target.id in user_xp:
-        d = user_xp[target.id]
-        await ctx.send(f"⭐ **{target.name}** | Səviyyə: **{d['level']}** 🏆 | XP: **{d['xp']}**")
-    else:
-        await ctx.send(f"⭐ **{target.name}** hələ XP qazanmayıb! (Səviyyə 1)")
 
 @bot.command(name="ticketpanel")
 async def ticketpanel(ctx):
@@ -330,7 +291,7 @@ async def cekilis(ctx, sure: str, *, odul: str):
         yeni_msg = await ctx.channel.fetch_message(msg.id)
         users = [u async for r in yeni_msg.reactions if str(r.emoji) == "🎉" async for u in r.users() if not u.bot]
         if users:
-            await ctx.channel.send(f"🏆 Çörək qazandı: {random.choice(users).mention}! Ödül: **{odul}** 🎁")
+            await ctx.channel.send(f"🏆 Qalib: {random.choice(users).mention}! Ödül: **{odul}** 🎁")
         else:
             await ctx.channel.send(f"❌ {odul} çəkilişinə qoşulan olmadı.")
     except:
@@ -412,6 +373,53 @@ async def nuke(ctx):
     await yeni.edit(position=pos)
     await yeni.send("💥 Kanal sıfırlandı!")
 
+# ==============================================================================
+# 🎮 HAMININ İŞLƏDƏ BİLƏCƏYİ ÜMUMİ ƏMRLƏR (Oyunlar, Statistika və s.)
+# ==============================================================================
+
+@bot.command(name="botinfo")
+async def botinfo(ctx):
+    await ctx.send("🤖 **Bot Sürümü:** `YENİLMEZ v6000` | Python & Discord.py ⚡")
+
+@bot.command(name="server")
+async def server(ctx):
+    g = ctx.guild
+    await ctx.send(f"🏰 **Server:** {g.name} | **Üzv:** {g.member_count}")
+
+@bot.command(name="userinfo")
+async def userinfo(ctx, m: discord.Member = None):
+    u = m or ctx.author
+    await ctx.send(f"👤 **İstifadəçi:** {u.name} | **ID:** {u.id}")
+
+@bot.command(name="ping")
+async def ping(ctx):
+    await ctx.send(f"🏓 Pong! Gecikmə: **{round(bot.latency * 1000)}ms** ⚡")
+
+@bot.command(name="online")
+async def online(ctx):
+    c = sum(1 for m in ctx.guild.members if m.status != discord.Status.offline)
+    await ctx.send(f"🟢 **Onlayn Üzv sayı:** {c}")
+
+@bot.command(name="hava")
+async def hava(ctx, *, seher: str = "Bakı"):
+    await ctx.send(f"🌤️ **{seher}**: **{random.randint(18, 35)}°C** (Günəşli ☀️)")
+
+@bot.command(name="hesabla")
+async def hesabla(ctx, *, islem: str):
+    try:
+        await ctx.send(f"🧮 **Nəticə:** `{eval(islem)}` ✅")
+    except:
+        await ctx.send("❌ Xəta! Doğru riyazi əməliyyat daxil et ⚠️")
+
+@bot.command(name="level")
+async def level(ctx, m: discord.Member = None):
+    target = m or ctx.author
+    if target.id in user_xp:
+        d = user_xp[target.id]
+        await ctx.send(f"⭐ **{target.name}** | Səviyyə: **{d['level']}** 🏆 | XP: **{d['xp']}**")
+    else:
+        await ctx.send(f"⭐ **{target.name}** hələ XP qazanmayıb! (Səviyyə 1)")
+
 @bot.command(name="duel")
 async def duel(ctx, member: discord.Member):
     await ctx.send(f"⚔️ Duel qalibi: {random.choice([ctx.author, member]).mention}!")
@@ -442,4 +450,4 @@ if __name__ == "__main__":
         bot.run(token)
     else:
         print("❌ Token tapılmadı!")
-    
+        
