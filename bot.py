@@ -170,7 +170,7 @@ async def bot_komanda(ctx):
         "`r?bakim` - Baxım rejimini dəyişir.\n"
         "`r?slowmode` - Chatda yavaş mod tənzimləyir.\n"
         "`r?sayac` - Üzv hədəf sayğacını yeniləyir.\n"
-        "`r?rolver` - İstifadəçiyə istəപ്പെli rolu verir.\n"
+        "`r?rolver` - İstifadəçiyə istənilən rolu verir.\n"
         "`r?rolal` - İstifadəçidən rolu geri alır.\n"
         "`r?botdurdur` - Botu təhlükəsiz şəkildə dayandırır."
     ), inline=False)
@@ -465,4 +465,4 @@ async def eightball(ctx, *, s): await ctx.send(f"🔮 {random.choice(['Bəli', '
 @bot.command(name="sevgi")
 async def sevgi(ctx, m: discord.Member): await ctx.send(f"❤️ Uyğunluq: %{random.randint(10, 100)}")
 @bot.command(name="hackle")
-async def hackle(ctx, m: discord.M
+async def hackle(ctx, m: discord.Me
