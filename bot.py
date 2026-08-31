@@ -104,7 +104,6 @@ async def on_message(message):
         except: 
             pass
 
-    # Sürətli fərqli mesaj spam (flood) qoruması (Normal söhbətə toxunmur, ardıcıl 5-6 mesajı tutur)
     if aid != SAHIB_ID:
         if aid not in spam_takip: spam_takip[aid] = []
         spam_takip[aid] = [t for t in spam_takip[aid] if sindi - t < 4]
@@ -520,9 +519,11 @@ async def sohbet(ctx): await ctx.send("💬 Necəsən, qardaş? İşlər necə g
 async def rozet(ctx): await ctx.send("🏆 Sən bu serverin əfsanəvi sahibisən!")
 
 @bot.command(name="tarix")
-async def tarix(ctx): await ctx.send(f"📅 Bu gün: {time.strftime('%d.%m.%Y')}")
+async def tarix(ctx):
+    await ctx.send(f"📅 Bu gün: {time.strftime('%d.%m.%Y')}")
 
 if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("TOKEN")
-  
+    if token: bot.run(token)
+    
