@@ -1,4 +1,3 @@
-
 import discord
 from discord.ext import commands
 import asyncio
@@ -20,7 +19,6 @@ SAHIB_ID = 1391781251390451713
 # Yaddaş Sistemləri
 ticket_span_kontrol = {}
 user_xp = {}
-spam_takip = {}
 
 @bot.event
 async def on_ready():
@@ -28,7 +26,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="r?yardim | DEADAZE v5000 👑"))
 
 # ==============================================================================
-# 🛡️ BALANSLI TƏHLÜKƏSİZLİK VƏ XP SİSTEMİ
+# 🛡️ XP VƏ MESAJ SİSTEMİ (Spam qoruması tamamilə silindi, heç kimə mute düşmür)
 # ==============================================================================
 
 @bot.event
@@ -37,9 +35,8 @@ async def on_message(message):
         return
 
     author_id = message.author.id
-    sindi = time.time()
 
-    # 1. Level & XP Sistemi
+    # Level & XP Sistemi
     if author_id not in user_xp:
         user_xp[author_id] = {"xp": 0, "level": 1}
     
@@ -53,41 +50,6 @@ async def on_message(message):
             await message.channel.send(f"🎉 Təbriklər {message.author.mention}! Yeni səviyyəyə yüksəldin: **Səviyyə {user_xp[author_id]['level']}** 🚀")
         except:
             pass
-
-    # Sahib üçün qoruma istisnası
-    if author_id != SAHIB_ID:
-        # A. Link və Reklam Qoruması
-        if "http://" in message.content or "https://" in message.content or "discord.gg/" in message.content:
-            try:
-                await message.delete()
-                await message.channel.send(f"⚠️ {message.author.mention}, Bu serverdə reklam/link paylaşmaq qadağandır!", delete_after=3)
-                return
-            except:
-                pass
-
-        # B. Həddindən artıq uzun simvol spamı
-        if len(message.content) > 600:
-            try:
-                await message.delete()
-                await message.channel.send(f"⚠️ {message.author.mention}, Çox uzun simvol spamı etmək qadağandır!", delete_after=3)
-                return
-            except:
-                pass
-
-        # C. Sürətli Flood Qoruması
-        if author_id not in spam_takip:
-            spam_takip[author_id] = []
-        
-        spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 4]
-        spam_takip[author_id].append(sindi)
-
-        if len(spam_takip[author_id]) >= 7:
-            try:
-                await message.delete()
-                await message.channel.send(f"⚠️ {message.author.mention}, Çox sürətli mesaj yazırsan, bir az yavaş ol!", delete_after=3)
-                return
-            except:
-                pass
 
     await bot.process_commands(message)
 
@@ -115,11 +77,11 @@ async def on_raw_reaction_add(payload):
 async def yardim(ctx):
     embed = discord.Embed(
         title="👑 MASTER PANEL v5000 (Bütün Komutlar)",
-        description="Bütün gücləndirilmiş əmrlər və qoruma sistemləri:",
+        description="Bütün gücləndirilmiş əmrlər və idarəetmə sistemləri:",
         color=0xffa200
     )
     embed.add_field(name="👑 Sahib & İdarəetmə", value="`r?elan`, `r?anket`, `r?cekilis`, `r?duyuru`, `r?bakim`, `r?ticketpanel`", inline=False)
-    embed.add_field(name="🛡️ Təhlükəsizlıq & Kanal", value="`r?gizle`, `r?goster`, `r?sesgizle`, `r?sesgoster`, `r?tumunugizle`, `r?tumunugoster`", inline=False)
+    embed.add_field(name="🛡️ Kanal İdarəsi", value="`r?gizle`, `r?goster`, `r?sesgizle`, `r?sesgoster`, `r?tumunugizle`, `r?tumunugoster`", inline=False)
     embed.add_field(name="📋 Məlumat & Statistika", value="`r?server`, `r?userinfo`, `r?botinfo`, `r?ping`, `r?online`, `r?hava`, `r?hesabla`, `r?level`", inline=False)
     embed.add_field(name="🛠️ Moderasiya & Rol", value="`r?sil`, `r?temizle`, `r?silkanal`, `r?kanalac`, `r?mute`, `r?unmute`, `r?ban`, `r?unban`, `r?kick`, `r?lock`, `r?unlock`, `r?rolver`, `r?rolsil`, `r?nuke`", inline=False)
     embed.add_field(name="🎮 Oyunlar & Əyləncə", value="`r?duel`, `r?coinflip`, `r?slot`, `r?hacker`, `r?zar`, `r?sevgili`, `r?iq`, `r?balıq`, `r?sifre`", inline=False)
@@ -211,7 +173,7 @@ async def bakim(ctx, durum: str = "açıq"):
     await ctx.send(f"🛠️ Baxım rejimi: **{durum}** olaraq dəyişdirildi! ⚠️")
 
 # ==============================================================================
-# 🛡️ KANAL GİZLƏMƏ & TƏHLÜKƏSİZLİK KOMUTLARI
+# 🛡️ KANAL GİZLƏMƏ KOMUTLARI
 # ==============================================================================
 
 @bot.command(name="gizle")
@@ -471,4 +433,4 @@ if __name__ == "__main__":
         print("❌ XƏTA: Token tapılmadı!")
     else:
         bot.run(token)
-        
+    
