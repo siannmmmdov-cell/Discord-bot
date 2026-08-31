@@ -104,15 +104,17 @@ async def on_message(message):
         except: 
             pass
 
+    # Sürətli fərqli mesaj spam (flood) qoruması (Normal söhbətə toxunmur, ardıcıl 5-6 mesajı tutur)
     if aid != SAHIB_ID:
         if aid not in spam_takip: spam_takip[aid] = []
-        spam_takip[aid] = [t for t in spam_takip[aid] if sindi - t < 3]
+        spam_takip[aid] = [t for t in spam_takip[aid] if sindi - t < 4]
         spam_takip[aid].append(sindi)
-        if len(spam_takip[aid]) >= 9:
+        if len(spam_takip[aid]) >= 5:
             try:
-                await message.delete()
-                await message.author.timeout(discord.utils.utcnow() + discord.timedelta(seconds=30), reason="Spam")
-                await message.channel.send(f"⚠️ {message.author.mention}, spama görə 30 san mute aldın!", delete_after=5)
+                await message.channel.purge(limit=6)
+                await message.author.timeout(discord.utils.utcnow() + discord.timedelta(minutes=3), reason="Sürətli Spam / Flood")
+                await message.channel.send(f"⚠️ {message.author.mention}, sürətli spam etdiyin üçün 3 dəqiqəlik mute aldın!", delete_after=5)
+                spam_takip[aid] = []
                 return
             except: pass
 
@@ -523,5 +525,4 @@ async def tarix(ctx): await ctx.send(f"📅 Bu gün: {time.strftime('%d.%m.%Y')}
 if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("TOKEN")
-    if token: bot.run(token)
-            
+  
