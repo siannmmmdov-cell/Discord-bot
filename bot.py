@@ -579,4 +579,68 @@ async def hesabla(ctx, *, i="2+2"):
         await ctx.send("❌ Riyazi xeta!")
 
 @bot.command(name="tassaxla")
-async def tassaxla(c
+async def tassaxla(ctx): 
+    zer = random.randint(1, 6)
+    await ctx.send(f"🎲 Zer: {zer}")
+
+@bot.command(name="sec")
+async def sec(ctx, *, l="Beli, Xeyir"): 
+    secim = random.choice(l.split(',')).strip()
+    await ctx.send(f"🎯 Secimim: {secim}")
+
+@bot.command(name="8ball")
+async def eightball(ctx, *, s="Sual"): 
+    cavablar = ['Beli', 'Xeyir', 'Belke de', 'Mutleq']
+    cavab = random.choice(cavablar)
+    await ctx.send(f"🔮 Sehrli kure: {cavab}")
+
+@bot.command(name="sevgi")
+async def sevgi(ctx, m: discord.Member = None):
+    target = m.mention if m else "Kimse"
+    faiz = random.randint(10, 100)
+    await ctx.send(f"❤️ {ctx.author.mention} ve {target} uygunlugu: %{faiz}")
+
+@bot.command(name="hackle")
+async def hackle(ctx, m: discord.Member = None):
+    target = m.mention if m else "Dost"
+    await ctx.send(f"💻 {target} ugurla hacklendi! Parol: `12345`")
+
+@bot.command(name="soz")
+async def soz(ctx): 
+    sozler = ['Ugur qetiyyetlidir.', 'Daim ireli!', 'Zehmet cekmeden hec ne olmur.']
+    secilen_soz = random.choice(sozler)
+    await ctx.send(f"📜 Soz: {secilen_soz}")
+
+@bot.command(name="cat")
+async def cat(ctx): 
+    await ctx.send("🐱 Pisik fakti: Omrunun 70 faizini yatmaqla kecirirler.")
+
+@bot.command(name="joke")
+async def joke(ctx): 
+    await ctx.send("🎭 Zarafat: - Muellim, asagidan yazin basa dusmurem. - Asagi yer yoxdur!")
+
+@bot.command(name="cmk")
+async def cmk(ctx): 
+    secimler = ['Das 🪨', 'Kagiz 📄', 'Qayci ✂️']
+    secim = random.choice(secimler)
+    await ctx.send(f"🎮 Das-Kagiz-Qayci: {secim}")
+
+@bot.command(name="ters")
+async def ters(ctx, *, yazi="Salam"): 
+    await ctx.send(yazi[::-1])
+
+@bot.command(name="sohbet")
+async def sohbet(ctx): 
+    await ctx.send("💬 Nesesen, qardas? Isler nece gedir?")
+
+@bot.command(name="date")
+async def date(ctx):
+    bugun = time.strftime("%d.%m.%Y")
+    await ctx.send(f"📅 Bu gun: {bugun}")
+
+if __name__ == "__main__":
+    keep_alive()
+    token = os.environ.get("TOKEN")
+    if token: 
+        bot.run(token)
+        
