@@ -561,7 +561,8 @@ async def iq(ctx, m: discord.Member = None):
 
 @bot.command(name="baliq")
 async def baliq(ctx): 
-    tutulan = random.choice(['🐟 Baliq', '🐠 Qizil Baliq', '🦈 Akula', '👞 Basmaq'])
+    baliqlar = ['🐟 Baliq', '🐠 Qizil Baliq', '🦈 Akula', '👞 Basmaq']
+    tutulan = random.choice(baliqlar)
     await ctx.send(f"🎣 Tutdun: {tutulan}")
 
 @bot.command(name="hava")
@@ -578,5 +579,4 @@ async def hesabla(ctx, *, i="2+2"):
         await ctx.send("❌ Riyazi xeta!")
 
 @bot.command(name="tassaxla")
-async def tassaxla(ctx): 
-    zer = random.r
+async def tassaxla(c
