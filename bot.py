@@ -33,6 +33,7 @@ SAHIB_ID = 641014966312501259
 
 user_xp = {}
 spam_takip = {}
+interaction_spam = {}
 warn_sistemi = {}
 
 @bot.event
@@ -62,6 +63,26 @@ async def on_member_remove(member):
     kanal = discord.utils.get(member.guild.text_channels, name="gelen-geden") or member.guild.system_channel
     if kanal:
         await kanal.send(f"👋 **{member.name}** serverden ayrildi.")
+
+@bot.event
+async def on_interaction(interaction):
+    if interaction.user.id == SAHIB_ID:
+        return
+    
+    uid = interaction.user.id
+    sindi = time.time()
+    if uid not in interaction_spam:
+        interaction_spam[uid] = []
+    
+    interaction_spam[uid] = [t for t in interaction_spam[uid] if sindi - t < 4]
+    interaction_spam[uid].append(sindi)
+    
+    if len(interaction_spam[uid]) >= 4:
+        try:
+            await interaction.response.send_message("⚠️ Çox sürətli əmr yazırsan, spam etdiyinə görə dayandırıldı!", ephemeral=True)
+            return
+        except:
+            pass
 
 @tasks.loop(minutes=10)
 async def stats_update():
@@ -293,7 +314,8 @@ async def cekilis(ctx, sure: str = "1m", *, odul: str = "Hediyye"):
         yeni = await ctx.channel.fetch_message(msg.id)
         users = [u async for r in yeni.reactions if str(r.emoji) == "🎉" async for u in r.users() if not u.bot]
         if users: 
-            await ctx.channel.send(f"🏆 Qalib: {random.choice(users).mention}! Odul: **{odul}**")
+            qalib = random.choice(users)
+            await ctx.channel.send(f"🏆 Qalib: {qalib.mention}! Odul: **{odul}**")
         else: 
             await ctx.channel.send("❌ Qosulan olmadi.")
     except: 
@@ -480,7 +502,11 @@ async def kanalbilgi(ctx):
 @bot.command(name="boosters")
 async def boosters(ctx):
     bs = ctx.guild.premium_subscribers
-    await ctx.send(f"🚀 Boost verenler: {', '.join([b.name for b in bs])}" if bs else "Boost yoxdur.")
+    if bs:
+        boost_names = ", ".join([b.name for b in bs])
+        await ctx.send(f"🚀 Boost verenler: {boost_names}")
+    else:
+        await ctx.send("Boost yoxdur.")
 
 @bot.command(name="avatar")
 async def avatar(ctx, m: discord.Member = None):
@@ -491,7 +517,10 @@ async def avatar(ctx, m: discord.Member = None):
 async def banner(ctx, m: discord.Member = None):
     try:
         u = await bot.fetch_user((m or ctx.author).id)
-        await ctx.send(u.banner.url if u.banner else "Banner yoxdur.")
+        if u.banner:
+            await ctx.send(u.banner.url)
+        else:
+            await ctx.send("Banner yoxdur.")
     except: 
         await ctx.send("Banner tapilmadi.")
 
@@ -501,68 +530,53 @@ async def emojisay(ctx):
 
 @bot.command(name="servericon")
 async def servericon(ctx): 
-    await ctx.send(ctx.guild.icon.url if ctx.guild.icon else "Ikon yoxdur.")
+    if ctx.guild.icon:
+        await ctx.send(ctx.guild.icon.url)
+    else:
+        await ctx.send("Ikon yoxdur.")
 
 @bot.command(name="duel")
 async def duel(ctx, m: discord.Member = None):
     target = m.mention if m else "Dost"
-    await ctx.send(f"⚔️ Duel qalibi: {random.choice([ctx.author.mention, target])}!")
+    secim = random.choice([ctx.author.mention, target])
+    await ctx.send(f"⚔️ Duel qalibi: {secim}!")
 
 @bot.command(name="coinflip")
 async def coinflip(ctx): 
-    await ctx.send(f"🎲 Netice: {random.choice(['Yazi 🪙', 'Tura 👑'])}")
+    netice = random.choice(['Yazi 🪙', 'Tura 👑'])
+    await ctx.send(f"🎲 Netice: {netice}")
 
 @bot.command(name="slot")
 async def slot(ctx):
     e = ["🍎", "🍋", "🍒", "7️⃣", "💎"]
     a, b, c = random.choice(e), random.choice(e), random.choice(e)
-    await ctx.send(f"🎰 [{a} | {b} | {c}]\n" + ("🎉 UDDUNUZ!" if a==b==c else "❌ Uduzdunuz!"))
+    durum = "🎉 UDDUNUZ!" if a == b == c else "❌ Uduzdunuz!"
+    await ctx.send(f"🎰 [{a} | {b} | {c}]\n{durum}")
 
 @bot.command(name="iq")
 async def iq(ctx, m: discord.Member = None):
     t = m or ctx.author
-    await ctx.send(f"🧠 {t.name} IQ seviyyesi: {random.randint(50, 160)}")
+    sayi = random.randint(50, 160)
+    await ctx.send(f"🧠 {t.name} IQ seviyyesi: {sayi}")
 
 @bot.command(name="baliq")
 async def baliq(ctx): 
-    await ctx.send(f"🎣 Tutdun: {random.choice(['🐟 Baliq', '🐠 Qizil Baliq', '🦈 Akula', '👞 Basmaq'])}")
+    tutulan = random.choice(['🐟 Baliq', '🐠 Qizil Baliq', '🦈 Akula', '👞 Basmaq'])
+    await ctx.send(f"🎣 Tutdun: {tutulan}")
 
 @bot.command(name="hava")
 async def hava(ctx, *, s="Baki"): 
-    await ctx.send(f"🌤️ Hava ({s}): {random.randint(18, 35)}°C")
+    derece = random.randint(18, 35)
+    await ctx.send(f"🌤️ Hava ({s}): {derece}°C")
 
 @bot.command(name="hesabla")
 async def hesabla(ctx, *, i="2+2"):
     try: 
-        await ctx.send(f"🧮 Netice: {eval(i)}")
+        netice = eval(i)
+        await ctx.send(f"🧮 Netice: {netice}")
     except: 
         await ctx.send("❌ Riyazi xeta!")
 
 @bot.command(name="tassaxla")
 async def tassaxla(ctx): 
-    await ctx.send(f"🎲 Zer: {random.randint(1, 6)}")
-
-@bot.command(name="sec")
-async def sec(ctx, *, l="Beli, Xeyir"): 
-    await ctx.send(f"🎯 Secimim: {random.choice(l.split(',')).strip()}")
-
-@bot.command(name="8ball")
-async def eightball(ctx, *, s="Sual"): 
-    await ctx.send(f"🔮 Sehrli kure: {random.choice(['Beli', 'Xeyir', 'Belke de', 'Mutleq'])}")
-
-@bot.command(name="sevgi")
-async def sevgi(ctx, m: discord.Member = None):
-    target = m.mention if m else "Kimse"
-    await ctx.send(f"❤️ {ctx.author.mention} ve {target} uygunlugu: %{random.randint(10, 100)}")
-
-@bot.command(name="hackle")
-async def hackle(ctx, m: discord.Member = None):
-    target = m.mention if m else "Dost"
-    await ctx.send(f"💻 {target} ugurla hacklendi! Parol: `12345`")
-
-@bot.command(name="soz")
-async def soz(ctx): 
-    await ctx.send(f"📜 Soz: {random.choice(['Ugur qetiyyetlidir.', 'Daim ireli!', 'Zehmet cekmeden hec ne olmur.'])}")
-
-@bot.command(name="cat")
-async def cat(ctx)
+    zer = random.r
