@@ -123,6 +123,8 @@ async def on_message(message):
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return
+    elif isinstance(error, commands.CommandOnCooldown):
+        await ctx.send(f"⏳ Çox tez-tez yazırsan! Bir az gözlə, {round(error.retry_after, 1)} saniyə sonra təkrar yoxla.", delete_after=5)
     elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(f"❌ Əksik arqument! Əmri düzgün istifadə et.", delete_after=6)
     elif isinstance(error, commands.MissingPermissions):
@@ -162,7 +164,7 @@ async def bot_komanda(ctx):
     )
     embed1.add_field(name="👑 Sahib & İdarəetmə", value=(
         "`r?bot` - Əmr panelini açır.\n"
-        "`r?ticketpanel` - Ticket sistemi.\n"
+        "`r?ticketyarat` - Ticket sistemi.\n"
         "`r?elan` - Elan verir.\n"
         "`r?anket` - Səsvermə açır.\n"
         "`r?cekilis` - Çəkiliş başladır.\n"
@@ -225,16 +227,17 @@ async def bot_komanda(ctx):
     await ctx.send(embed=embed1)
     await ctx.send(embed=embed2)
 
-@bot.command(name="ticketpanel")
-async def ticketpanel(ctx):
-    if ctx.author.id != SAHIB_ID: return
+@bot.command(name="ticketyarat")
+@commands.cooldown(1, 10, commands.BucketType.user)
+async def ticketyarat(ctx):
     try: await ctx.message.delete()
     except: pass
     await ctx.send(embed=discord.Embed(title="🎫 Dəstək Paneli", description="Aşağıdakı düyməyə basaraq ticket açın.", color=0x00aaff), view=TicketAc())
 
-@bot.command(name="ticket")
-async def ticket_alias(ctx):
-    await ctx.invoke(bot.get_command('ticketpanel'))
+@bot.command(name="ticketpanel")
+@commands.cooldown(1, 10, commands.BucketType.user)
+async def ticketpanel_alias(ctx):
+    await ctx.invoke(bot.get_command('ticketyarat'))
 
 @bot.command(name="elan")
 async def elan(ctx, *, m="Elan mətni yoxdur"):
@@ -518,12 +521,4 @@ async def sohbet(ctx): await ctx.send("💬 Necəsən, qardaş? İşlər necə g
 @bot.command(name="rozet")
 async def rozet(ctx): await ctx.send("🏆 Sən bu serverin əfsanəvi sahibisən!")
 
-@bot.command(name="tarix")
-async def tarix(ctx):
-    await ctx.send(f"📅 Bu gün: {time.strftime('%d.%m.%Y')}")
-
-if __name__ == "__main__":
-    keep_alive()
-    token = os.environ.get("TOKEN")
-    if token: bot.run(token)
-    
+@bot.command(name="tarix
