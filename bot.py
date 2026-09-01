@@ -25,7 +25,7 @@ intents.message_content = True
 intents.members = True
 intents.guilds = True
 intents.voice_states = True
-intents.reactions = True  # Emojileri izlemek ucun vacibdir
+intents.reactions = True
 
 bot = commands.Bot(command_prefix="r?", intents=intents)
 
@@ -42,7 +42,6 @@ async def on_ready():
     stats_update.start()
     voice_xp_loop.start()
 
-# SEN EMOJI BASANDA BOTUN DA EYNI EMOJIYI BASMASI UCUN FUNKSIYA
 @bot.event
 async def on_reaction_add(reaction, user):
     if user.id == SAHIB_ID:
@@ -563,4 +562,7 @@ async def hackle(ctx, m: discord.Member = None):
 
 @bot.command(name="soz")
 async def soz(ctx): 
-    await ctx.send(f"📜 Soz: {random.choice(['Ugur qetiyyetlidir.
+    await ctx.send(f"📜 Soz: {random.choice(['Ugur qetiyyetlidir.', 'Daim ireli!', 'Zehmet cekmeden hec ne olmur.'])}")
+
+@bot.command(name="cat")
+async def cat(ctx)
