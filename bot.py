@@ -37,7 +37,7 @@ uyari_sayi = {}
 @bot.event
 async def on_ready():
     print(f"YENİLMEZ Bot Aktivləşdi: {bot.user.name}")
-    await bot.change_presence(activity=discord.Game(name="r?bot | Hər Komut Ayrı İzahlı 👑"))
+    await bot.change_presence(activity=discord.Game(name="r?bot | Moderasiya və İdarəetmə 👑"))
 
 # ==================== EMOJİ REAKSİYA SİSTEMİ ====================
 @bot.event
@@ -86,11 +86,11 @@ async def on_message(message):
             pass
         return
 
-    # Səmimi Salamlaşma
+    # Sadə Salamlaşma (Kimin yazmasından asılı olmayaraq sadə və qısa cavab)
     icerik = message.content.lower()
     if icerik in ["salam", "salamlar", "as", "aleykümsalam", "hi", "hello"]:
         try:
-            await message.channel.send(f"Salam, xoş gəlmisən {message.author.mention}! 👑 Səfəmizə şad olduq.")
+            await message.channel.send(f"Salam, {message.author.mention}! Xoş gəlmisən.")
         except:
             pass
 
@@ -111,74 +111,55 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# ==================== HƏR KOMUT HAQQINDA AYRI-AYRI İZAHLI r?bot PANELİ ====================
+# ==================== R?BOT PANELİ ====================
 
 @bot.command(name="bot")
 async def bot_panel(ctx):
     # 1-ci Embed: Təhlükəsizlik və Moderasiya
     embed1 = discord.Embed(
-        title="🛡️ YENİLMEZ - TƏHLÜKƏSİZLİK & MODERASİYA KOMUTLARI",
-        description="Serveri qorumaq və qayda pozanları tənzimləmək üçün əsas əmrlər:",
+        title="🛡️ YENİLMEZ - TƏHLÜKƏSİZLİK & MODERASİYA",
+        description="Serveri qorumaq və tənzimləmək üçün əsas əmrlər:",
         color=0xff0000
     )
-    embed1.add_field(name="r?ban <istifadəçi>", value="Seçilən istifadəçini serverdən tamamilə qovur (ban edir).", inline=False)
-    embed1.add_field(name="r?kick <istifadəçi>", value="İstifadəçini serverdən uzaqlaşdırır (istəsə yenə gələ bilər).", inline=False)
-    embed1.add_field(name="r?mute <istifadəçi> <dəqiqə>", value="Qayda pozana göstərilən dəqiqə qədər zaman aşımı (timeout) verir.", inline=False)
-    embed1.add_field(name="r?unmute <istifadəçi>", value="Cəza alan istifadəçinin səs/yazı qadağasını qaldırır.", inline=False)
-    embed1.add_field(name="r?warn <istifadəçi> <səbəb>", value="İstifadəçiyə rəsmi xəbərdarlıq göndərir.", inline=False)
-    embed1.add_field(name="r?sil <say>", value="Mətndəki mesajları qeyd edilən sayda təmizləyir.", inline=False)
+    embed1.add_field(name="r?ban <istifadəçi>", value="Seçilən istifadəçini serverdən tamamilə qovur.", inline=False)
+    embed1.add_field(name="r?kick <istifadəçi>", value="İstifadəçini serverdən uzaqlaşdırır.", inline=False)
+    embed1.add_field(name="r?mute <istifadəçi> <dəqiqə>", value="Qayda pozana zaman aşımı (timeout) verir.", inline=False)
+    embed1.add_field(name="r?unmute <istifadəçi>", value="Cəza alan istifadəçinin qadağasını qaldırır.", inline=False)
+    embed1.add_field(name="r?warn <istifadəçi> <səbəb>", value="İstifadəçiyə xəbərdarlıq göndərir.", inline=False)
+    embed1.add_field(name="r?clear <say>", value="Mətndəki mesajları qeyd edilən sayda təmizləyir.", inline=False)
 
-    # 2-ci Embed: Kanal və Səs İdarəetməsi
+    # 2-ci Embed: Kanal və Server İdarəetməsi
     embed2 = discord.Embed(
-        title="⚙️ YENİLMEZ - KANAL, SƏS VƏ ROL İDARƏSİ",
-        description="Otaqların və səslərin gizlədilməsi, açılması və idarə edilməsi:",
+        title="⚙️ YENİLMEZ - KANAL VƏ İDARƏETMƏ",
+        description="Kanal, səs və rol idarəetmə əmrləri:",
         color=0x00ff00
     )
-    embed2.add_field(name="r?kanalac <ad>", value="Yeni mətn kanalı yaradır.", inline=False)
-    embed2.add_field(name="r?kanalsil", value="Hazırda yazdığın və ya işarələdiyin kanalı silir.", inline=False)
-    embed2.add_field(name="r?kanalbagla", value="Kanalı üzvlərin yazışmasına bağlayır (Lock).", inline=False)
-    embed2.add_field(name="r?kanalas", value="Bağlanmış kanalın kilidini açır.", inline=False)
-    embed2.add_field(name="r?kanalgizle", value="Mətn kanalını hamıdan gizlədir.", inline=False)
-    embed2.add_field(name="r?kanalgoster", value="Gizlədilmiş kanalı yenidən hər kəsə göstərir.", inline=False)
-    embed2.add_field(name="r?sesgizle <kanal>", value="Səs kanalını üzvlərin girişinə bağlayır/gizlədir.", inline=False)
-    embed2.add_field(name="r?sesgoster <kanal>", value="Səs kanalının girişini hər kəsə açır.", inline=False)
-    embed2.add_field(name="r?yavasmod <saniyə>", value="Kanalda mesajlar arası gözləmə müddəti (slowmode) qoyur.", inline=False)
-    embed2.add_field(name="r?rolver / r?rolal", value="İstifadəçiyə rol verir və ya rolunu geri alır.", inline=False)
-    embed2.add_field(name="r?duyuru / r?anket", value="Serverdə diqqət çəkən elanlar və ya səsvermə anketləri açır.", inline=False)
+    embed2.add_field(name="r?createchannel <ad>", value="Yeni mətn kanalı yaradır.", inline=False)
+    embed2.add_field(name="r?deletechannel", value="Hazırda yazılan kanalı silir.", inline=False)
+    embed2.add_field(name="r?lock", value="Kanalı yazışmaya bağlayır.", inline=False)
+    embed2.add_field(name="r?unlock", value="Bağlanmış kanalın kilidini açır.", inline=False)
+    embed2.add_field(name="r?hide", value="Mətn kanalını hamıdan gizlədir.", inline=False)
+    embed2.add_field(name="r?reveal", value="Gizlədilmiş kanalı yenidən göstərir.", inline=False)
+    embed2.add_field(name="r?slowmode <saniyə>", value="Kanalda yavaş rejim (slowmode) qoyur.", inline=False)
+    embed2.add_field(name="r?nuke", value="Kanalı təmizləmək üçün klonlayıb yenidən yaradır.", inline=False)
+    embed2.add_field(name="r?giverole / r?takerole", value="İstifadəçiyə rol verir və ya rolunu alır.", inline=False)
+    embed2.add_field(name="r?announcement", value="Serverdə diqqət çəkən elan açır.", inline=False)
 
-    # 3-cü Embed: Əyləncə və Zarafat Komutları
+    # 3-cü Embed: Məlumat və Sistem
     embed3 = discord.Embed(
-        title="🎉 YENİLMEZ - ƏYLƏNCƏ VƏ ZARAFAT KOMUTLARI",
-        description="Serverdə darıxmağın qarşısını alacaq əyləncəli əmrlər:",
-        color=0x0099ff
-    )
-    embed3.add_field(name="r?zarafat", value="Bot gülməli lətifələr və zarafatlar danışır.", inline=False)
-    embed3.add_field(name="r?sevgi <ad>", value="Qeyd edilən şəxslə sevgi uyğunluğunu faizlə hesablayır.", inline=False)
-    embed3.add_field(name="r?hacklə <istifadəçi>", value="Zarafat məqsədilə istifadəçini 'hackləyir' və saxta IP göstərir.", inline=False)
-    embed3.add_field(name="r?mənasız", value="Həyatdan mənasız və gülməli fəlsəfi cümlələr verir.", inline=False)
-    embed3.add_field(name="r?tiryaki", value="Siqaret/tiryaki əleyhinə dostca xəbərdarlıq edir.", inline=False)
-    embed3.add_field(name="r?falbax", value="Gələcəyin barədə qısa və gülməli fal baxır.", inline=False)
-    embed3.add_field(name="r?dava <kimlə>", value="İstifadəçi ilə kimsə arasında 'dava' səhnəsi yaradır.", inline=False)
-    embed3.add_field(name="r?kral", value="Serverin əsl kralının kim olduğunu açıqlayır.", inline=False)
-    embed3.add_field(name="r?zarat / r?yazitura", value="Zər atır və ya yazı-tərəf oyunu oynayır.", inline=False)
-
-    # 4-cü Embed: Məlumat və Sistem
-    embed4 = discord.Embed(
-        title="📊 YENİLMEZ - MƏLUMAT VƏ SƏVİYYƏ KOMUTLARI",
+        title="📊 YENİLMEZ - MƏLUMAT VƏ SƏVİYYƏ",
         description="Statistika və səviyyə izləmə əmrləri:",
         color=0xffd700
     )
-    embed4.add_field(name="r?ping", value="Botun serverlə əlaqə sürətini (ms) ölçür.", inline=False)
-    embed4.add_field(name="r?seviye [istifadəçi]", value="10.000 səviyyəlik sistemdə cari səviyyəni və XP-ni göstərir.", inline=False)
-    embed4.set_footer(text="YENİLMEZ Bot © 2026 | Bütün əmrlər tam işlək vəziyyətdədir ⚡")
+    embed3.add_field(name="r?ping", value="Botun serverlə əlaqə sürətini (ms) ölçür.", inline=False)
+    embed3.add_field(name="r?level [istifadəçi]", value="10.000 səviyyəlik sistemdə cari səviyyəni və XP-ni göstərir.", inline=False)
+    embed3.set_footer(text="YENİLMEZ Bot © 2026 | Bütün əmrlər tam işlək vəziyyətdədir ⚡")
 
-    # Hamısını ardıcıl olaraq göndər ki, hər komut haqqında ayrı-ayrı məlumat görünsün!
     await ctx.send(embed=embed1)
     await ctx.send(embed=embed2)
     await ctx.send(embed=embed3)
-    await ctx.send(embed=embed4)
 
-# ---- Moderasiya Əmrləri ----
+# ---- Moderasiya Əmrləri (İngiliscə Adlar) ----
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban(ctx, member: discord.Member, *, reason=None):
@@ -208,156 +189,93 @@ async def unmute(ctx, member: discord.Member):
 async def warn(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     await ctx.send(f"⚠️ {member.mention} xəbərdar edildi! Səbəb: {reason}")
 
-# ---- Kanal & Səs İdarəetməsi ----
-@bot.command(name="kanalac")
-@commands.has_permissions(manage_channels=True)
-async def kanalac(ctx, *, isim):
-    await ctx.guild.create_text_channel(isim)
-    await ctx.send(f"✅ `{isim}` adlı mətn kanalı yaradıldı.")
-
-@bot.command(name="kanalsil")
-@commands.has_permissions(manage_channels=True)
-async def kanalsil(ctx, channel: discord.TextChannel = None):
-    channel = channel or ctx.channel
-    await channel.delete()
-
-@bot.command(name="kanalbagla")
-@commands.has_permissions(manage_channels=True)
-async def kanalbagla(ctx):
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
-    await ctx.send("🔒 Bu kanal yazışmaya bağlandı.")
-
-@bot.command(name="kanalas")
-@commands.has_permissions(manage_channels=True)
-async def kanalas(ctx):
-    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
-    await ctx.send("🔓 Bu kanal yazışmaya açıldı.")
-
-@bot.command(name="kanalgizle")
-@commands.has_permissions(manage_channels=True)
-async def kanalgizle(ctx):
-    await ctx.channel.set_permissions(ctx.guild.default_role, read_messages=False)
-    await ctx.send("👻 Bu kanal hamıdan gizlətildi!")
-
-@bot.command(name="kanalgoster")
-@commands.has_permissions(manage_channels=True)
-async def kanalgoster(ctx):
-    await ctx.channel.set_permissions(ctx.guild.default_role, read_messages=True)
-    await ctx.send("👀 Bu kanal yenidən hər kəsə göstərildi.")
-
-@bot.command(name="sesgizle")
-@commands.has_permissions(manage_channels=True)
-async def sesgizle(ctx, channel: discord.VoiceChannel):
-    await channel.set_permissions(ctx.guild.default_role, connect=False)
-    await ctx.send(f"🔇 `{channel.name}` səs kanalı gizlətildi.")
-
-@bot.command(name="sesgoster")
-@commands.has_permissions(manage_channels=True)
-async def sesgoster(ctx, channel: discord.VoiceChannel):
-    await channel.set_permissions(ctx.guild.default_role, connect=True)
-    await ctx.send(f"🔊 `{channel.name}` səs kanalı açıldı.")
-
-@bot.command(name="yavasmod")
-@commands.has_permissions(manage_channels=True)
-async def yavasmod(ctx, seconds: int):
-    await ctx.channel.edit(slowmode_delay=seconds)
-    await ctx.send(f"⏱️ Kanalın yavaş modu `{seconds}` saniyə edildi.")
-
-@bot.command(name="sil")
+@bot.command(name="clear")
 @commands.has_permissions(manage_messages=True)
-async def sil(ctx, amount: int = 5):
+async def clear(ctx, amount: int = 5):
     await ctx.message.delete()
     deleted = await ctx.channel.purge(limit=amount)
     await ctx.send(f"🧹 `{len(deleted)}` dənə mesaj təmizləndi!", delete_after=3)
 
-# ---- Rol & Elan Əmrləri ----
-@bot.command(name="rolver")
+# ---- Kanal & Səs İdarəetməsi (İngiliscə Adlar & Nuke) ----
+@bot.command(name="createchannel")
+@commands.has_permissions(manage_channels=True)
+async def createchannel(ctx, *, isim):
+    await ctx.guild.create_text_channel(isim)
+    await ctx.send(f"✅ `{isim}` adlı mətn kanalı yaradıldı.")
+
+@bot.command(name="deletechannel")
+@commands.has_permissions(manage_channels=True)
+async def deletechannel(ctx, channel: discord.TextChannel = None):
+    channel = channel or ctx.channel
+    await channel.delete()
+
+@bot.command(name="lock")
+@commands.has_permissions(manage_channels=True)
+async def lock(ctx):
+    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
+    await ctx.send("🔒 Bu kanal yazışmaya bağlandı.")
+
+@bot.command(name="unlock")
+@commands.has_permissions(manage_channels=True)
+async def unlock(ctx):
+    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
+    await ctx.send("🔓 Bu kanal yazışmaya açıldı.")
+
+@bot.command(name="hide")
+@commands.has_permissions(manage_channels=True)
+async def hide(ctx):
+    await ctx.channel.set_permissions(ctx.guild.default_role, read_messages=False)
+    await ctx.send("👻 Bu kanal hamıdan gizlətildi!")
+
+@bot.command(name="reveal")
+@commands.has_permissions(manage_channels=True)
+async def reveal(ctx):
+    await ctx.channel.set_permissions(ctx.guild.default_role, read_messages=True)
+    await ctx.send("👀 Bu kanal yenidən hər kəsə göstərildi.")
+
+@bot.command(name="slowmode")
+@commands.has_permissions(manage_channels=True)
+async def slowmode(ctx, seconds: int):
+    await ctx.channel.edit(slowmode_delay=seconds)
+    await ctx.send(f"⏱️ Kanalın yavaş modu `{seconds}` saniyə edildi.")
+
+@bot.command(name="nuke")
+@commands.has_permissions(manage_channels=True)
+async def nuke(ctx):
+    channel = ctx.channel
+    position = channel.position
+    new_channel = await channel.clone(reason="Nuke command executed")
+    await channel.delete()
+    await new_channel.edit(position=position)
+    await new_channel.send("💥 Kanal uğurla təmizləndi (Nuke atıldı)!")
+
+# ---- Rol & Elan Əmrləri (İngiliscə Adlar) ----
+@bot.command(name="giverole")
 @commands.has_permissions(manage_roles=True)
-async def rolver(ctx, member: discord.Member, role: discord.Role):
+async def giverole(ctx, member: discord.Member, role: discord.Role):
     await member.add_roles(role)
     await ctx.send(f"✅ {member.mention} istifadəçisinə `{role.name}` rolu verildi.")
 
-@bot.command(name="rolal")
+@bot.command(name="takerole")
 @commands.has_permissions(manage_roles=True)
-async def rolal(ctx, member: discord.Member, role: discord.Role):
+async def takerole(ctx, member: discord.Member, role: discord.Role):
     await member.remove_roles(role)
     await ctx.send(f"❌ {member.mention} istifadəçisindən `{role.name}` rolu alındı.")
 
-@bot.command(name="duyuru")
+@bot.command(name="announcement")
 @commands.has_permissions(administrator=True)
-async def duyuru(ctx, *, mesaj):
+async def announcement(ctx, *, mesaj):
     await ctx.message.delete()
     embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xff9900)
     await ctx.send(embed=embed)
-
-@bot.command(name="anket")
-async def anket(ctx, *, soru):
-    await ctx.message.delete()
-    msg = await ctx.send(embed=discord.Embed(title="📊 ANKET", description=soru, color=0x0099ff))
-    await msg.add_reaction("👍")
-    await msg.add_reaction("👎")
-
-# ---- Əyləncə & Zarafat Əmrləri ----
-@bot.command(name="zarafat")
-async def zarafat(ctx):
-    zarafatlar = [
-        "Məktəbdə müəllim şagirdə deyir: 'De görüm hara gedirsən?' Şagird: 'Evə müəllim, onsuz da dərs bitdi!'",
-        "Kompüter donanda niyə pəncərədən baxmır? Çünki ekran çərçivəsində qalır! 😂",
-        "İnternetim o qədər zəifdir ki, Google-da axtarış verəndən sonra qocalıb ölürəm."
-    ]
-    await ctx.send(f"🤖 {random.choice(zarafatlar)}")
-
-@bot.command(name="sevgi")
-async def sevgi(ctx, *, kishi: str):
-    await ctx.send(f"❤️ **{ctx.author.name}** ilə **{kishi}** uyğunluğu: **%{random.randint(40, 100)}** 🥰")
-
-@bot.command(name="hacklə")
-async def hackle(ctx, member: discord.Member):
-    await ctx.send(f"💻 {member.mention} hack olunur... IP: `192.168.0.5` | Şifrə: `yenilmez_123` 🕶️")
-
-@bot.command(name="mənasız")
-async def menasiz(ctx):
-    await ctx.send(f"🧠 Fəlsəfə: {random.choice(['Su içmək sağlamlığa xeyirlidir.', 'Əgər saatda 60 km gedirsənsə, 1 saata 60 km getmisən.'])}")
-
-@bot.command(name="ayıp")
-async def ayip(ctx):
-    await ctx.send(f"😳 Ayıp ayıp, {ctx.author.mention}!")
-
-@bot.command(name="tiryaki")
-async def tiryaki(ctx):
-    await ctx.send("🚬 Çəkmə qardaş, ciyərlərinə yazığın gəl!")
-
-@bot.command(name="falbax")
-async def falbax(ctx):
-    await ctx.send(f"🔮 Falın: {random.choice(['Bu həftə cibin pul dolacaq.', 'Qarşıdan böyük uğur gəlir.'])}")
-
-@bot.command(name="dava")
-async def dava(ctx, *, kimle):
-    await ctx.send(f"🥊 {ctx.author.mention} və **{kimle}** arasında dava başladı! 💥")
-
-@bot.command(name="kral")
-async def kral(ctx):
-    await ctx.send(f"👑 Bu serverin əsl kralı **{ctx.author.name}**-dir!")
-
-@bot.command(name="zarat")
-async def zarat(ctx):
-    await ctx.send(f"🎲 Zər: **{random.randint(1, 6)}**")
-
-@bot.command(name="yazitura")
-async def yazitura(ctx):
-    await ctx.send(f"🪙 Nəticə: **{random.choice(['Yazı', 'Tərəf'])}**")
-
-@bot.command(name="məsləhət")
-async def meslehet(ctx):
-    await ctx.send(f"💡 Məsləhət: {random.choice(['Yuxun gəlirsə yat.', 'Hər zaman özün ol.'])}")
 
 # ---- Məlumat Əmrləri ----
 @bot.command(name="ping")
 async def ping(ctx):
     await ctx.send(f"🏓 Gecikmə: `{round(bot.latency * 1000)}ms`")
 
-@bot.command(name="seviye")
-async def seviye(ctx, member: discord.Member = None):
+@bot.command(name="level")
+async def level(ctx, member: discord.Member = None):
     member = member or ctx.author
     data = user_xp.get(member.id, {"xp": 0, "level": 1})
     await ctx.send(f"📈 {member.mention} səviyyəsi: **{data['level']} / 10000** (XP: {data['xp']})")
@@ -367,4 +285,4 @@ if __name__ == "__main__":
     token = os.environ.get("TOKEN")
     if token:
         bot.run(token)
-            
+                
