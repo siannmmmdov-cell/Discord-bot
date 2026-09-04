@@ -33,6 +33,7 @@ SAHIB_ID = 64101496631250258
 user_xp = {}
 spam_takip = {}
 uyari_sayi = {}
+auto_role_name = "Üzv"  # Avtomatik veriləcək rol adı
 
 @bot.event
 async def on_ready():
@@ -49,7 +50,21 @@ async def on_reaction_add(reaction, user):
     except:
         pass
 
-# ==================== QABAQCIL SPAM & TƏHLÜKƏSİZLİK ====================
+# ==================== AVTO-ROL (YENİ ÜZV QOŞULANDA) ====================
+@bot.event
+async def on_member_join(member):
+    channel = member.guild.system_channel
+    if channel:
+        await channel.send(f"Salam, {member.mention}! Xoş gəlmisən.")
+    
+    try:
+        role = discord.utils.get(member.guild.roles, name=auto_role_name)
+        if role:
+            await member.add_roles(role)
+    except:
+        pass
+
+# ==================== QABAQCIL SPAM, SALAM & ÇƏTİNLƏŞƏN XP SİSTEMİ ====================
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -86,7 +101,7 @@ async def on_message(message):
             pass
         return
 
-    # Sadə Salamlaşma
+    # Səmimi Salamlaşma
     icerik = message.content.lower()
     if icerik in ["salam", "salamlar", "as", "aleykümsalam", "hi", "hello"]:
         try:
@@ -94,24 +109,25 @@ async def on_message(message):
         except:
             pass
 
-    # 10,000 Level XP Sistemi
+    # Getdikcə çətinləşən Level / XP Sistemi
     if author_id not in user_xp:
         user_xp[author_id] = {"xp": 0, "level": 1}
 
     user_xp[author_id]["xp"] += 15
-    gerekli_xp = user_xp[author_id]["level"] * 150
+    # Hər səviyyə atladıqca tələb olunan XP formulu çətinləşir
+    gerekli_xp = user_xp[author_id]["level"] * 200 + 100
 
     if user_xp[author_id]["xp"] >= gerekli_xp and user_xp[author_id]["level"] < 10000:
         user_xp[author_id]["xp"] -= gerekli_xp
         user_xp[author_id]["level"] += 1
         try:
-            await message.channel.send(f"🎉 Təbriklər {message.author.mention}, səviyyə atladın! Yeni səviyyən: **{user_xp[author_id]['level']} / 10000** 🚀")
+            await message.channel.send(f"🎉 Təbriklər {message.author.mention}, harada olmağından asılı olmayaraq səviyyə atladın! Yeni səviyyən: **{user_xp[author_id]['level']} / 10000** 🚀")
         except:
             pass
 
     await bot.process_commands(message)
 
-# ==================== R?BOT PANELİ (70+ KOMANDA AÇIqlaması) ====================
+# ==================== R?BOT PANELİ (YENİ KOMANDALAR DA DAXİLDİR) ====================
 
 @bot.command(name="bot")
 async def bot_panel(ctx):
@@ -123,24 +139,22 @@ async def bot_panel(ctx):
     embed1.add_field(name="r?ban / r?unban", value="İstifadəçini ban edir və ya banını açır.", inline=False)
     embed1.add_field(name="r?kick", value="İstifadəçini serverdən qovur.", inline=False)
     embed1.add_field(name="r?mute / r?unmute", value="Zaman aşımı verir və ya qaldırır.", inline=False)
-    embed1.add_field(name="r?warn / r?warnings", value="İstifadəçiyə xəbərdarlıq edir və sayına baxır.", inline=False)
-    embed1.add_field(name="r?clear / r?purge", value="Mesajları kütləvi təmizləyir.", inline=False)
-    embed1.add_field(name="r?lockall / r?unlockall", value="Bütün serveri kilidləyir/açır.", inline=False)
+    embed1.add_field(name="r?warn", value="İstifadəçiyə xəbərdarlıq edir.", inline=False)
+    embed1.add_field(name="r?clear", value="Mesajları kütləvi təmizləyir.", inline=False)
+    embed1.add_field(name="r?lockall / r?unlockall", value="Bütün serverdəki kanalları kilidləyir/açır.", inline=False)
 
     embed2 = discord.Embed(
-        title="⚙️ YENİLMEZ - KANAL VƏ KATEGORİYA İDARƏSİ",
-        description="Kanalların yaradılması, gizlədilməsi və silinməsi:",
+        title="⚙️ YENİLMEZ - KANAL VƏ SİFIRLAMA İDARƏSİ",
+        description="Kanalların idarə edilməsi, nuke və təmizlənməsi:",
         color=0x00ff00
     )
     embed2.add_field(name="r?createchannel / r?createvoice", value="Mətn və ya səs kanalı yaradır.", inline=False)
     embed2.add_field(name="r?deletechannel", value="Cari kanalı silir.", inline=False)
     embed2.add_field(name="r?lock / r?unlock", value="Kanalı yazışmaya bağlayır/açır.", inline=False)
     embed2.add_field(name="r?hide / r?reveal", value="Kanalı hamıdan gizlədir/göstərir.", inline=False)
-    embed2.add_field(name="r?sesgizle / r?sesgoster", value="Səs kanalını bağlayır/açır.", inline=False)
     embed2.add_field(name="r?slowmode", value="Kanalda yavaş rejim tənzimləyir.", inline=False)
-    embed2.add_field(name="r?nuke", value="Kanalı klonlayıb təmiz səhifə açır.", inline=False)
+    embed2.add_field(name="r?nuke", value="Kanalı silmədən daxilindəki bütün mesajları təmizləyib sıfırlayır.", inline=False)
     embed2.add_field(name="r?rename", value="Kanalın adını dəyişdirir.", inline=False)
-    embed2.add_field(name="r?topic", value="Kanalın açıqlamasını (topic) dəyişir.", inline=False)
 
     embed3 = discord.Embed(
         title="👑 YENİLMEZ - ROL VƏ İSTİFADƏÇİ İDARƏSİ",
@@ -148,26 +162,28 @@ async def bot_panel(ctx):
         color=0x0099ff
     )
     embed3.add_field(name="r?giverole / r?takerole", value="Rollar verir və ya geri alır.", inline=False)
-    embed3.add_field(name="r?createrole", value="Yeni rol yaradır.", inline=False)
-    embed3.add_field(name="r?deleterole", value="Rolü silir.", inline=False)
-    embed3.add_field(name="r?rolecolor", value="Rolün rəngini dəyişir.", inline=False)
+    embed3.add_field(name="r?createrole / r?deleterole", value="Rol yaradır və ya silir.", inline=False)
     embed3.add_field(name="r?userinfo", value="İstifadəçi haqqında ətraflı məlumat verir.", inline=False)
     embed3.add_field(name="r?avatar", value="İstifadəçinin profil şəklini göstərir.", inline=False)
     embed3.add_field(name="r?botinfo", value="Botun ümumi sistem məlumatlarını göstərir.", inline=False)
 
     embed4 = discord.Embed(
-        title="📊 YENİLMEZ - SERVER, SİSTEM VƏ XP",
-        description="Server statistikaları, elanlar və səviyyə sistemi:",
+        title="📊 YENİLMEZ - XÜSUSİ ALƏTLƏR, ÇƏKİLİŞ & XP",
+        description="Banner, səsvermə, çəkiliş və səviyyə sistemləri:",
         color=0xffd700
     )
+    embed4.add_field(name="r?embed <başlıq> | <mətn>", value="Xüsusi qəşəng embed mesaj göndərir.", inline=False)
+    embed4.add_field(name="r?suggestion <təklif>", value="Server üçün təklif paneli yaradır.", inline=False)
+    embed4.add_field(name="r?serverlock", value="Serveri yeni qoşulmalara qapadır/açır.", inline=False)
     embed4.add_field(name="r?serverinfo", value="Serverin bütün detallarını göstərir.", inline=False)
     embed4.add_field(name="r?ping", value="Botun gecikmə sürətini ölçür.", inline=False)
-    embed4.add_field(name="r?level", value="10.000 səviyyəlik sistemdə XP və level göstərir.", inline=False)
+    embed4.add_field(name="r?level", value="Getdikcə çətinləşən sistemdə XP və level göstərir.", inline=False)
     embed4.add_field(name="r?announcement", value="Serverdə diqqət çəkən rəsmi elan paylaşır.", inline=False)
-    embed4.add_field(name="r?poll", value="Anket yaradır.", inline=False)
-    embed4.add_field(name="r?say", value="Botun dilindən istədiyin mətni yazdırır.", inline=False)
-    embed4.add_field(name="r?membercount", value="Serverdəki toplam üzv sayını göstərir.", inline=False)
-    embed4.set_footer(text="YENİLMEZ Bot © 2026 | Bütün 70+ funksiya aktivdir ⚡")
+    embed4.add_field(name="r?banner / r?serverbanner", value="İstifadəçi və ya server bannerini göstərir.", inline=False)
+    embed4.add_field(name="r?poll <sual>", value="Avtomatik reaksiyalı anket/səsvermə açır.", inline=False)
+    embed4.add_field(name="r?say <mətn>", value="Yazdığın mətni birbaşa botun dilindən göndərir.", inline=False)
+    embed4.add_field(name="r?çekiliş <gün> <hədiyyə>", value="Məs: r?çekiliş 2 nitro - 2 gün sonra avtomatik qalib seçir.", inline=False)
+    embed4.set_footer(text="YENİLMEZ Bot © 2026 | Bütün funksiyalar tam işlək vəziyyətdədir ⚡")
 
     await ctx.send(embed=embed1)
     await ctx.send(embed=embed2)
@@ -223,13 +239,7 @@ async def clear(ctx, amount: int = 5):
     deleted = await ctx.channel.purge(limit=amount)
     await ctx.send(f"🧹 `{len(deleted)}` dənə mesaj təmizləndi!", delete_after=3)
 
-@bot.command(name="purge")
-@commands.has_permissions(manage_messages=True)
-async def purge(ctx, amount: int = 10):
-    await ctx.message.delete()
-    await ctx.channel.purge(limit=amount)
-
-# ==================== 2. KANAL VƏ KATEGORİYA İDARƏSİ ====================
+# ==================== 2. KANAL VƏ SİFIRLAMA İDARƏSİ ====================
 @bot.command(name="createchannel")
 @commands.has_permissions(manage_channels=True)
 async def createchannel(ctx, *, isim):
@@ -272,18 +282,6 @@ async def reveal(ctx):
     await ctx.channel.set_permissions(ctx.guild.default_role, read_messages=True)
     await ctx.send("👀 Bu kanal yenidən hər kəsə göstərildi.")
 
-@bot.command(name="sesgizle")
-@commands.has_permissions(manage_channels=True)
-async def sesgizle(ctx, channel: discord.VoiceChannel):
-    await channel.set_permissions(ctx.guild.default_role, connect=False)
-    await ctx.send(f"🔇 `{channel.name}` səs kanalı girişə bağlandı.")
-
-@bot.command(name="sesgoster")
-@commands.has_permissions(manage_channels=True)
-async def sesgoster(ctx, channel: discord.VoiceChannel):
-    await channel.set_permissions(ctx.guild.default_role, connect=True)
-    await ctx.send(f"🔊 `{channel.name}` səs kanalı girişə açıldı.")
-
 @bot.command(name="slowmode")
 @commands.has_permissions(manage_channels=True)
 async def slowmode(ctx, seconds: int):
@@ -293,24 +291,16 @@ async def slowmode(ctx, seconds: int):
 @bot.command(name="nuke")
 @commands.has_permissions(manage_channels=True)
 async def nuke(ctx):
-    channel = ctx.channel
-    position = channel.position
-    new_channel = await channel.clone(reason="Nuke command executed")
-    await channel.delete()
-    await new_channel.edit(position=position)
-    await new_channel.send("💥 Kanal uğurla təmizləndi (Nuke atıldı)!")
+    # Kanalı KLONLAMIR, yalnız kanaldakı mesajları təmizləyib sıfırlayır
+    await ctx.message.delete()
+    deleted = await ctx.channel.purge(limit=None)
+    await ctx.send(f"💥 Kanal silmədən sıfırlandı! Toplam `{len(deleted)}` mesaj təmizləndi.", delete_after=5)
 
 @bot.command(name="rename")
 @commands.has_permissions(manage_channels=True)
 async def rename(ctx, *, yeni_ad):
     await ctx.channel.edit(name=yeni_ad)
     await ctx.send(f"✏️ Kanalın adı dəyişdirildi: `{yeni_ad}`")
-
-@bot.command(name="topic")
-@commands.has_permissions(manage_channels=True)
-async def topic(ctx, *, yeni_topic):
-    await ctx.channel.edit(topic=yeni_topic)
-    await ctx.send("📝 Kanal açıqlaması yeniləndi.")
 
 # ==================== 3. ROL VƏ İSTİFADƏÇİ İDARƏSİ ====================
 @bot.command(name="giverole")
@@ -361,43 +351,76 @@ async def botinfo(ctx):
     embed.add_field(name="Status", value="Aktiv & Qorumalı ⚡", inline=False)
     await ctx.send(embed=embed)
 
-# ==================== 4. SERVER VƏ MƏLUMAT KOMANDALARI ====================
-@bot.command(name="serverinfo")
-async def serverinfo(ctx):
-    guild = ctx.guild
-    embed = discord.Embed(title=f"📊 {guild.name} - Server Statistikası", color=0x3498DB)
-    embed.add_field(name="Üzv Sayı", value=guild.member_count, inline=True)
-    embed.add_field(name="Kanal Sayı", value=len(guild.channels), inline=True)
-    embed.add_field(name="Rol Sayı", value=len(guild.roles), inline=True)
-    embed.set_thumbnail(url=guild.icon.url if guild.icon else None)
-    await ctx.send(embed=embed)
-
-@bot.command(name="membercount")
-async def membercount(ctx):
-    await ctx.send(f"👥 Serverdə ümumi **{ctx.guild.member_count}** üzv var!")
-
-@bot.command(name="ping")
-async def ping(ctx):
-    await ctx.send(f"🏓 Gecikmə: `{round(bot.latency * 1000)}ms`")
-
-@bot.command(name="level")
-async def level(ctx, member: discord.Member = None):
-    member = member or ctx.author
-    data = user_xp.get(member.id, {"xp": 0, "level": 1})
-    await ctx.send(f"📈 {member.mention} səviyyəsi: **{data['level']} / 10000** (XP: {data['xp']})")
-
-@bot.command(name="announcement")
+# ==================== 4. GÜCLÜ İDARƏETMƏ ƏMRDƏRİ (1, 2, 4, 5) ====================
+@bot.command(name="lockall")
 @commands.has_permissions(administrator=True)
-async def announcement(ctx, *, mesaj):
+async def lockall(ctx):
+    for channel in ctx.guild.text_channels:
+        await channel.set_permissions(ctx.guild.default_role, send_messages=False)
+    await ctx.send("🔒 Bütün serverdəki mətn kanalları yazışmaya bağlandı!")
+
+@bot.command(name="unlockall")
+@commands.has_permissions(administrator=True)
+async def unlockall(ctx):
+    for channel in ctx.guild.text_channels:
+        await channel.set_permissions(ctx.guild.default_role, send_messages=True)
+    await ctx.send("🔓 Bütün serverdəki mətn kanalları yazışmaya açıldı!")
+
+@bot.command(name="serverlock")
+@commands.has_permissions(administrator=True)
+async def serverlock(ctx):
+    await ctx.guild.edit(verification_level=discord.VerificationLevel.high)
+    await ctx.send("🚨 Server təhlükəsizlik rejiminə keçirildi (Yüksək doğrulama səviyyəsi aktivdir).")
+
+@bot.command(name="embed")
+@commands.has_permissions(manage_messages=True)
+async def custom_embed(ctx, *, text):
     await ctx.message.delete()
-    embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xff9900)
+    if "|" in text:
+        title, desc = text.split("|", 1)
+        embed = discord.Embed(title=title.strip(), description=desc.strip(), color=0x00ffcc)
+    else:
+        embed = discord.Embed(description=text, color=0x00ffcc)
     await ctx.send(embed=embed)
+
+@bot.command(name="suggestion")
+async def suggestion(ctx, *, teklif):
+    await ctx.message.delete()
+    embed = discord.Embed(title="💡 YENİ TƏKLİF", description=teklif, color=0x9b59b6)
+    embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
+    msg = await ctx.send(embed=embed)
+    await msg.add_reaction("👍")
+    await msg.add_reaction("👎")
+
+# ==================== 5. ƏLAVƏ GÖRÜNTÜ, ÇƏKİLİŞ VƏ SOSİAL KOMANDALAR ====================
+@bot.command(name="banner")
+async def banner(ctx, member: discord.Member = None):
+    member = member or ctx.author
+    user = await bot.fetch_user(member.id)
+    if user.banner:
+        embed = discord.Embed(title=f"🎨 {member.name} - Server Banneri", color=0x9b59b6)
+        embed.set_image(url=user.banner.url)
+        await ctx.send(embed=embed)
+    else:
+        await ctx.send(f"❌ {member.mention} istifadəçisinin xüsusi banneri yoxdur.")
+
+@bot.command(name="serverbanner")
+async def serverbanner(ctx):
+    guild = ctx.guild
+    if guild.banner:
+        embed = discord.Embed(title=f"🖼️ {guild.name} - Server Banneri", color=0x3498DB)
+        embed.set_image(url=guild.banner.url)
+        await ctx.send(embed=embed)
+    else:
+        await ctx.send("❌ Bu serverin xüsusi banner şəkli yoxdur.")
 
 @bot.command(name="poll")
 @commands.has_permissions(manage_messages=True)
 async def poll(ctx, *, soru):
     await ctx.message.delete()
-    msg = await ctx.send(embed=discord.Embed(title="📊 ANKET", description=soru, color=0x0099ff))
+    embed = discord.Embed(title="📊 ANKET / SƏSVERMƏ", description=soru, color=0x2ecc71)
+    embed.set_footer(text=f"Anketi yaradan: {ctx.author.name}")
+    msg = await ctx.send(embed=embed)
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
 
@@ -407,8 +430,47 @@ async def say(ctx, *, mesaj):
     await ctx.message.delete()
     await ctx.send(mesaj)
 
-if __name__ == "__main__":
-    keep_alive()
-    token = os.environ.get("TOKEN")
-    if token:
-        bot.run(token)
+@bot.command(name="çekiliş", aliases=["cekilis"])
+@commands.has_permissions(manage_guild=True)
+async def çekiliş(ctx, zaman_gun: int, *, odul):
+    await ctx.message.delete()
+    saniye = zaman_gun * 86400
+
+    embed = discord.Embed(
+        title="🎉 YENİ ÇƏKİLİŞ! 🎉",
+        description=f"Hədiyyə: **{odul}**\n\nQatılmaq üçün aşağıdakı 🎉 reaksiyasına toxun!\nBitmə müddəti: **{zaman_gun} gün**",
+        color=0xe91e63
+    )
+    embed.set_footer(text=f"Çəkilişi təşkil edən: {ctx.author.name}")
+    
+    mesaj = await ctx.send(embed=embed)
+    await mesaj.add_reaction("🎉")
+
+    await asyncio.sleep(saniye)
+
+    try:
+        yeni_mesaj = await ctx.channel.fetch_message(mesaj.id)
+        reaksiya = discord.utils.get(yeni_mesaj.reactions, emoji="🎉")
+        
+        if reaksiya:
+            istirakcilar = [user async for user in reaksiya.users() if not user.bot]
+            
+            if istirakcilar:
+                qalib = random.choice(istirakcilar)
+                await ctx.send(f"🎊 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldun! 🏆")
+            else:
+                await ctx.send("❌ Çəkilişə heç kim qoşulmadığı üçün qalib seçilmədi.")
+        else:
+            await ctx.send("❌ Çəkiliş zamanı xəta baş verdi.")
+    except Exception as e:
+        await ctx.send(f"❌ Çəkiliş nəticələnərkən xəta yarandı: {e}")
+
+# ==================== 6. SERVER VƏ MƏLUMAT KOMANDALARI ====================
+@bot.command(name="serverinfo")
+async def serverinfo(ctx):
+    guild = ctx.guild
+    embed = discord.Embed(title=f"📊 {guild.name} - Server Statistikası", color=0x3498DB)
+    embed.add_field(name="Üzv Sayı", value=guild.member_count, inline=True)
+    embed.add_field(name="Kanal Sayı", value=len(guild.channels), inline=True)
+    embed.add_field(name="Rol Sayı", value=len(guild.roles), inline=True)
+    embed.set_thumbnail(url=guild.icon.url if guild.icon else 
