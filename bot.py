@@ -42,7 +42,6 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="r?bot | Professional Management Suite 👑"))
 
 # ==================== 1. EMOJİ REAKSİYA SİSTEMİ ====================
-# Botun atdığı mesajlara avtomatik reaksiyaları əks etdirir
 @bot.event
 async def on_reaction_add(reaction, user):
     if user.bot:
@@ -72,7 +71,6 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # Sahib və Adminlər spamdan və salamlaşmadan azaddır
     if message.author.id == SAHIB_ID or message.author.guild_permissions.administrator:
         await bot.process_commands(message)
         return
@@ -80,14 +78,14 @@ async def on_message(message):
     author_id = message.author.id
     sindi = time.time()
 
-    # ==================== Qabaqcıl Spam Qoruması ====================
+    # Spam Qoruması
     if author_id not in spam_takip:
         spam_takip[author_id] = []
 
-    spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 3] # 3 saniyəlik pəncərə
+    spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 3]
     spam_takip[author_id].append(sindi)
 
-    if len(spam_takip[author_id]) >= 5: # 3 saniyədə 5 mesaj spama gedir
+    if len(spam_takip[author_id]) >= 5:
         try:
             if author_id not in uyari_sayi:
                 uyari_sayi[author_id] = 0
@@ -105,7 +103,7 @@ async def on_message(message):
             pass
         return
 
-    # ==================== Səmimi Salamlaşma ====================
+    # Səmimi Salamlaşma
     icerik = message.content.lower()
     if icerik in ["salam", "salamlar", "as", "aleykümsalam", "hi", "hello"]:
         try:
@@ -113,14 +111,11 @@ async def on_message(message):
         except:
             pass
 
-    # ==================== Getdikcə Çətinləşən XP / Level Sistemi ====================
+    # XP & Level Sistemi
     if author_id not in user_xp:
         user_xp[author_id] = {"xp": 0, "level": 1}
 
-    # Hər mesaj üçün 15 XP verir
     user_xp[author_id]["xp"] += 15
-    
-    # Səviyyə atlamaq üçün tələb olunan XP formulu (çətinləşən)
     gerekli_xp = user_xp[author_id]["level"] * 300 + 200
 
     if user_xp[author_id]["xp"] >= gerekli_xp:
@@ -133,8 +128,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# ==================== 4. R?BOT PANELİ (MƏLUMAT ƏMRİ) ====================
-
+# ==================== 4. R?BOT PANELİ ====================
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed1 = discord.Embed(
@@ -183,7 +177,7 @@ async def bot_panel(ctx):
     embed4.add_field(name="r?serverlock", value="Serveri yeni qoşulmalara qapadır/açır.", inline=True)
     embed4.add_field(name="r?serverinfo", value="Serverin bütün detallarını göstərir.", inline=True)
     embed4.add_field(name="r?ping", value="Botun gecikmə sürətini ölçür.", inline=True)
-    embed4.add_field(name="r?level", value="XP və level göstərir (getdikcə çətinləşən).", inline=True)
+    embed4.add_field(name="r?level", value="XP və level göstərir.", inline=True)
     embed4.add_field(name="r?announcement", value="Serverdə rəsmi elan paylaşır.", inline=True)
     embed4.add_field(name="r?banner / r?serverbanner", value="İstifadəçi və ya server bannerini göstərir.", inline=True)
     embed4.add_field(name="r?poll <sual>", value="Avtomatik reaksiyalı anket açır.", inline=True)
@@ -245,7 +239,7 @@ async def clear(ctx, amount: int = 5):
     deleted = await ctx.channel.purge(limit=amount)
     await ctx.send(f"🧹 `{len(deleted)}` dənə mesaj təmizləndi!", delete_after=3)
 
-# ==================== 6. KANAL VƏ SİFIRLAMA İDARƏSİ ====================
+# ==================== 6. KANAL VƏ ROL İDARƏSİ ====================
 @bot.command(name="createchannel")
 @commands.has_permissions(manage_channels=True)
 async def createchannel(ctx, *, isim):
@@ -267,8 +261,7 @@ async def deletechannel(ctx, channel: discord.TextChannel = None):
 @bot.command(name="lock")
 @commands.has_permissions(manage_channels=True)
 async def lock(ctx):
-    await ctx.channel.set_permissions(
-    ctx.guild.default_role, send_messages=False)
+    await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=False)
     await ctx.send("🔒 Bu kanal yazışmaya bağlandı.")
 
 @bot.command(name="unlock")
@@ -499,18 +492,7 @@ async def ping(ctx):
 async def level(ctx, member: discord.Member = None):
     member = member or ctx.author
     data = user_xp.get(member.id, {"xp": 0, "level": 1})
-    await ctx.send(f"📈 {member.mention} səviyyəsi: **{data['level']} / 10000** (XP: {data['xp']})")
+    await ctx.send(f"📈 {member.mention} səviyyəsi: **{data['level']}** (XP: {data['xp']})")
 
 @bot.command(name="announcement")
-@commands.has_permissions(administrator=True)
-async def announcement(ctx, *, mesaj):
-    await ctx.message.delete()
-    embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xff9900)
-    await ctx.send(embed=embed)
-
-if __name__ == "__main__":
-    keep_alive()
-    token = os.environ.get("TOKEN")
-    if token:
-        bot.run(token)
-             
+@commands
