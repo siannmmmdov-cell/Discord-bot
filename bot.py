@@ -146,7 +146,7 @@ async def bot_panel(ctx):
     embed2.add_field(name="r?lock / r?unlock", value="Kanalı yazışmaya bağlayır/açır.", inline=True)
     embed2.add_field(name="r?hide / r?reveal", value="Kanalı gizlədir/göstərir.", inline=True)
     embed2.add_field(name="r?slowmode", value="Kanalda yavaş rejim tənzimləyir.", inline=True)
-    embed2.add_field(name="r?nuke", value="Kanalı silmədən içini sıfırlayır.", inline=True)
+    embed2.add_field(name="r?nuke", value="Kanalı klonlayıb sıfırdan yaradır.", inline=True)
     embed2.add_field(name="r?rename", value="Kanalın adını dəyişir.", inline=True)
 
     embed3 = discord.Embed(
@@ -282,15 +282,12 @@ async def slowmode(ctx, seconds: int):
 @bot.command(name="nuke")
 @commands.has_permissions(manage_channels=True)
 async def nuke(ctx):
-    try:
-        await ctx.message.delete()
-        deleted = await ctx.channel.purge(limit=None)
-        await ctx.send(f"💥 Kanal silmədən sıfırlandı! Toplam `{len(deleted)}` mesaj təmizləndi.", delete_after=5)
-    except discord.HTTPException as e:
-        if e.code == 50074:
-            await ctx.send("❌ Bu kanal İcma (Community) serverinin əsas kanalıdır, təmizlənməsinə Discord icazə vermir.", delete_after=7)
-        else:
-            raise e
+    kanal = ctx.channel
+    konum = kanal.position
+    yeni_kanal = await kanal.clone(reason="Nuke əmri ilə sıfırlandı")
+    await kanal.delete()
+    await yeni_kanal.edit(position=konum)
+    await yeni_kanal.send("💥 Kanal uğurla nuke olundu, hər şey sıfırdan başladı!", delete_after=5)
 
 @bot.command(name="rename")
 @commands.has_permissions(manage_channels=True)
@@ -456,7 +453,7 @@ async def cekilis(ctx, zaman_gun: int, *, odul):
             
             if istirakcilar:
                 qalib = random.choice(istirakcilar)
-                await ctx.send(f"🎊 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldون! 🏆")
+                await ctx.send(f"🎊 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldun! 🏆")
             else:
                 await ctx.send("❌ Çəkilişə heç kim qoşulmadığı üçün qalib seçilmədi.")
         else:
