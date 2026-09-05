@@ -523,4 +523,14 @@ async def level(ctx, member: discord.Member = None):
 @commands.has_permissions(administrator=True)
 async def announcement(ctx, *, mesaj):
     await ctx.message.delete()
-    e
+    embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xFF9900)
+    await ctx.send(embed=embed)
+
+if __name__ == "__main__":
+    keep_alive()
+    token = os.environ.get("TOKEN")
+    if token:
+        bot.run(token)
+    else:
+        print("❌ Xəbərdarlıq: TOKEN tapılmadı!")
+        
