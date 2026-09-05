@@ -5,6 +5,7 @@ import asyncio
 import os
 import random
 import time
+import re
 from flask import Flask
 from threading import Thread
 
@@ -34,6 +35,7 @@ SAHIB_ID = 64101496631250258
 user_xp = {}
 spam_takip = {}
 uyari_sayi = {}
+son_qosulmalar = []
 auto_role_name = "Üzv"
 
 @bot.event
@@ -46,7 +48,6 @@ async def on_reaction_add(reaction, user):
     if user.bot:
         return
     
-    # Təkcə sənin (SAHIB_ID) basdığın reaksiyalarda işləsin:
     if user.id == SAHIB_ID:
         try:
             await reaction.message.add_reaction(reaction.emoji)
@@ -55,6 +56,18 @@ async def on_reaction_add(reaction, user):
 
 @bot.event
 async def on_member_join(member):
+    global son_qosulmalar
+    sindi = time.time()
+    son_qosulmalar.append(sindi)
+    son_qosulmalar = [t for t in son_qosulmalar if sindi - t < 10]
+
+    if len(son_qosulmalar) >= 4:
+        try:
+            await member.guild.edit(verification_level=discord.VerificationLevel.high)
+            print("🚨 Kütləvi bot hücumu (Raid) aşkmlandı, server təhlükəsizlik rejiminə keçirildi!")
+        except:
+            pass
+
     channel = member.guild.system_channel
     if channel:
         await channel.send(f"Salam, {member.mention}! Xoş gəlmisən, aramızda yerin hazır idi.")
@@ -77,6 +90,23 @@ async def on_message(message):
 
     author_id = message.author.id
     sindi = time.time()
+    icerik = message.content
+    icerik_lower = icerik.lower()
+
+    if "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or icerik.startswith("/"):
+        try:
+            await message.delete()
+            return
+        except:
+            pass
+
+    qeribe_simvol_sayi = len(re.findall(r'[\/\\#@\$\%\^\&\*\(\)\[\]\{\}\|]', icerik))
+    if qeribe_simvol_sayi > 3 or ("http" in icerik_lower and len(icerik) < 15):
+        try:
+            await message.delete()
+            return
+        except:
+            pass
 
     if author_id not in spam_takip:
         spam_takip[author_id] = []
@@ -84,7 +114,7 @@ async def on_message(message):
     spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 3]
     spam_takip[author_id].append(sindi)
 
-    if len(spam_takip[author_id]) >= 5:
+    if len(spam_takip[author_id]) >= 4:
         try:
             if author_id not in uyari_sayi:
                 uyari_sayi[author_id] = 0
@@ -93,17 +123,16 @@ async def on_message(message):
             await message.delete()
 
             if uyari_sayi[author_id] == 1:
-                await message.channel.send(f"⚠️ {message.author.mention}, spam etmə! İlk xəbərdarlıq.", delete_after=5)
+                await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq sürətli mesaj yazırsan! İlk xəbərdarlıq.", delete_after=5)
             elif uyari_sayi[author_id] >= 2:
-                await message.author.timeout(discord.utils.utcnow() + discord.timedelta(minutes=5), reason="Spam və flood")
+                await message.author.timeout(discord.utils.utcnow() + discord.timedelta(minutes=5), reason="Spam və flood hücumu")
                 await message.channel.send(f"🔇 {message.author.mention}, dayanmadığın üçün 5 dəqiqəlik mute aldın!", delete_after=6)
                 uyari_sayi[author_id] = 0
         except:
             pass
         return
 
-    icerik = message.content.lower()
-    if icerik in ["salam", "salamlar", "as", "aleykümsalam", "hi", "hello"]:
+    if icerik_lower in ["salam", "salamlar", "as", "aleykümsalam", "hi", "hello"]:
         try:
             await message.channel.send(f"Salam, {message.author.mention}! Xoş gəlmisən, səni görməyimizə şadıq! 👋")
         except:
@@ -497,4 +526,4 @@ if __name__ == "__main__":
     token = os.environ.get("TOKEN")
     if token:
         bot.run(token)
-    
+        
