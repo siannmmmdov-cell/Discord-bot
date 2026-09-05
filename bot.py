@@ -45,10 +45,13 @@ async def on_ready():
 async def on_reaction_add(reaction, user):
     if user.bot:
         return
-    try:
-        await reaction.message.add_reaction(reaction.emoji)
-    except:
-        pass
+    
+    # Təkcə sənin (SAHIB_ID) basdığın reaksiyalarda işləsin:
+    if user.id == SAHIB_ID:
+        try:
+            await reaction.message.add_reaction(reaction.emoji)
+        except:
+            pass
 
 @bot.event
 async def on_member_join(member):
