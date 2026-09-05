@@ -28,7 +28,7 @@ intents.members = True
 intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
-intents.webhooks = True  # Webhook nəzarəti üçün
+intents.webhooks = True
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
@@ -83,28 +83,23 @@ async def on_member_join(member):
     except:
         pass
 
-# --- GÜCLƏNDİRİLMİŞ WEBHOOK QORUMASI ---
 @bot.event
 async def on_webhooks_update(channel):
     try:
         webhooks = await channel.webhooks()
         for wh in webhooks:
-            # Əgər webhook-u yaradan bot bizim öz botumuz deyilsə, dərhal sil!
             if wh.user and wh.user.id != bot.user.id:
                 await wh.delete()
                 print(f"Təhlükəli Webhook silindi: {wh.name}")
     except Exception as e:
         print(f"Webhook silinərkən xəta: {e}")
-# ---------------------------------------
 
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Əgər mesajı yazan botdur اما musiqi botu və ya təhlükəsiz botdursa (komandaları işlətsin)
     if message.author.bot:
-        # Amma əgər həmin bot (və ya webhook) içində .gg və ya http linki spamlayırsa, dərhal silinsin!
         icerik_lower = message.content.lower()
         if "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower or ".gg/" in icerik_lower:
             try:
@@ -124,7 +119,6 @@ async def on_message(message):
     icerik = message.content
     icerik_lower = icerik.lower()
 
-    # Link və dəvət qoruması (bütün istifadəçilər üçün)
     if "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower or ".gg/" in icerik_lower:
         try:
             await message.delete()
@@ -475,7 +469,6 @@ async def poll(ctx, *, soru):
 async def say(ctx, *, mesaj):
     await ctx.message.delete()
     await ctx.send(mesaj)
-
 @bot.command(name="cekilis", aliases=["çəkiliş"])
 @commands.has_permissions(manage_guild=True)
 async def cekilis(ctx, zaman_gun: int, *, odul):
@@ -516,7 +509,13 @@ async def serverinfo(ctx):
     guild = ctx.guild
     embed = discord.Embed(title=f"{guild.name} - Server Statistikası", color=0x3498DB)
     embed.add_field(name="Üzv Sayı", value=guild.member_count, inline=True)
-   @bot.command(name="ping")
+    embed.add_field(name="Kanal Sayı", value=len(guild.channels), inline=True)
+    embed.add_field(name="Rol Sayı", value=len(guild.roles), inline=True)
+    if guild.icon:
+        embed.set_thumbnail(url=guild.icon.url)
+    await ctx.send(embed=embed)
+
+@bot.command(name="ping")
 async def ping(ctx):
     await ctx.send(f"🏓 Gecikmə: {round(bot.latency * 1000)}ms")
 
@@ -535,10 +534,5 @@ async def announcement(ctx, *, mesaj):
 
 if __name__ == "__main__":
     keep_alive()
-    token = os.environ.get("TOKEN")
-    if token:
-        bot.run(token)
-    else:
-        print("❌ Xəbərdarlıq: TOKEN tapılmadı!")
+    bot.run(os.environ.get("TOKEN"))
     
-        
