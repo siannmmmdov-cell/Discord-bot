@@ -32,6 +32,7 @@ intents.reactions = True
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
 SAHIB_ID = 64101498631250250
+TOXUNULMAZ_BOTLAR = [651095740390834176, 689766089567109158] # Security və Erensi
 user_xp = {}
 spam_takip = {}
 uyari_sayi = {}
@@ -96,6 +97,11 @@ async def on_webhooks_update(channel):
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
+        return
+
+    # İstisna olunan botlara (Security və Erensi) toxunmuruq
+    if message.author.id in TOXUNULMAZ_BOTLAR:
+        await bot.process_commands(message)
         return
 
     if message.author.bot or "discord.gg/" in message.content.lower() or "discord.com/invite/" in message.content.lower() or "http" in message.content.lower():
@@ -517,13 +523,4 @@ async def level(ctx, member: discord.Member = None):
 @commands.has_permissions(administrator=True)
 async def announcement(ctx, *, mesaj):
     await ctx.message.delete()
-    embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xFF9900)
-    await ctx.send(embed=embed)
-if __name__ == "__main__":
-    keep_alive()
-    token = os.environ.get("TOKEN")
-    if token:
-        bot.run(token)
-    else:
-        print("❌ Xəbərdarlıq: TOKEN tapılmadı!")
-        
+    e
