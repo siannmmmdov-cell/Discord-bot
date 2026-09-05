@@ -28,11 +28,11 @@ intents.members = True
 intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
+intents.webhooks = True  # Webhook nəzarəti üçün
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
 SAHIB_ID = 64101498631250250
-TOXUNULMAZ_BOTLAR = [651095740390834176, 689766089567109158] # Security və Erensi
 user_xp = {}
 spam_takip = {}
 uyari_sayi = {}
@@ -83,32 +83,36 @@ async def on_member_join(member):
     except:
         pass
 
-# --- WEBHOOK QORUMASI ---
+# --- GÜCLƏNDİRİLMİŞ WEBHOOK QORUMASI ---
 @bot.event
 async def on_webhooks_update(channel):
     try:
         webhooks = await channel.webhooks()
         for wh in webhooks:
-            await wh.delete()
+            # Əgər webhook-u yaradan bot bizim öz botumuz deyilsə, dərhal sil!
+            if wh.user and wh.user.id != bot.user.id:
+                await wh.delete()
+                print(f"Təhlükəli Webhook silindi: {wh.name}")
     except Exception as e:
         print(f"Webhook silinərkən xəta: {e}")
-# -------------------------
+# ---------------------------------------
 
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
-    # İstisna olunan botlara (Security və Erensi) toxunmuruq
-    if message.author.id in TOXUNULMAZ_BOTLAR:
-        await bot.process_commands(message)
-        return
-
-    if message.author.bot or "discord.gg/" in message.content.lower() or "discord.com/invite/" in message.content.lower() or "http" in message.content.lower():
-        try:
-            await message.delete()
-        except:
-            pass
+    # Əgər mesajı yazan botdur اما musiqi botu və ya təhlükəsiz botdursa (komandaları işlətsin)
+    if message.author.bot:
+        # Amma əgər həmin bot (və ya webhook) içində .gg və ya http linki spamlayırsa, dərhal silinsin!
+        icerik_lower = message.content.lower()
+        if "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower or ".gg/" in icerik_lower:
+            try:
+                await message.delete()
+            except:
+                pass
+        else:
+            await bot.process_commands(message)
         return
 
     if message.author.id == SAHIB_ID or message.author.guild_permissions.administrator:
@@ -119,6 +123,15 @@ async def on_message(message):
     sindi = time.time()
     icerik = message.content
     icerik_lower = icerik.lower()
+
+    # Link və dəvət qoruması (bütün istifadəçilər üçün)
+    if "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower or ".gg/" in icerik_lower:
+        try:
+            await message.delete()
+            await message.channel.send(f"⚠️ {message.author.mention}, bu kanalda link və ya dəvət kodu paylaşmaq qadağandır!", delete_after=5)
+        except:
+            pass
+        return
 
     qeribo_simvol_sayi = len(re.findall(r'[^a-zA-Z0-9\s]', icerik))
     if qeribo_simvol_sayi > 30:
@@ -503,13 +516,7 @@ async def serverinfo(ctx):
     guild = ctx.guild
     embed = discord.Embed(title=f"{guild.name} - Server Statistikası", color=0x3498DB)
     embed.add_field(name="Üzv Sayı", value=guild.member_count, inline=True)
-    embed.add_field(name="Kanal Sayı", value=len(guild.channels), inline=True)
-    embed.add_field(name="Rol Sayı", value=len(guild.roles), inline=True)
-    if guild.icon:
-        embed.set_thumbnail(url=guild.icon.url)
-    await ctx.send(embed=embed)
-
-@bot.command(name="ping")
+   @bot.command(name="ping")
 async def ping(ctx):
     await ctx.send(f"🏓 Gecikmə: {round(bot.latency * 1000)}ms")
 
