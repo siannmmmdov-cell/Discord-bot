@@ -188,7 +188,7 @@ async def bot_panel(ctx):
     embed2.add_field(name="r?deletechannel", value="Cari kanalı silir.", inline=True)
     embed2.add_field(name="r?hide / r?reveal", value="Kanalı gizlədir/göstərir.", inline=True)
     embed2.add_field(name="r?slowmode", value="Kanalda yavaş rejimi tənzimləyir.", inline=True)
-    embed2.add_field(name="r?nuke", value="Kanalı uqula sıfırdan yaradır.", inline=True)
+    embed2.add_field(name="r?nuke", value="Kanalı sıfırdan yaradır.", inline=True)
     embed2.add_field(name="r?rename", value="Kanalın adını dəyişdirir.", inline=True)
 
     embed3 = discord.Embed(
@@ -519,11 +519,11 @@ async def announcement(ctx, *, mesaj):
     await ctx.message.delete()
     embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xFF9900)
     await ctx.send(embed=embed)
-
 if __name__ == "__main__":
     keep_alive()
     token = os.environ.get("TOKEN")
     if token:
         bot.run(token)
     else:
-   
+        print("❌ Xəbərdarlıq: TOKEN tapılmadı!")
+        
