@@ -82,7 +82,7 @@ async def on_member_join(member):
     except:
         pass
 
-# --- YENİ ƏLAVƏ EDİLƏN WEBHOOK QORUMASI ---
+# --- WEBHOOK QORUMASI ---
 @bot.event
 async def on_webhooks_update(channel):
     try:
@@ -91,14 +91,13 @@ async def on_webhooks_update(channel):
             await wh.delete()
     except Exception as e:
         print(f"Webhook silinərkən xəta: {e}")
-# ------------------------------------------
+# -------------------------
 
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Kənar botları, webhook-ları, diskord dəvətlərini və ya şübhəli linkləri dərhal silən sərt qoruma
     if message.author.bot or "discord.gg/" in message.content.lower() or "discord.com/invite/" in message.content.lower() or "http" in message.content.lower():
         try:
             await message.delete()
@@ -519,4 +518,12 @@ async def level(ctx, member: discord.Member = None):
 async def announcement(ctx, *, mesaj):
     await ctx.message.delete()
     embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xFF9900)
-    await ctx.send(embed=
+    await ctx.send(embed=embed)
+
+if __name__ == "__main__":
+    keep_alive()
+    token = os.environ.get("TOKEN")
+    if token:
+        bot.run(token)
+    else:
+   
