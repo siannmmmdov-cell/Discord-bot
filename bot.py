@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import discord
 from discord.ext import commands, tasks
 import asyncio
@@ -29,19 +30,17 @@ intents.reactions = True
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
-# SAHIB_ID-ni öz ID-n ilə dəyişdir!
 SAHIB_ID = 64101496631250258 
 user_xp = {}
 spam_takip = {}
 uyari_sayi = {}
-auto_role_name = "Üzv"  # Yeni qoşulana veriləcək rol adı
+auto_role_name = "Üzv"
 
 @bot.event
 async def on_ready():
     print(f"YENİLMEZ Bot Aktivləşdi: {bot.user.name}")
     await bot.change_presence(activity=discord.Game(name="r?bot | Professional Management Suite 👑"))
 
-# ==================== 1. EMOJİ REAKSİYA SİSTEMİ ====================
 @bot.event
 async def on_reaction_add(reaction, user):
     if user.bot:
@@ -51,7 +50,6 @@ async def on_reaction_add(reaction, user):
     except:
         pass
 
-# ==================== 2. AVTO-ROL (YENİ ÜZV QOŞULANDA) ====================
 @bot.event
 async def on_member_join(member):
     channel = member.guild.system_channel
@@ -65,7 +63,6 @@ async def on_member_join(member):
     except:
         pass
 
-# ==================== 3. SPAM, SALAM & XP SİSTEMİ ====================
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -78,7 +75,6 @@ async def on_message(message):
     author_id = message.author.id
     sindi = time.time()
 
-    # Spam Qoruması
     if author_id not in spam_takip:
         spam_takip[author_id] = []
 
@@ -103,7 +99,6 @@ async def on_message(message):
             pass
         return
 
-    # Səmimi Salamlaşma
     icerik = message.content.lower()
     if icerik in ["salam", "salamlar", "as", "aleykümsalam", "hi", "hello"]:
         try:
@@ -111,7 +106,6 @@ async def on_message(message):
         except:
             pass
 
-    # XP & Level Sistemi
     if author_id not in user_xp:
         user_xp[author_id] = {"xp": 0, "level": 1}
 
@@ -128,7 +122,6 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# ==================== 4. R?BOT PANELİ ====================
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed1 = discord.Embed(
@@ -182,7 +175,7 @@ async def bot_panel(ctx):
     embed4.add_field(name="r?banner / r?serverbanner", value="İstifadəçi və ya server bannerini göstərir.", inline=True)
     embed4.add_field(name="r?poll <sual>", value="Avtomatik reaksiyalı anket açır.", inline=True)
     embed4.add_field(name="r?say <mətn>", value="Yazdığın mətni botun dilindən göndərir.", inline=True)
-    embed4.add_field(name="r?çekiliş <gün> <hədiyyə>", value="Çəkiliş başladır (Məs: r?çekiliş 2 nitro).", inline=True)
+    embed4.add_field(name="r?cekilis <gün> <hədiyyə>", value="Çəkiliş başladır (Məs: r?cekilis 2 nitro).", inline=True)
     embed4.set_footer(text="YENİLMEZ Bot © 2026 | Bütün funksiyalar tam işlək vəziyyətdədir ⚡")
 
     await ctx.send(embed=embed1)
@@ -190,7 +183,6 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed3)
     await ctx.send(embed=embed4)
 
-# ==================== 5. MODERASİYA KOMANDALARI ====================
 @bot.command(name="ban")
 @commands.has_permissions(ban_members=True)
 async def ban(ctx, member: discord.Member, *, reason=None):
@@ -239,7 +231,6 @@ async def clear(ctx, amount: int = 5):
     deleted = await ctx.channel.purge(limit=amount)
     await ctx.send(f"🧹 `{len(deleted)}` dənə mesaj təmizləndi!", delete_after=3)
 
-# ==================== 6. KANAL VƏ ROL İDARƏSİ ====================
 @bot.command(name="createchannel")
 @commands.has_permissions(manage_channels=True)
 async def createchannel(ctx, *, isim):
@@ -438,9 +429,9 @@ async def say(ctx, *, mesaj):
     await ctx.message.delete()
     await ctx.send(mesaj)
 
-@bot.command(name="çekiliş", aliases=["cekilis"])
+@bot.command(name="cekilis", aliases=["çekiliş"])
 @commands.has_permissions(manage_guild=True)
-async def çekiliş(ctx, zaman_gun: int, *, odul):
+async def cekilis(ctx, zaman_gun: int, *, odul):
     await ctx.message.delete()
     saniye = zaman_gun * 86400
 
@@ -465,7 +456,7 @@ async def çekiliş(ctx, zaman_gun: int, *, odul):
             
             if istirakcilar:
                 qalib = random.choice(istirakcilar)
-                await ctx.send(f"🎊 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldun! 🏆")
+                await ctx.send(f"🎊 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldون! 🏆")
             else:
                 await ctx.send("❌ Çəkilişə heç kim qoşulmadığı üçün qalib seçilmədi.")
         else:
@@ -495,4 +486,15 @@ async def level(ctx, member: discord.Member = None):
     await ctx.send(f"📈 {member.mention} səviyyəsi: **{data['level']}** (XP: {data['xp']})")
 
 @bot.command(name="announcement")
-@commands
+@commands.has_permissions(administrator=True)
+async def announcement(ctx, *, mesaj):
+    await ctx.message.delete()
+    embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xff9900)
+    await ctx.send(embed=embed)
+
+if __name__ == "__main__":
+    keep_alive()
+    token = os.environ.get("TOKEN")
+    if token:
+        bot.run(token)
+    
