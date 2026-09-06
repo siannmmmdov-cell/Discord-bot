@@ -336,6 +336,29 @@ async def reveal(ctx):
         return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
     await ctx.send("🐵 Bu kanal yenidən hər kəsə göstərildi.")
+    # Bütün kanalları toplu gizlətmək və açmaq üçün
+@bot.command(name="hideall")
+async def hideall(ctx):
+    if ctx.author.id != SAHIB_ID:
+        return
+    for channel in ctx.guild.channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, view_channel=False)
+        except:
+            pass
+    await ctx.send("🙈 Serverdəki bütün kanallar hamıdan gizlətildi!")
+
+@bot.command(name="revealall")
+async def revealall(ctx):
+    if ctx.author.id != SAHIB_ID:
+        return
+    for channel in ctx.guild.channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, view_channel=True)
+        except:
+            pass
+    await ctx.send("🐵 Serverdəki bütün kanallar yenidən hər kəsə göstərildi!")
+    
 
 @bot.command(name="slowmode")
 async def slowmode(ctx, seconds: int):
