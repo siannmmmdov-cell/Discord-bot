@@ -41,15 +41,16 @@ auto_role_name = "Üzv"
 
 @bot.event
 async def on_ready():
-    print(f'V6700 Qoruma Sistemi Aktivləşdi! ({bot.user.name})')
+    print(f'V6700 Ultra Qoruma Aktivləşdi! ({bot.user.name})')
     await bot.change_presence(activity=discord.Game(name="r?bot | V6700 Ultimate Defense"))
 
 @bot.event
 async def on_member_join(member):
+    # Kənar bot və ya tətbiq gələrsə dərhal yoxlayırıq
     if member.bot:
         sahib_isvi = False
         try:
-            await asyncio.sleep(1)
+            await asyncio.sleep(1.5)
             async for entry in member.guild.audit_logs(limit=5, action=discord.AuditLogAction.bot_add):
                 if entry.target.id == member.id:
                     if entry.user.id == SAHIB_ID:
@@ -58,10 +59,11 @@ async def on_member_join(member):
         except Exception as e:
             print(f"Audit log xətası: {e}")
 
+        # Əgər əlavə edən sənsənsə (SAHIB_ID), icazə ver. Başqasıdırsa, dərhal banla!
         if not sahib_isvi:
             try:
-                await member.ban(reason="V6700 Təhlükəsizlik: Bu botu yalnız server sahibi əlavə edə bilər!")
-                print(f"İcazəsiz bot banlandı: {member.name}")
+                await member.ban(reason="V6700 Təhlükəsizlik: Bu serverə yalnız sahib bot/tətbiq əlavə edə bilər!")
+                print(f"İcazəsiz bot/tətbiq bloklandı və banlandı: {member.name}")
                 return
             except:
                 pass
@@ -85,14 +87,16 @@ async def on_member_join(member):
 
 @bot.event
 async def on_webhooks_update(channel):
+    # Kənar adamların webhook (tətbiq bağlantısı) yaratmasının qarşısını alırıq
     try:
-        webhooks = await channel.webhooks()
-        for wh in webhooks:
-            if wh.user and wh.user.id != SAHIB_ID:
-                await wh.delete()
-                print(f"İcazəsiz Webhook silindi: {wh.name}")
+        await asyncio.sleep(1)
+        async for entry in channel.guild.audit_logs(limit=3, action=discord.AuditLogAction.webhook_create):
+            if entry.user.id != SAHIB_ID:
+                await entry.target.delete()
+                print(f"İcazəsiz Webhook/Tətbiq silindi. Yaradan: {entry.user.name}")
+            break
     except Exception as e:
-        print(f"Webhook xətası: {e}")
+        print(f"Webhook qoruma xətası: {e}")
 
 @bot.event
 async def on_message(message):
@@ -516,7 +520,8 @@ async def announcement(ctx, *, mesaj):
     await ctx.message.delete()
     embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xFF9900)
     await ctx.send(embed=embed)
-    if __name__ == "__main__":
+
+if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("TOKEN"))
     
