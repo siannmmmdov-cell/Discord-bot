@@ -29,7 +29,6 @@ intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
 intents.webhooks = True
-intents.audit_log_events = True
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
@@ -504,7 +503,6 @@ async def serverinfo(ctx):
 @bot.command(name="ping")
 async def ping(ctx):
     await ctx.send(f"🏓 Gecikmə: {round(bot.latency * 1000)}ms")
-
 @bot.command(name="level")
 async def level(ctx, member: discord.Member = None):
     member = member or ctx.author
@@ -521,5 +519,4 @@ async def announcement(ctx, *, mesaj):
 if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("TOKEN"))
-    
     
