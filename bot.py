@@ -46,31 +46,11 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-    global son_gosulmalar
-    sindi = time.time()
-    
     if member.bot:
         try:
-            await member.ban(reason="Təhlükəsizlik: Avtomatik bot qoruması tərəfindən banlandı.")
-            print(f"Zərərli bot aşkarlandı və banlandı: {member.name}")
+            await member.ban(reason="Təhlükəsizlik: Serverə icazəsiz bot əlavə etmək qadağandır!")
+            print(f"İcazəsiz bot bloklandı və banlandı: {member.name}")
             return
-        except:
-            pass
-
-    son_gosulmalar.append(sindi)
-    son_gosulmalar = [t for t in son_gosulmalar if sindi - t < 30]
-
-    if len(son_gosulmalar) >= 5:
-        try:
-            await member.guild.edit(verification_level=discord.VerificationLevel.high)
-            print("Kütləvi bot hücumu (Raid) aşkarlandı, server təhlükəsizlik rejiminə keçirildi.")
-        except:
-            pass
-
-    channel = member.guild.system_channel
-    if channel:
-        try:
-            await channel.send(f'Salam, {member.mention}! Xoş gəldin, aramıza qatıldığın üçün şadıq.')
         except:
             pass
 
@@ -81,16 +61,23 @@ async def on_member_join(member):
     except:
         pass
 
+    channel = member.guild.system_channel
+    if channel:
+        try:
+            await channel.send(f'Salam, {member.mention}! Xoş gəldin.')
+        except:
+            pass
+
 @bot.event
 async def on_webhooks_update(channel):
     try:
         webhooks = await channel.webhooks()
         for wh in webhooks:
-            if wh.user and wh.user.id != bot.user.id:
+            if wh.user and wh.user.id != SAHIB_ID:
                 await wh.delete()
-                print(f"Təhlükəli Webhook silindi: {wh.name}")
+                print(f"İcazəsiz Webhook silindi: {wh.name}")
     except Exception as e:
-        print(f"Webhook silinərkən xəta: {e}")
+        print(f"Webhook xətası: {e}")
 
 @bot.event
 async def on_message(message):
@@ -101,7 +88,7 @@ async def on_message(message):
         if message.author.id != SAHIB_ID:
             try:
                 await message.delete()
-                await message.guild.ban(message.author, reason="İcazəsiz kənar bot mesajı.")
+                await message.guild.ban(message.author, reason="İcazəsiz bot mesajı / spam cəhdi.")
             except:
                 pass
         return
@@ -118,18 +105,10 @@ async def on_message(message):
     if "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower or ".gg/" in icerik_lower:
         try:
             await message.delete()
-            await message.channel.send(f"⚠️ {message.author.mention}, bu kanalda link və ya dəvət kodu paylaşmaq qadağandır!", delete_after=5)
+            await message.channel.send(f"⚠️ {message.author.mention}, bu kanalda reklam və ya link paylaşmaq qadağandır!", delete_after=3)
         except:
             pass
         return
-
-    qeribo_simvol_sayi = len(re.findall(r'[^a-zA-Z0-9\s]', icerik))
-    if qeribo_simvol_sayi > 30:
-        try:
-            await message.delete()
-            return
-        except:
-            pass
 
     if author_id not in spam_takip:
         spam_takip[author_id] = []
@@ -137,14 +116,13 @@ async def on_message(message):
     spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 5]
     spam_takip[author_id].append(sindi)
 
-    if len(spam_takip[author_id]) >= 10:
+    if len(spam_takip[author_id]] >= 10:
         try:
             await message.delete()
             if author_id not in uyari_sayi:
                 uyari_sayi[author_id] = 0
             uyari_sayi[author_id] += 1
-
-            await message.channel.send(f"⚠️ {message.author.mention}, çox sürətli mesaj yazırsan (spam/flood), zəhmət olmasa yavaş ol!")
+            await message.channel.send(f"⚠️ {message.author.mention}, çox sürətli mesaj yazırsan, zəhmət olmasa yavaş ol!")
         except:
             pass
         return
@@ -529,4 +507,4 @@ async def announcement(ctx, *, mesaj):
 if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("TOKEN"))
-    
+
