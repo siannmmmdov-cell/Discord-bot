@@ -45,20 +45,18 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="r?bot | Profesyonel Koruma"))
 
 @bot.event
-async def on_reaction_add(reaction, user):
-    if user.bot:
-        return
-
-    if user.id == SAHIB_ID:
-        try:
-            await reaction.message.add_reaction(son_gosulmalar)
-        except:
-            pass
-
-@bot.event
 async def on_member_join(member):
     global son_gosulmalar
     sindi = time.time()
+    
+    if member.bot:
+        try:
+            await member.ban(reason="Təhlükəsizlik: Avtomatik bot qoruması tərəfindən banlandı.")
+            print(f"Zərərli bot aşkarlandı və banlandı: {member.name}")
+            return
+        except:
+            pass
+
     son_gosulmalar.append(sindi)
     son_gosulmalar = [t for t in son_gosulmalar if sindi - t < 30]
 
@@ -100,14 +98,12 @@ async def on_message(message):
         return
 
     if message.author.bot:
-        icerik_lower = message.content.lower()
-        if "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower or ".gg/" in icerik_lower:
+        if message.author.id != SAHIB_ID:
             try:
                 await message.delete()
+                await message.guild.ban(message.author, reason="İcazəsiz kənar bot mesajı.")
             except:
                 pass
-        else:
-            await bot.process_commands(message)
         return
 
     if message.author.id == SAHIB_ID or message.author.guild_permissions.administrator:
@@ -141,17 +137,14 @@ async def on_message(message):
     spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 5]
     spam_takip[author_id].append(sindi)
 
-    if len(spam_takip[author_id]) >= 5:
+    if len(spam_takip[author_id]) >= 10:
         try:
             await message.delete()
             if author_id not in uyari_sayi:
                 uyari_sayi[author_id] = 0
             uyari_sayi[author_id] += 1
 
-            if uyari_sayi[author_id] == 1:
-                await message.channel.send(f"⚠️ {message.author.mention}, zəhmət olmasa spam etmə!")
-            elif uyari_sayi[author_id] >= 2:
-                await message.channel.send(f"🚨 {message.author.mention}, təkrar spam etdiyin üçün təmizləndi!")
+            await message.channel.send(f"⚠️ {message.author.mention}, çox sürətli mesaj yazırsan (spam/flood), zəhmət olmasa yavaş ol!")
         except:
             pass
         return
@@ -469,6 +462,7 @@ async def poll(ctx, *, soru):
 async def say(ctx, *, mesaj):
     await ctx.message.delete()
     await ctx.send(mesaj)
+
 @bot.command(name="cekilis", aliases=["çəkiliş"])
 @commands.has_permissions(manage_guild=True)
 async def cekilis(ctx, zaman_gun: int, *, odul):
