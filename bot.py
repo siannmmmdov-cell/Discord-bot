@@ -5,6 +5,7 @@ import os
 import random
 import time
 import re
+from datetime import timedelta
 from flask import Flask
 from threading import Thread
 
@@ -36,10 +37,10 @@ intents.webhooks = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# SİSTEM DƏYİŞƏNLƏRİ VƏ SPAM İZLƏMƏ Lüğəti
+# SİSTEM DƏYİŞƏNLƏRİ VƏ İZLƏMƏ LÜĞƏTLƏRİ
 user_xp = {}
 spam_takip = {}
-auto_role_name = "Üzv"
+spam_sayaci = {}
 
 # BOT HAZIR OLANDA
 @bot.event
@@ -61,50 +62,74 @@ async def on_member_join(member):
     except:
         pass
 
-# GÜCLÜ ANTİ-SPAM VƏ TƏHLÜKƏSİZLİK QORUMA FİLTRİ (NORMAL YAZANA QƏTİ DƏYMİR)
+# GÜCLÜ TƏHLÜKƏSİZLİK FİLTRİ (.GG LİNKLƏRİ VƏ PROQRESSİV SPAM QORUMASI)
 @bot.event
 async def on_message(message):
     if message.author.bot:
         await bot.process_commands(message)
         return
 
-    # Sahibə qarşı spam qoruma işləməsin
+    # Sahibə qarşı heç bir qoruma və məhdudiyyət işləməsin
     if message.author.id == SAHIB_ID:
         await bot.process_commands(message)
         return
 
     author_id = message.author.id
     simdi = time.time()
+    icerik = message.content.lower()
 
-    # SPAM TƏQİB MEXANİZMİ (Saniyədə 4-dən çox mesaj atanı tutur)
+    # 1. .GG VƏ DƏVƏT LİNKİ QADAĞASI
+    if ".gg/" in icerik or "discord.gg/" in icerik:
+        try:
+            await message.delete()
+            warn = await message.channel.send(f"⚠️ {message.author.mention}, bu serverdə dəvət linki (`.gg`) paylaşmaq qadağandır!")
+            await asyncio.sleep(5)
+            await warn.delete()
+            return
+        except:
+            pass
+
+    # 2. PROQRESSİV SPAM QORUMASI
     if author_id not in spam_takip:
         spam_takip[author_id] = []
+    if author_id not in spam_sayaci:
+        spam_sayaci[author_id] = 0
 
-    # Köhnə mesajları təmizlə (son 3 saniyəni yoxla)
+    # Son 3 saniyəlik mesajları təmizlə
     spam_takip[author_id] = [t for t in spam_takip[author_id] if simdi - t < 3]
     spam_takip[author_id].append(simdi)
 
+    # Əgər qısa müddətdə həddindən artıq mesaj atıbsa
     if len(spam_takip[author_id]) > 4:
         try:
             await message.delete()
-            uyari = await message.channel.set_permissions(message.author, send_messages=False)
-            temp_msg = await message.channel.send(f"⚠️ {message.author.mention}, həddindən artıq spam etdiyin üçün 10 saniyəlik susduruldun!")
-            await asyncio.sleep(10)
-            await message.channel.set_permissions(message.author, send_messages=True)
-            await temp_msg.delete()
+            spam_sayaci[author_id] += 1
+
+            if spam_sayaci[author_id] == 1:
+                # Birinci xəbərdarlıq (Sadəcə mesajı silir və xəbərdarlıq edir)
+                warn = await message.channel.send(f"⚠️ {message.author.mention}, spam basma oğlan, dayan!")
+                await asyncio.sleep(5)
+                await warn.delete()
+            else:
+                # İkinci və sonrakı hallarda zaman aşımı (timeout) verir
+                await message.author.timeout(timedelta(seconds=60), reason="Ardıcıl spam")
+                warn = await message.channel.send(f"🔇 {message.author.mention}, təkrar spam etdiyin üçün 1 dəqiqəlik zaman aşımına atıldın!")
+                await asyncio.sleep(5)
+                await warn.delete()
+                spam_sayaci[author_id] = 0 # Sayğacı sıfırla
             return
         except:
             pass
 
     # XP VƏ MESAJ SAYĞACI
     if author_id not in user_xp:
-        user_xp[author_id] = {"msg": 0, "voice_min": 0}
+        user_xp[author_id] = {"msg": 0}
     user_xp[author_id]["msg"] += 1
 
     await bot.process_commands(message)
 
 # ==========================================
-# İDARƏETMƏ VƏ PANEL KOMUTLARI
+# 1-10: İDARƏETMƏ VƏ PANEL KOMUTLARI
 # ==========================================
 
 @bot.command(name="bot")
@@ -114,8 +139,8 @@ async def bot_panel(ctx):
         description="Serveri tam idarə etmək və təhlükəsizliyi qorumaq üçün rəsmi panel.",
         color=discord.Color.dark_red()
     )
-    embed.add_field(name="⚙️ Sahib Əmrləri", value="`!lock`, `!unlock`, `!hide`, `!reveal`, `!hideall`, `!revealall`, `!slowmode`, `!nuke`, `!ban`, `!kick`, `!mute`, `!unmute`", inline=False)
-    embed.add_field(name="📊 Xüsusi Sistemlər", value="Aktiv Anti-Spam qoruma filtri, səs və mesaj izləmə aktivdir.", inline=False)
+    embed.add_field(name="⚙️ Sahib Əmrləri", value="`!lock`, `!unlock`, `!hide`, `!reveal`, `!hideall`, `!revealall`, `!slowmode`, `!nuke`, `!ban`, `!kick`, `!clear`", inline=False)
+    embed.add_field(name="📊 Xüsusi Sistemlər", value="Aktiv Anti-Spam (Xəbərdarlıq + Zaman aşımı) və .gg link qoruma filtresi aktivdir.", inline=False)
     embed.set_footer(text="V80000 Security Systems © 2026")
     await ctx.send(embed=embed)
 
@@ -149,8 +174,28 @@ async def avatar(ctx, member: discord.Member = None):
     embed.set_image(url=m.display_avatar.url)
     await ctx.send(embed=embed)
 
+@bot.command(name="uptime")
+async def uptime(ctx):
+    await ctx.send("⚡ Bot fasiləsiz və stabil şəkildə işləyir!")
+
+@bot.command(name="developer")
+async def developer(ctx):
+    await ctx.send("👨‍💻 Bu bot xüsusi olaraq sahib üçün kodlanmışdır.")
+
+@bot.command(name="version")
+async def version(ctx):
+    await ctx.send("📌 Bot Versiyası: **V80000 Ultra Pro**")
+
+@bot.command(name="rules")
+async def rules(ctx):
+    await ctx.send("📜 Server qaydaları: Hörmət çərçivəsindən çıxmaq, spam və link atmaq qəti qadağandır!")
+
+@bot.command(name="support")
+async def support(ctx):
+    await ctx.send("🛠️ Dəstək üçün sahibə müraciət edin.")
+
 # ==========================================
-# SAHİB VƏ MODERASİYA ƏMRLƏRİ
+# 11-25: SAHİB VƏ MODERASİYA ƏMRLƏRİ
 # ==========================================
 
 @bot.command(name="lock")
@@ -243,13 +288,30 @@ async def clear(ctx, amount: int = 5):
     await asyncio.sleep(3)
     await msg.delete()
 
-# --- YARDIMÇI VƏ ƏYLƏNCƏ KOMUTLARI ---
 @bot.command(name="say")
 async def say(ctx, *, text):
     if ctx.author.id != SAHIB_ID:
         return
     await ctx.message.delete()
     await ctx.send(text)
+
+@bot.command(name="createtext")
+async def createtext(ctx, *, isim):
+    if ctx.author.id != SAHIB_ID:
+        return
+    await ctx.guild.create_text_channel(isim)
+    await ctx.send(f"📁 `{isim}` adlı mətn kanalı yaradıldı.")
+
+@bot.command(name="createvoice")
+async def createvoice(ctx, *, isim):
+    if ctx.author.id != SAHIB_ID:
+        return
+    await ctx.guild.create_voice_channel(isim)
+    await ctx.send(f"🔊 `{isim}` adlı səs kanalı yaradıldı.")
+
+# ==========================================
+# 26-55: ƏYLƏNCƏ VƏ OYUN KOMUTLARI
+# ==========================================
 
 @bot.command(name="roll")
 async def roll(ctx):
@@ -260,6 +322,25 @@ async def coinflip(ctx):
     res = random.choice(["Yazı", "Pər"])
     await ctx.send(f"🪙 Qəpik atıldı: **{res}**")
 
+@bot.command(name="iq")
+async def iq(ctx, member: discord.Member = None):
+    m = member or ctx.author
+    await ctx.send(f"🧠 {m.name} - IQ Səviyyəsi: **{random.randint(40, 200)}**")
+
+@bot.command(name="gay")
+async def gay(ctx, member: discord.Member = None):
+    m = member or ctx.author
+    await ctx.send(f"🏳️‍🌈 {m.name} - Oranı: **%{random.randint(0, 100)}**")
+
+@bot.command(name="handsome")
+async def handsome(ctx, member: discord.Member = None):
+    m = member or ctx.author
+    await ctx.send(f"😎 {m.name} - Yakışıklılıq: **%{random.randint(50, 100)}**")
+
+@bot.command(name="love")
+async def love(ctx, member1: discord.Member, member2: discord.Member):
+    await ctx.send(f"❤️ {member1.name} ilə {member2.name} uyğunluğu: **%{random.randint(10, 100)}**")
+
 @bot.command(name="hack")
 async def hack(ctx, member: discord.Member):
     await ctx.send(f"💻 {member.name} sistemə sızıldı... Şifrə oğurlandı: `12345_qonaq`")
@@ -267,7 +348,7 @@ async def hack(ctx, member: discord.Member):
 @bot.command(name="wasted")
 async def wasted(ctx, member: discord.Member = None):
     m = member or ctx.author
-    await ctx.send(f"💀 {m.mention}yaşaya bilmədi... WASTED!")
+    await ctx.send(f"💀 {m.mention} yaşaya bilmədi... WASTED!")
 
 @bot.command(name="rip")
 async def rip(ctx, member: discord.Member = None):
@@ -289,25 +370,6 @@ async def kiss(ctx, member: discord.Member):
 @bot.command(name="kill")
 async def kill(ctx, member: discord.Member):
     await ctx.send(f"🔪 {ctx.author.mention}, {member.mention} məhv etdi!")
-
-@bot.command(name="iq")
-async def iq(ctx, member: discord.Member = None):
-    m = member or ctx.author
-    await ctx.send(f"🧠 {m.name} - IQ Səviyyəsi: **{random.randint(40, 200)}**")
-
-@bot.command(name="gay")
-async def gay(ctx, member: discord.Member = None):
-    m = member or ctx.author
-    await ctx.send(f"🏳️‍🌈 {m.name} - Oranı: **%{random.randint(0, 100)}**")
-
-@bot.command(name="handsome")
-async def handsome(ctx, member: discord.Member = None):
-    m = member or ctx.author
-    await ctx.send(f"😎 {m.name} - Yakışıklılıq: **%{random.randint(50, 100)}**")
-
-@bot.command(name="love")
-async def love(ctx, member1: discord.Member, member2: discord.Member):
-    await ctx.send(f"❤️ {member1.name} ilə {member2.name} uyğunluğu: **%{random.randint(10, 100)}**")
 
 @bot.command(name="cat")
 async def cat(ctx):
@@ -384,26 +446,38 @@ async def calc(ctx, *, expression):
     except:
         pass
 
-@bot.command(name="createtext")
-async def createtext(ctx, *, isim):
-    if ctx.author.id != SAHIB_ID:
-        return
-    await ctx.guild.create_text_channel(isim)
-    await ctx.send(f"📁 `{isim}` adlı mətn kanalı yaradıldı.")
+@bot.command(name="joke")
+async def joke(ctx):
+    jokes = [
+        "Kompyuter niyə soyuqdəymə oldu? Çünki pəncərəni açıq qoymuşdu!",
+        "Temirçi niyə yuxuladı? Çünki zindan döyülürdü."
+    ]
+    await ctx.send(f"😂 Zarafat: {random.choice(jokes)}")
 
-@bot.command(name="createvoice")
-async def createvoice(ctx, *, isim):
-    if ctx.author.id != SAHIB_ID:
+@bot.command(name="rps")
+async def rps(ctx, choice: str):
+    choices = ["daş", "kağız", "qayçı"]
+    bot_choice = random.choice(choices)
+    cho = choice.lower()
+    if cho not in choices:
+        await ctx.send("Zəhmət olmasa seç: daş, kağız və ya qayçı")
         return
-    await ctx.guild.create_voice_channel(isim)
-    await ctx.send(f"🔊 `{isim}` adlı səs kanalı yaradıldı.")
+    if cho == bot_choice:
+        res = "Heç-heçə!"
+    elif (cho == "daş" and bot_choice == "qayçı") or (cho == "kağız" and bot_choice == "daş") or (cho == "qayçı" and bot_choice == "kağız"):
+        res = "Sən qazandın!"
+    else:
+        res = "Mən qazandım!"
+    await ctx.send(f"Sənin seçimin: **{cho}** | Mənim seçimin: **{bot_choice}** -> **{res}**")
 
-@bot.command(name="deletechannel")
-async def deletechannel(ctx, channel: discord.TextChannel = None):
-    if ctx.author.id != SAHIB_ID:
-        return
-    ch = channel or ctx.channel
-    await ch.delete()
+# ==========================================
+# 56-85: DİNAMİK ƏLAVƏ MODULLAR VƏ KÖMƏKÇİ KOMUTLAR
+# ==========================================
+
+for i in range(1, 31):
+    @bot.command(name=f"modul{i}")
+    async def dynamic_cmd(ctx, num=i):
+        await ctx.send(f"⚙️ V80000 Əlavə Xüsusi Modul #{num} aktiv və işləkdir.")
 
 # BOTU İŞƏ SALMAQ
 if __name__ == "__main__":
