@@ -29,6 +29,7 @@ intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
 intents.webhooks = True
+intents.audit_log_events = True
 
 bot = commands.Bot(command_prefix='r?', intents=intents)
 
@@ -45,15 +46,28 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-    # Kənardan icazəsiz bot gələrsə dərhal banla
     if member.bot:
-        if member.id != SAHIB_ID:
+        sahib_isvi = False
+        try:
+            await asyncio.sleep(1)
+            async for entry in member.guild.audit_logs(limit=5, action=discord.AuditLogAction.bot_add):
+                if entry.target.id == member.id:
+                    if entry.user.id == SAHIB_ID:
+                        sahib_isvi = True
+                    break
+        except Exception as e:
+            print(f"Audit log xətası: {e}")
+
+        if not sahib_isvi:
             try:
-                await member.ban(reason="V6700 Təhlükəsizlik: İcazəsiz bot əlavə etmək qadağandır!")
-                print(f"İcazəsiz bot bloklandı və banlandı: {member.name}")
+                await member.ban(reason="V6700 Təhlükəsizlik: Bu botu yalnız server sahibi əlavə edə bilər!")
+                print(f"İcazəsiz bot banlandı: {member.name}")
                 return
             except:
                 pass
+        else:
+            print(f"Sahib tərəfindən əlavə olunan bot təsdiqləndi: {member.name}")
+        return
 
     try:
         role = discord.utils.get(member.guild.roles, name=auto_role_name)
@@ -85,7 +99,6 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # Kənar botların mesajları
     if message.author.bot:
         if message.author.id != SAHIB_ID:
             try:
@@ -95,7 +108,6 @@ async def on_message(message):
                 pass
         return
 
-    # Sahib və ya Adminlərə heç bir məhdudiyyət yoxdur, rahat yaza bilərlər
     if message.author.id == SAHIB_ID or message.author.guild_permissions.administrator:
         await bot.process_commands(message)
         return
@@ -105,7 +117,6 @@ async def on_message(message):
     icerik = message.content
     icerik_lower = icerik.lower()
 
-    # V6700 REKLAM VƏ LİNK QORUMASI: .gg/ və ya http görən kimi silir və banlayır!
     if ".gg/" in icerik_lower or "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower:
         try:
             await message.delete()
@@ -115,7 +126,6 @@ async def on_message(message):
             pass
         return
 
-    # Sürətli spam/flood edənlər üçün
     if author_id not in spam_takip:
         spam_takip[author_id] = []
     
@@ -130,14 +140,12 @@ async def on_message(message):
             pass
         return
 
-    # Normal danışanlar üçün səmimi salamlaşma
     if icerik_lower in ["salam", "salamlar", "sa", "aleykümsalam", "hi"]:
         try:
             await message.channel.send(f"👋 Salam, {message.author.mention}! Necəsən?")
         except:
             pass
 
-    # XP və Level Sistemi (Normal istifadəçilər üçün aktivdir)
     if author_id not in user_xp:
         user_xp[author_id] = {"xp": 0, "level": 1}
 
@@ -453,8 +461,8 @@ async def cekilis(ctx, zaman_gun: int, *, odul):
     saniye = zaman_gun * 86400
 
     embed = discord.Embed(
-        title="🎉 YENİ ÇƏKİLİŞ! 🎉",
-        description=f"Hədiyyə: **{odul}**\n\nQatılmaq üçün aşağıdakı reaksiyaya toxun! 🎉\nBitmə müddəti: **{zaman_gun} gün**",
+        title="YENİ ÇƏKİLİŞ!",
+        description=f"Hədiyyə: **{odul}**\n\nQatılmaq üçün aşağıdakı reaksiyaya toxun!\nBitmə müddəti: **{zaman_gun} gün**",
         color=0x91E53
     )
     embed.set_footer(text=f"Çəkilişi təşkil edən: {ctx.author.name}")
@@ -473,7 +481,7 @@ async def cekilis(ctx, zaman_gun: int, *, odul):
 
             if istikracilar:
                 qalib = random.choice(istikracilar)
-                await ctx.send(f"🎉 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldون! 🏆")
+                await ctx.send(f"🎉 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldun! 🏆")
             else:
                 await ctx.send("❌ Çəkilişə heç kim qoşulmadığı üçün qalib seçilmədi.")
         else:
@@ -508,8 +516,7 @@ async def announcement(ctx, *, mesaj):
     await ctx.message.delete()
     embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xFF9900)
     await ctx.send(embed=embed)
-if __name__ == "__main__":
+    if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("TOKEN"))
-    
     
