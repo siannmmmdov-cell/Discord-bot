@@ -36,23 +36,24 @@ SAHIB_ID = 64101498631250250
 user_xp = {}
 spam_takip = {}
 uyari_sayi = {}
-son_gosulmalar = []
 auto_role_name = "Üzv"
 
 @bot.event
 async def on_ready():
-    print(f'YENİLMEZ Bot Aktivləşdi! ({bot.user.name})')
-    await bot.change_presence(activity=discord.Game(name="r?bot | Profesyonel Koruma"))
+    print(f'V6700 Qoruma Sistemi Aktivləşdi! ({bot.user.name})')
+    await bot.change_presence(activity=discord.Game(name="r?bot | V6700 Ultimate Defense"))
 
 @bot.event
 async def on_member_join(member):
+    # Kənardan icazəsiz bot gələrsə dərhal banla
     if member.bot:
-        try:
-            await member.ban(reason="Təhlükəsizlik: Serverə icazəsiz bot əlavə etmək qadağandır!")
-            print(f"İcazəsiz bot bloklandı və banlandı: {member.name}")
-            return
-        except:
-            pass
+        if member.id != SAHIB_ID:
+            try:
+                await member.ban(reason="V6700 Təhlükəsizlik: İcazəsiz bot əlavə etmək qadağandır!")
+                print(f"İcazəsiz bot bloklandı və banlandı: {member.name}")
+                return
+            except:
+                pass
 
     try:
         role = discord.utils.get(member.guild.roles, name=auto_role_name)
@@ -84,15 +85,17 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
+    # Kənar botların mesajları
     if message.author.bot:
         if message.author.id != SAHIB_ID:
             try:
                 await message.delete()
-                await message.guild.ban(message.author, reason="İcazəsiz bot mesajı / spam cəhdi.")
+                await message.guild.ban(message.author, reason="V6700: İcazəsiz bot mesajı.")
             except:
                 pass
         return
 
+    # Sahib və ya Adminlərə heç bir məhdudiyyət yoxdur, rahat yaza bilərlər
     if message.author.id == SAHIB_ID or message.author.guild_permissions.administrator:
         await bot.process_commands(message)
         return
@@ -102,37 +105,39 @@ async def on_message(message):
     icerik = message.content
     icerik_lower = icerik.lower()
 
-    if "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower or ".gg/" in icerik_lower:
+    # V6700 REKLAM VƏ LİNK QORUMASI: .gg/ və ya http görən kimi silir və banlayır!
+    if ".gg/" in icerik_lower or "discord.gg/" in icerik_lower or "discord.com/invite/" in icerik_lower or "http" in icerik_lower:
         try:
             await message.delete()
-            await message.channel.send(f"⚠️ {message.author.mention}, bu kanalda reklam və ya link paylaşmaq qadağandır!", delete_after=3)
+            await message.guild.ban(message.author, reason="V6700: Serverdə reklam və link paylaşmaq qadağandır!")
+            print(f"V6700 Reklamçını təmizlədi: {message.author.name}")
         except:
             pass
         return
 
+    # Sürətli spam/flood edənlər üçün
     if author_id not in spam_takip:
         spam_takip[author_id] = []
     
     spam_takip[author_id] = [t for t in spam_takip[author_id] if sindi - t < 5]
     spam_takip[author_id].append(sindi)
 
-    if len(spam_takip[author_id]] >= 10:
+    if len(spam_takip[author_id]) >= 7:
         try:
             await message.delete()
-            if author_id not in uyari_sayi:
-                uyari_sayi[author_id] = 0
-            uyari_sayi[author_id] += 1
-            await message.channel.send(f"⚠️ {message.author.mention}, çox sürətli mesaj yazırsan, zəhmət olmasa yavaş ol!")
+            await message.channel.send(f"⚠️ {message.author.mention}, çox sürətli yazırsan, zəhmət olmasa yavaş ol!", delete_after=4)
         except:
             pass
         return
 
+    # Normal danışanlar üçün səmimi salamlaşma
     if icerik_lower in ["salam", "salamlar", "sa", "aleykümsalam", "hi"]:
         try:
-            await message.channel.send(f"👋 Salam, {message.author.mention}! Xoş gəldin.")
+            await message.channel.send(f"👋 Salam, {message.author.mention}! Necəsən?")
         except:
             pass
 
+    # XP və Level Sistemi (Normal istifadəçilər üçün aktivdir)
     if author_id not in user_xp:
         user_xp[author_id] = {"xp": 0, "level": 1}
 
@@ -152,7 +157,7 @@ async def on_message(message):
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="🛡️ YENİLMEZ - TƏHLÜKƏSİZLİK & MODERASİYA",
+        title="🛡️ V6700 YENİLMEZ - TƏHLÜKƏSİZLİK & MODERASİYA",
         description="Server təhlükəsizliyi üçün əsas əmrlər:",
         color=0xFF0000
     )
@@ -164,7 +169,7 @@ async def bot_panel(ctx):
     embed.add_field(name="r?lock / r?unlock", value="Bütün serveri kilidləyir/açır.", inline=True)
 
     embed2 = discord.Embed(
-        title="📁 YENİLMEZ - KANAL VƏ SIFIRLAMA İDARƏSİ",
+        title="📁 V6700 - KANAL VƏ SIFIRLAMA İDARƏSİ",
         description="Kanalların idarə edilməsi, nuke və təmizlənməsi:",
         color=0x00FF90
     )
@@ -176,7 +181,7 @@ async def bot_panel(ctx):
     embed2.add_field(name="r?rename", value="Kanalın adını dəyişdirir.", inline=True)
 
     embed3 = discord.Embed(
-        title="👑 YENİLMEZ - ROL VƏ İSTİFADƏÇİ İDARƏSİ",
+        title="👑 V6700 - ROL VƏ İSTİFADƏÇİ İDARƏSİ",
         description="Rolların verilməsi və istifadəçi məlumatları:",
         color=0x0099FF
     )
@@ -187,7 +192,7 @@ async def bot_panel(ctx):
     embed3.add_field(name="r?botinfo", value="Botun sistem məlumatlarını göstərir.", inline=True)
 
     embed4 = discord.Embed(
-        title="🌟 YENİLMEZ - XÜSUSİ ALƏTLƏR, ÇƏKİLİŞ & XP",
+        title="🌟 V6700 - XÜSUSİ ALƏTLƏR, ÇƏKİLİŞ & XP",
         description="Banner, səsvermə, çəkiliş və səviyyə sistemləri:",
         color=0xFFD700
     )
@@ -202,7 +207,7 @@ async def bot_panel(ctx):
     embed4.add_field(name="r?poll <sual>", value="Avtomatik reaksiyalı səsvermə.", inline=False)
     embed4.add_field(name="r?say <mesaj>", value="Yazdığın mətni botun dilindən yazar.", inline=False)
     embed4.add_field(name="r?cekilis <gün> <hədiyyə>", value="Çəkiliş başladar.", inline=False)
-    embed4.set_footer(text="YENİLMEZ Bot © 2026 | Bütün funksiyalar tam təhlükəsizdir.")
+    embed4.set_footer(text="V6700 Ultimate Bot © 2026 | Bütün funksiyalar tam təhlükəsizdir.")
 
     await ctx.send(embed=embed)
     await ctx.send(embed=embed2)
@@ -363,10 +368,10 @@ async def avatar(ctx, member: discord.Member = None):
 
 @bot.command(name="botinfo")
 async def botinfo(ctx):
-    embed = discord.Embed(title="🤖 YENİLMEZ Bot Sistem Məlumatı", color=0x3498DB)
+    embed = discord.Embed(title="🤖 V6700 Bot Sistem Məlumatı", color=0x3498DB)
     embed.add_field(name="Yaradıcı / Sahib", value="<@64101498631250250>", inline=True)
     embed.add_field(name="Server Sayı", value=str(len(bot.guilds)), inline=True)
-    embed.add_field(name="Status", value="Aktiv & Qorumalı 🛡️", inline=True)
+    embed.add_field(name="Status", value="V6700 Ultra Qoruma Aktiv 🛡️", inline=True)
     await ctx.send(embed=embed)
 
 @bot.command(name="lockall")
@@ -393,7 +398,7 @@ async def unlockall(ctx):
 @commands.has_permissions(administrator=True)
 async def serverlock(ctx):
     await ctx.guild.edit(verification_level=discord.VerificationLevel.high)
-    await ctx.send("🛡️ Server təhlükəsizlik rejiminə keçirildi.")
+    await ctx.send("🛡️ Server V6700 təhlükəsizlik rejiminə keçirildi.")
 
 @bot.command(name="embed")
 @commands.has_permissions(manage_messages=True)
@@ -468,7 +473,7 @@ async def cekilis(ctx, zaman_gun: int, *, odul):
 
             if istikracilar:
                 qalib = random.choice(istikracilar)
-                await ctx.send(f"🎉 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldun! 🏆")
+                await ctx.send(f"🎉 Təbriklər {qalib.mention}! **{odul}** çəkilişinin qalibi oldون! 🏆")
             else:
                 await ctx.send("❌ Çəkilişə heç kim qoşulmadığı üçün qalib seçilmədi.")
         else:
@@ -503,8 +508,8 @@ async def announcement(ctx, *, mesaj):
     await ctx.message.delete()
     embed = discord.Embed(title="📢 SERVER ELANI", description=mesaj, color=0xFF9900)
     await ctx.send(embed=embed)
-
 if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("TOKEN"))
-
+    
+    
