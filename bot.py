@@ -42,7 +42,6 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # SAHİB VƏ TƏHLÜKƏSİZLİK TƏNZİMLƏMƏLƏRİ
 # ==========================================
 SAHIB_ID = 64101498631250250  
-ICAZELI_BOTLAR = [SAHIB_ID] 
 
 user_xp = {}
 spam_takip = {}
@@ -61,31 +60,12 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="!bot | V80000 Ultra Qoruma"))
 
 # ==========================================
-# YENİ ÜZV QOŞULANDA VƏ BOT QORUMASI
+# YENİ ÜZV VƏ BOTLARIN QOŞULMA QAYDASI
 # ==========================================
 @bot.event
 async def on_member_join(member):
     if member.bot:
-        if member.id in ICAZELI_BOTLAR:
-            return
-        
-        sahib_isvi = False
-        try:
-            await asyncio.sleep(1.5)
-            async for entry in member.guild.audit_logs(limit=5, action=discord.AuditLogAction.bot_add):
-                if entry.target.id == member.id:
-                    if entry.user.id == SAHIB_ID:
-                        sahib_isvi = True
-                    break
-        except:
-            pass
-
-        if not sahib_isvi:
-            try:
-                await member.ban(reason="V80000 Təhlükəsizlik: İcazəsiz kənar bot bloklandı!")
-                return
-            except:
-                pass
+        # İstənilən başqa botun (Owo, Eren və s.) serverə girməsinə sərbəst icazə verir
         return
 
     try:
@@ -438,4 +418,4 @@ async def avatar(ctx, member: discord.Member = None):
 if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("TOKEN"))
-                        
+             
