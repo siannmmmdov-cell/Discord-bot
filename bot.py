@@ -46,7 +46,6 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
-    # Kənar bot və ya tətbiq gələrsə dərhal yoxlayırıq
     if member.bot:
         sahib_isvi = False
         try:
@@ -59,7 +58,6 @@ async def on_member_join(member):
         except Exception as e:
             print(f"Audit log xətası: {e}")
 
-        # Əgər əlavə edən sənsənsə (SAHIB_ID), icazə ver. Başqasıdırsa, dərhal banla!
         if not sahib_isvi:
             try:
                 await member.ban(reason="V6700 Təhlükəsizlik: Bu serverə yalnız sahib bot/tətbiq əlavə edə bilər!")
@@ -87,7 +85,6 @@ async def on_member_join(member):
 
 @bot.event
 async def on_webhooks_update(channel):
-    # Kənar adamların webhook (tətbiq bağlantısı) yaratmasının qarşısını alırıq
     try:
         await asyncio.sleep(1)
         async for entry in channel.guild.audit_logs(limit=3, action=discord.AuditLogAction.webhook_create):
@@ -524,4 +521,5 @@ async def announcement(ctx, *, mesaj):
 if __name__ == "__main__":
     keep_alive()
     bot.run(os.environ.get("TOKEN"))
+    
     
