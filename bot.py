@@ -1,10 +1,9 @@
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 import asyncio
 import os
 import random
 import time
-import re
 from datetime import timedelta
 from flask import Flask
 from threading import Thread
@@ -50,7 +49,7 @@ async def on_ready():
     print(f' Botun Adı: {bot.user.name}')
     print(f' ID: {bot.user.id}')
     print(f'----------------------------------------')
-    await bot.change_presence(activity=discord.Game(name="!bot | V80000 Ultra Qoruma"))
+    await bot.change_presence(activity=discord.Game(name="!bot | Menyulu Baza Sistemi"))
 
 # YENİ ÜZV QOŞULANDA
 @bot.event
@@ -121,44 +120,66 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# ==========================================
-# İDARƏETMƏ VƏ PANEL KOMUTU (!bot)
-# ==========================================
+# ====================================================
+# İNTERAKTİV BAZA MENYUSU (!bot komutu)
+# ====================================================
+
+class BazaMenyu(discord.ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(label="1. Təhlükəsizlik və Nuke Sistemi", description="Anti-spam, .gg link qoruması və !nuke əmri haqqında", emoji="🛡️"),
+            discord.SelectOption(label="2. İdarəetmə və Moderasiya Əmrləri", description="Lock, unlock, hide, ban, kick, clear və digərləri", emoji="🔨"),
+            discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zərlər, oyunlar, profil və əyləncə komutları", emoji="🎮"),
+            discord.SelectOption(label="4. Dinamik Əlavə Modullar", description="!modul1-dən !modul30-ə qədər olan xüsusi bazalar", emoji="⚡")
+        ]
+        super().__init__(placeholder="Baxmaq istədiyin bazanı seç...", min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        if self.values[0] == "1. Təhlükəsizlik və Nuke Sistemi":
+            embed = discord.Embed(title="🛡️ Baza 1: Təhlükəsizlik və Nuke Sistemi", color=discord.Color.dark_red())
+            embed.add_field(name="Anti-.GG Link Qoruması", value="Serverdə paylaşılmağa çalışılan bütün discord dəvət linklərini (`.gg/` və ya `discord.gg/`) dərhal avtomatik silir və xəbərdarlıq edir.", inline=False)
+            embed.add_field(name="Proqressiv Spam Qoruması", value="Qısa müddətdə ardıcıl mesaj atan istifadəçiləri izləyir. İlk öncə xəbərdarlıq edir, təkrarlandıqda isə avtomatik 1 dəqiqəlik timeout verir.", inline=False)
+            embed.add_field(name="Sahib Mühafizəsi", value=f"Sənin ID-n (`{SAHIB_ID}`) sistemdə qeyd olunduğu üçün heç bir anti-spam və ya link məhdudiyyəti sənə təsir etmir.", inline=False)
+            embed.add_field(name="🔥 !nuke Əmri nə işə yarayır?", value="Olduğun kanalı tamamilə silir və eynilə həmin yerdə təzə kanal klonlayır. Kanalı bütün lazımsız/köhnə çirkli mesajlardan birdəfəyə təmizləyib sıfırlayır.", inline=False)
+            await interaction.response.edit_message(embed=embed)
+
+        elif self.values[0] == "2. İdarəetmə və Moderasiya Əmrləri":
+            embed = discord.Embed(title="🔨 Baza 2: İdarəetmə və Moderasiya Əmrləri", color=discord.Color.blue())
+            embed.add_field(name="Kanal İdarəetməsi", value="`!lock` / `!unlock` (Kanalı yazışmaya bağlayır/açır)\n`!hide` / `!reveal` (Kanalı gizlədir/göstərir)\n`!hideall` / `!revealall` (Bütün kanalları gizlədir/açır)\n`!slowmode [saniyə]` (Yavaş rejim qoyur)\n`!createtext` / `!createvoice` (Yeni kanal yaradır)", inline=False)
+            embed.add_field(name="Cəza və Təmizlik", value="`!ban` (Serverdən qovur)\n`!kick` (Atır)\n`!clear [say]` (Mesajları toplu silir)\n`!say [mətn]` (Botun dili ilə yazı yazdırır)", inline=False)
+            embed.add_field(name="İnformasiya", value="`!ping`, `!serverinfo`, `!userinfo`, `!avatar`, `!uptime`, `!developer`, `!version`, `!rules`, `!support`", inline=False)
+            await interaction.response.edit_message(embed=embed)
+
+        elif self.values[0] == "3. Əyləncə, Oyunlar və Alətlər":
+            embed = discord.Embed(title="🎮 Baza 3: Əyləncə, Oyunlar və Alətlər", color=discord.Color.green())
+            embed.add_field(name="Oyun və Şans", value="`!roll` (zər atır), `!coinflip` (yazı-pər), `!rps` (daş-kağız-qayçı), `!8ball` (sehirli top), `!calc` (riyazi hesab)", inline=False)
+            embed.add_field(name="Profil və Zarafat", value="`!iq`, `!gay`, `!handsome`, `!love`, `!hack`, `!wasted`, `!rip`, `!joke`, `!fact`, `!quote`", inline=False)
+            embed.add_field(name="Qarşılıqlı Əmrlər", value="`!slap` (şillə vurur), `!hug` (qucaqlayır), `!kiss` (öpür), `!kill` (məhv edir)", inline=False)
+            embed.add_field(name="Alətlər və Digərləri", value="`!weather`, `!poll`, `!reminder`, `!ascii`, `!reverse`, `!upper`, `!lower`, `!afk`", inline=False)
+            await interaction.response.edit_message(embed=embed)
+
+        elif self.values[0] == "4. Dinamik Əlavə Modullar":
+            embed = discord.Embed(title="⚡ Baza 4: Dinamik Əlavə Modullar", color=discord.Color.gold())
+            embed.add_field(name="Modul Bazası", value="Serverdə aktiv olan `!modul1`-dən tutmuş `!modul30`-ə qədər olan bütün əlavə xüsusi modul komutları bu bazaya daxildir. Hər biri çağırıldıqda işlək vəziyyətdə cavab verir.", inline=False)
+            await interaction.response.edit_message(embed=embed)
+
+class BazaView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(BazaMenyu())
 
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="🛡️ V80000 ULTRA İDARƏETMƏ VƏ KOMUT PANELİ",
-        description="Botun içindəki bütün sistemlər və kateqoriyalar aşağıdakılardır:",
-        color=discord.Color.dark_red()
+        title="🎛️ V80000 ULTRA BAZA VƏ İDARƏETMƏ PANELİ",
+        description="Aşağıdakı açılan menyudan istədiyin bazanı seçərək həm komutların detallı siyahısını, həm də **!nuke** kimi əmrlərin tam olaraq nə işə yaradığını ayrı-ayrı görə bilərsən!",
+        color=discord.Color.dark_purple()
     )
-    embed.add_field(
-        name="🛡️ 1. Təhlükəsizlik Sistemləri", 
-        value="• **Anti-.GG Link:** Dəvət linklərini avtomatik silir.\n• **Anti-Spam:** Ardıcıl mesajları dayandırır və timeout verir.\n• **Sahib Qoruması:** Səni bütün məhdudiyyətlərdən qoruyur.", 
-        inline=False
-    )
-    embed.add_field(
-        name="⚙️ 2. Panel və Məlumat Komutları", 
-        value="`!bot`, `!ping`, `!serverinfo`, `!userinfo`, `!avatar`, `!uptime`, `!developer`, `!version`, `!rules`, `!support`", 
-        inline=False
-    )
-    embed.add_field(
-        name="🔨 3. Sahib və Moderasiya Əmrləri", 
-        value="`!lock`, `!unlock`, `!hide`, `!reveal`, `!hideall`, `!revealall`, `!slowmode`, `!nuke`, `!ban`, `!kick`, `!clear`, `!say`, `!createtext`, `!createvoice`", 
-        inline=False
-    )
-    embed.add_field(
-        name="🎮 4. Əyləncə və Oyun Komutları", 
-        value="`!roll`, `!coinflip`, `!iq`, `!gay`, `!handsome`, `!love`, `!hack`, `!wasted`, `!rip`, `!slap`, `!hug`, `!kiss`, `!kill`, `!cat`, `!dog`, `!ascii`, `!reverse`, `!upper`, `!lower`, `!afk`, `!weather`, `!poll`, `!reminder`, `!fact`, `!quote`, `!8ball`, `!calc`, `!joke`, `!rps`", 
-        inline=False
-    )
-    embed.add_field(
-        name="⚡ 5. Dinamik Modullar", 
-        value="`!modul1`-dən `!modul30`-ə qədər xüsusi əlavə modullar mövcuddur.", 
-        inline=False
-    )
-    embed.set_footer(text="V80000 Security Systems © 2026 | Bütün hüquqlar qorunur.")
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, view=BazaView())
+
+# ====================================================
+# İNFORMASİYA VƏ PANEL KOMUTLARI
+# ====================================================
 
 @bot.command(name="ping")
 async def ping(ctx):
@@ -210,9 +231,9 @@ async def rules(ctx):
 async def support(ctx):
     await ctx.send("🛠️ Dəstək üçün sahibə müraciət edin.")
 
-# ==========================================
+# ====================================================
 # SAHİB VƏ MODERASİYA ƏMRLƏRİ
-# ==========================================
+# ====================================================
 
 @bot.command(name="lock")
 async def lock(ctx):
@@ -325,9 +346,9 @@ async def createvoice(ctx, *, isim):
     await ctx.guild.create_voice_channel(isim)
     await ctx.send(f"🔊 `{isim}` adlı səs kanalı yaradıldı.")
 
-# ==========================================
+# ====================================================
 # ƏYLƏNCƏ VƏ OYUN KOMUTLARI
-# ==========================================
+# ====================================================
 
 @bot.command(name="roll")
 async def roll(ctx):
@@ -469,7 +490,6 @@ async def joke(ctx):
         "Temirçi niyə yuxuladı? Çünki zindan döyülürdü."
     ]
     await ctx.send(f"😂 Zarafat: {random.choice(jokes)}")
-
 @bot.command(name="rps")
 async def rps(ctx, choice: str):
     choices = ["daş", "kağız", "qayçı"]
@@ -486,9 +506,9 @@ async def rps(ctx, choice: str):
         res = "Mən qazandım!"
     await ctx.send(f"Sənin seçimin: **{cho}** | Mənim seçimin: **{bot_choice}** -> **{res}**")
 
-# ==========================================
-# DİNAMİK ƏLAVƏ MODULLAR
-# ==========================================
+# ====================================================
+# DİNAMİK ƏLAVƏ MODULLAR (!modul1 - !modul30)
+# ====================================================
 
 for i in range(1, 31):
     @bot.command(name=f"modul{i}")
@@ -501,4 +521,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-    
+        
