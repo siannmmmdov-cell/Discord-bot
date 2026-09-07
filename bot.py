@@ -106,42 +106,58 @@ async def on_message(message):
             spam_sayaci[author_id] += 1
 
             if spam_sayaci[author_id] == 1:
-                # Birinci xəbərdarlıq (Sadəcə mesajı silir və xəbərdarlıq edir)
                 warn = await message.channel.send(f"⚠️ {message.author.mention}, spam basma oğlan, dayan!")
                 await asyncio.sleep(5)
                 await warn.delete()
             else:
-                # İkinci və sonrakı hallarda zaman aşımı (timeout) verir
                 await message.author.timeout(timedelta(seconds=60), reason="Ardıcıl spam")
                 warn = await message.channel.send(f"🔇 {message.author.mention}, təkrar spam etdiyin üçün 1 dəqiqəlik zaman aşımına atıldın!")
                 await asyncio.sleep(5)
                 await warn.delete()
-                spam_sayaci[author_id] = 0 # Sayğacı sıfırla
+                spam_sayaci[author_id] = 0
             return
         except:
             pass
 
-    # XP VƏ MESAJ SAYĞACI
-    if author_id not in user_xp:
-        user_xp[author_id] = {"msg": 0}
-    user_xp[author_id]["msg"] += 1
-
     await bot.process_commands(message)
 
 # ==========================================
-# 1-10: İDARƏETMƏ VƏ PANEL KOMUTLARI
+# İDARƏETMƏ VƏ PANEL KOMUTU (!bot)
 # ==========================================
 
 @bot.command(name="bot")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="🛡️ V80000 ULTRA İDARƏETMƏ PANELİ",
-        description="Serveri tam idarə etmək və təhlükəsizliyi qorumaq üçün rəsmi panel.",
+        title="🛡️ V80000 ULTRA İDARƏETMƏ VƏ KOMUT PANELİ",
+        description="Botun içindəki bütün sistemlər və kateqoriyalar aşağıdakılardır:",
         color=discord.Color.dark_red()
     )
-    embed.add_field(name="⚙️ Sahib Əmrləri", value="`!lock`, `!unlock`, `!hide`, `!reveal`, `!hideall`, `!revealall`, `!slowmode`, `!nuke`, `!ban`, `!kick`, `!clear`", inline=False)
-    embed.add_field(name="📊 Xüsusi Sistemlər", value="Aktiv Anti-Spam (Xəbərdarlıq + Zaman aşımı) və .gg link qoruma filtresi aktivdir.", inline=False)
-    embed.set_footer(text="V80000 Security Systems © 2026")
+    embed.add_field(
+        name="🛡️ 1. Təhlükəsizlik Sistemləri", 
+        value="• **Anti-.GG Link:** Dəvət linklərini avtomatik silir.\n• **Anti-Spam:** Ardıcıl mesajları dayandırır və timeout verir.\n• **Sahib Qoruması:** Səni bütün məhdudiyyətlərdən qoruyur.", 
+        inline=False
+    )
+    embed.add_field(
+        name="⚙️ 2. Panel və Məlumat Komutları", 
+        value="`!bot`, `!ping`, `!serverinfo`, `!userinfo`, `!avatar`, `!uptime`, `!developer`, `!version`, `!rules`, `!support`", 
+        inline=False
+    )
+    embed.add_field(
+        name="🔨 3. Sahib və Moderasiya Əmrləri", 
+        value="`!lock`, `!unlock`, `!hide`, `!reveal`, `!hideall`, `!revealall`, `!slowmode`, `!nuke`, `!ban`, `!kick`, `!clear`, `!say`, `!createtext`, `!createvoice`", 
+        inline=False
+    )
+    embed.add_field(
+        name="🎮 4. Əyləncə və Oyun Komutları", 
+        value="`!roll`, `!coinflip`, `!iq`, `!gay`, `!handsome`, `!love`, `!hack`, `!wasted`, `!rip`, `!slap`, `!hug`, `!kiss`, `!kill`, `!cat`, `!dog`, `!ascii`, `!reverse`, `!upper`, `!lower`, `!afk`, `!weather`, `!poll`, `!reminder`, `!fact`, `!quote`, `!8ball`, `!calc`, `!joke`, `!rps`", 
+        inline=False
+    )
+    embed.add_field(
+        name="⚡ 5. Dinamik Modullar", 
+        value="`!modul1`-dən `!modul30`-ə qədər xüsusi əlavə modullar mövcuddur.", 
+        inline=False
+    )
+    embed.set_footer(text="V80000 Security Systems © 2026 | Bütün hüquqlar qorunur.")
     await ctx.send(embed=embed)
 
 @bot.command(name="ping")
@@ -195,7 +211,7 @@ async def support(ctx):
     await ctx.send("🛠️ Dəstək üçün sahibə müraciət edin.")
 
 # ==========================================
-# 11-25: SAHİB VƏ MODERASİYA ƏMRLƏRİ
+# SAHİB VƏ MODERASİYA ƏMRLƏRİ
 # ==========================================
 
 @bot.command(name="lock")
@@ -310,7 +326,7 @@ async def createvoice(ctx, *, isim):
     await ctx.send(f"🔊 `{isim}` adlı səs kanalı yaradıldı.")
 
 # ==========================================
-# 26-55: ƏYLƏNCƏ VƏ OYUN KOMUTLARI
+# ƏYLƏNCƏ VƏ OYUN KOMUTLARI
 # ==========================================
 
 @bot.command(name="roll")
@@ -471,7 +487,7 @@ async def rps(ctx, choice: str):
     await ctx.send(f"Sənin seçimin: **{cho}** | Mənim seçimin: **{bot_choice}** -> **{res}**")
 
 # ==========================================
-# 56-85: DİNAMİK ƏLAVƏ MODULLAR VƏ KÖMƏKÇİ KOMUTLAR
+# DİNAMİK ƏLAVƏ MODULLAR
 # ==========================================
 
 for i in range(1, 31):
