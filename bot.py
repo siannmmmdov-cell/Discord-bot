@@ -226,25 +226,33 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. .URL REAL-TIME İNSTANCE & INVITE TRACKER KOMUTU (REAL VƏ DƏQİQ)
+# 6. .URL REAL-TIME İNSTANCE & INVITE TRACKER KOMUTU (DÜZGÜN VƏ DƏQİQ)
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
-    try:
-        invites = await ctx.guild.invites()
-        if invites:
-            aktif_davet = max(invites, key=lambda i: i.uses)
-            secilen_link = aktif_davet.url
-            toplam_istifade = aktif_davet.uses
-            davet_eden = aktif_davet.inviter.name if aktif_davet.inviter else "Server Üzvü"
-        else:
-            secilen_link = f"https://discord.gg/{ctx.guild.vanity_url_code}" if ctx.guild.vanity_url else "Aktiv dəvət linki tapılmadı."
-            toplam_istifade = ctx.guild.vanity_url.uses if ctx.guild.vanity_url else 0
-            davet_eden = "Xüsusi URL"
-    except Exception as e:
-        secilen_link = "Botun icazəsi çatışmır (Manage Server lazımdır)."
-        toplam_istifade = 0
-        davet_eden = "Xəta"
+    secilen_link = f"https://discord.gg/{ctx.guild.vanity_url_code}" if ctx.guild.vanity_url else "Aktiv dəvət linki tapılmadı."
+    
+    if ctx.guild.vanity_url:
+        try:
+            vanity = await ctx.guild.vanity_invite()
+            toplam_istifade = vanity.uses
+        except:
+            toplam_istifade = 0
+        davet_eden = "Xüsusi URL (XAS)"
+    else:
+        try:
+            invites = await ctx.guild.invites()
+            if invites:
+                aktif_davet = max(invites, key=lambda i: i.uses)
+                secilen_link = aktif_davet.url
+                toplam_istifade = aktif_davet.uses
+                davet_eden = aktif_davet.inviter.name if aktif_davet.inviter else "Server Üzvü"
+            else:
+                toplam_istifade = 0
+                davet_eden = "Məlum deyil"
+        except:
+            toplam_istifade = 0
+            davet_eden = "Məlum deyil"
 
     embed = discord.Embed(
         title=f"📊 {ctx.guild.name} — Real Dəvət Statistikası",
@@ -253,7 +261,7 @@ async def server_url(ctx):
     )
     embed.add_field(name="🔗 Aktiv Dəvət Linki", value=f"> {secilen_link}", inline=False)
     embed.add_field(name="📈 Anlıq İstifadə Sayı", value=f"> **{toplam_istifade}** nəfər", inline=True)
-    embed.add_field(name="👑 Linki Yaradan", value=f"> `{davet_eden}`", inline=True)
+    embed.add_field(name="👑 Linki Yaradan", value=f"> `{ctx.author.name}`", inline=True)
     
     if ctx.guild.icon:
         embed.set_thumbnail(url=ctx.guild.icon.url)
