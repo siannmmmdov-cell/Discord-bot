@@ -84,7 +84,7 @@ async def on_member_join(member):
         pass
 
 # =====================================================================
-# 4. ADVANCED SECURITY & AUTOMOD
+# 4. ADVANCED SECURITY & AUTOMOD (BÜTÜN SPAM VƏ ŞABLONLAR DAXİL)
 # =====================================================================
 @bot.event
 async def on_message(message):
@@ -112,12 +112,22 @@ async def on_message(message):
             sebep = afk_users[mention.id]
             await message.channel.send(f"💤 Etiketlədiyiniz istifadəçi (`{mention.name}`) şu an AFK-dır. Səbəb: **{sebep}**")
 
+    # Reklam və Link Qoruması
     if "gg/" in icerik or "discord.gg/" in icerik or "https://" in icerik or "http://" in icerik:
         try:
             await message.delete()
             warn = await message.channel.send(f"⚠️ {message.author.mention}, bu serverdə reklam və link paylaşmaq qadağandır!")
             await asyncio.sleep(5)
             await warn.delete()
+            return
+        except:
+            pass
+
+    # Şəklini atdığın /vur tipli və digər random şablon spamların qoruması
+    yasakli_sablonlar = ["/vur", "yaz gir xd", "w10bv", "yih8ym", "tcpn4", "6bbemn"]
+    if any(sablon in icerik for sablon in yasakli_sablonlar):
+        try:
+            await message.delete()
             return
         except:
             pass
@@ -179,7 +189,7 @@ class XASMenyu(discord.ui.Select):
         if self.values[0] == "1. Təhlükəsizlik və Nuke":
             embed = discord.Embed(title="🛡️ Təhlükəsizlik Sistemi", description="Serveri qoruyan avtomatik mexanizmlər.", color=XAS_COLOR)
             embed.add_field(name="Anti-GG Link Qoruması", value="Bütün xarici linkləri və dəvətləri dərhal silir.", inline=False)
-            embed.add_field(name="Spam Qoruması", value="Flood edənləri avtomatik cəzalandırır.", inline=False)
+            embed.add_field(name="Spam Qoruması", value="Flood edənləri və şablon bot spamlarını avtomatik bloklayır.", inline=False)
             embed.add_field(name="🔥 Nuke Əmri", value="`!nuke` - Kanalı sıfırlayıb yenidən yaradır.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
@@ -223,7 +233,6 @@ async def server_url(ctx):
     try:
         invites = await ctx.guild.invites()
         if invites:
-            # Ən çox işlədilən və ya ilk aktiv dəvət linkini tapırıq
             aktiv_davet = max(invites, key=lambda i: i.uses)
             link_url = aktiv_davet.url
             toplam_istifade = aktiv_davet.uses
@@ -243,7 +252,7 @@ async def server_url(ctx):
         color=XAS_COLOR
     )
     embed.add_field(name="🔗 Aktiv Dəvət Linki", value=f"> {link_url}", inline=False)
-    embed.add_field(name="📈 Neçə Nəfər İstifadə Edib?", value=> **{toplam_istifade}** nəfər bu linklə qoşulub!", inline=False)
+    embed.add_field(name="📈 Neçə Nəfər İstifadə Edib?", value=f"> **{toplam_istifade}** nəfər bu linklə qoşulub!", inline=False)
     embed.add_field(name="👑 Linki Yaradan", value=f"> `{davet_eden}`", inline=False)
     embed.set_footer(text="XAS Security • Anlıq Yenilənən Statistik Sistem")
     await ctx.send(embed=embed)
