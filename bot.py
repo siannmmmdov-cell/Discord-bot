@@ -401,10 +401,10 @@ async def clear_cmd(ctx, amount: int = 5):
 @bot.command(name="sex", aliases=["fuck", "kiss", "öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
     gifler = [
-        "https://media.giphy.com/media/2vn7_xvqT1VwY/giphy.gif",
-        "https://media.giphy.com/media/12VXIxGaNRFdlm/giphy.gif",
-        "https://media.giphy.com/media/l4FGuhL4U2WyjdkaY/giphy.gif",
-        "https://media.giphy.com/media/3og0IPxMM0erATueVW/giphy.gif"
+        "https://media.giphy.com/media/Gf3AU80aGNX7i/giphy.gif",
+        "https://media.giphy.com/media/nyGFcsP0kA3mE/giphy.gif",
+        "https://media.giphy.com/media/osYdfUSK6vUNi/giphy.gif",
+        "https://media.giphy.com/media/13hvLuZIDAC4Cc/giphy.gif"
     ]
     
     secilen_gif = random.choice(gifler)
