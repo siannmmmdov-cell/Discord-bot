@@ -401,21 +401,21 @@ async def clear_cmd(ctx, amount: int = 5):
 @bot.command(name="sex", aliases=["fuck", "kiss", "öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
     gifler = [
-        "https://media.giphy.com/media/Gf3AU80aGNX7i/giphy.gif",
-        "https://media.giphy.com/media/nyGFcsP0kA3mE/giphy.gif",
-        "https://media.giphy.com/media/osYdfUSK6vUNi/giphy.gif",
-        "https://media.giphy.com/media/13hvLuZIDAC4Cc/giphy.gif"
+        "https://media1.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+        "https://media2.giphy.com/media/10UxDBfTEr2gy4/giphy.gif",
+        "https://media3.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
+        "https://media4.giphy.com/media/l0HlvcW4Pz7nsu0c0/giphy.gif"
     ]
     
     secilen_gif = random.choice(gifler)
     
     embed = discord.Embed(
-        title="Fuck",
+        title="Romantik Anlar!",
+        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər!",
         color=XAS_COLOR
     )
-    embed.set_author(name=f"{ctx.author.name} & {member.name}")
     embed.set_image(url=secilen_gif)
-    embed.set_footer(text="Əyləncə və Statistika — Fuck")
+    embed.set_footer(text="Əyləncə və Statistika — Sex/Kiss")
     
     await ctx.send(embed=embed)
 
@@ -446,7 +446,7 @@ async def handsome_cmd(ctx, member: discord.Member = None):
 @bot.command(name="love", aliases=["sevgi"])
 async def love_cmd(ctx, member1: discord.Member, member2: discord.Member = None):
     m2 = member2 or ctx.author
-    await ctx.send(f"❤️ {member1.name} və {m2.name} uyğunluğu: **%{random.randint(10, 100)}**")
+        await ctx.send(f"❤️ {member1.name} və {m2.name} uyğunluğu: **%{random.randint(10, 100)}**")
 
 @bot.command(name="hack")
 async def hack_cmd(ctx, member: discord.Member):
