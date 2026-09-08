@@ -15,7 +15,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "XAS Ultra Mega Ultimate Bot 1000+ Sətir Aktiv və Rejimdədir!"
+    return "XAS Ultra Mega Ultimate Bot Aktivdir!"
 
 def run():
     app.run(host="0.0.0.0", port=10000)
@@ -40,7 +40,7 @@ intents.invites = True
 
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
-# SİSTEM LÜĞƏTLƏRİ VƏ BAZALAR
+# SİSTEM BAZALARI
 spam_takip = {}
 spam_sayaci = {}
 user_levels = {}
@@ -58,14 +58,6 @@ async def on_ready():
     print(f" Bot Tag: {bot.user}")
     print(f" Server Sayı: {len(bot.guilds)}")
     print(f"--------------------------------------------------")
-    
-    for guild in bot.guilds:
-        try:
-            invs = await guild.invites()
-            server_invites[guild.id] = {inv.code: inv.uses for inv in invs}
-        except:
-            pass
-            
     status_task.start()
 
 @tasks.loop(seconds=10)
@@ -73,8 +65,7 @@ async def status_task():
     activities = [
         discord.Activity(type=discord.ActivityType.watching, name="!panel | XAS Security"),
         discord.Activity(type=discord.ActivityType.playing, name="discord.gg/xas"),
-        discord.Activity(type=discord.ActivityType.listening, name="100+ Komut & Sistem"),
-        discord.Activity(type=discord.ActivityType.competing, name="XAS Community")
+        discord.Activity(type=discord.ActivityType.listening, name="XAS Sistem & Komutlar"),
     ]
     await bot.change_presence(activity=random.choice(activities))
 
@@ -85,7 +76,7 @@ async def on_member_join(member):
     try:
         embed = discord.Embed(
             title="XAS Serverinə Xoş Gəldin!",
-            description=f"Salam {member.mention}, səni aramızda görməkdən şadıq!\n\n> Qaydaları oxumağı və kanallara göz gəzdirməyi unutma.",
+            description=f"Salam {member.mention}, səni aramızda görməkdən şadıq!\n\n> Qaydaları oxumağı unutma.",
             color=XAS_COLOR
         )
         embed.set_thumbnail(url=member.display_avatar.url)
@@ -94,7 +85,7 @@ async def on_member_join(member):
         pass
 
 # =====================================================================
-# 4. ADVANCED SECURITY & AUTOMOD (ANTİ-GG, SPAM, AFK, XP)
+# 4. ADVANCED SECURITY & AUTOMOD
 # =====================================================================
 @bot.event
 async def on_message(message):
@@ -125,7 +116,7 @@ async def on_message(message):
     if "gg/" in icerik or "discord.gg/" in icerik or "https://" in icerik or "http://" in icerik:
         try:
             await message.delete()
-            warn = await message.channel.send(f"⚠️ {message.author.mention}, bu serverdə reklam, dəvət linki və ya link paylaşmaq qəti qadağandır!")
+            warn = await message.channel.send(f"⚠️ {message.author.mention}, bu serverdə reklam və link paylaşmaq qadağandır!")
             await asyncio.sleep(5)
             await warn.delete()
             return
@@ -149,7 +140,7 @@ async def on_message(message):
                 await warn.delete()
             else:
                 await message.author.timeout(timedelta(seconds=60), reason="Spam Flood")
-                warn = await message.channel.send(f"🔇 {message.author.mention}, ardıcıl spam/flood səbəbilə 1 dəqiqəlik mute olundu!")
+                warn = await message.channel.send(f"🔇 {message.author.mention}, spam səbəbilə 1 dəqiqəlik mute olundu!")
                 await asyncio.sleep(5)
                 await warn.delete()
                 spam_sayaci[author_id] = 0
@@ -173,44 +164,41 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # =====================================================================
-# 5. INTERACTIVE SELECT MENU (PANEL - 100+ KOMUT)
+# 5. INTERACTIVE SELECT MENU (PANEL)
 # =====================================================================
 class XASMenyu(discord.ui.Select):
     def __init__(self):
         options = [
-            discord.SelectOption(label="1. Təhlükəsizlik və Nuke", description="Anti-GG, spam qoruması, nuke və kanal təhlükəsizliyi.", emoji="🛡️"),
-            discord.SelectOption(label="2. İdarəetmə və Moderasiya", description="Ban, kick, clear, lock, unlock, slowmode, hide.", emoji="⚙️"),
+            discord.SelectOption(label="1. Təhlükəsizlik və Nuke", description="Anti-GG, spam qoruması və kanal idarəsi.", emoji="🛡️"),
+            discord.SelectOption(label="2. İdarəetmə və Moderasiya", description="Ban, kick, clear, lock, slowmode.", emoji="⚙️"),
             discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zər, yazı-pər, daş-kağız, sex, fuck, kiss, iq, slot.", emoji="🎮"),
-            discord.SelectOption(label="4. XAS Xüsusi URL & Sistem", description="XAS server rəsmi dəvət linki, statistikalar və info.", emoji="💎")
+            discord.SelectOption(label="4. XAS Xüsusi URL & Sistem", description="XAS server rəsmi dəvət linki və məlumatlar.", emoji="💎")
         ]
-        super().__init__(placeholder="XAS 100+ Komut İdarəetmə Menyusundan Bölmə Seçin...", min_values=1, max_values=1, options=options)
+        super().__init__(placeholder="XAS İdarəetmə Menyusundan Bölmə Seçin...", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
         if self.values[0] == "1. Təhlükəsizlik və Nuke":
-            embed = discord.Embed(title="🛡️ Baza 1: Təhlükəsizlik Sistemi", description="Serveri qoruyan avtomatik mexanizmlər.", color=XAS_COLOR)
+            embed = discord.Embed(title="🛡️ Təhlükəsizlik Sistemi", description="Serveri qoruyan avtomatik mexanizmlər.", color=XAS_COLOR)
             embed.add_field(name="Anti-GG Link Qoruması", value="Bütün xarici linkləri və dəvətləri dərhal silir.", inline=False)
-            embed.add_field(name="Proqressiv Spam Qoruması", value="Flood və sürətli mesaj atanları avtomatik müəyyən edib cəzalandırır.", inline=False)
-            embed.add_field(name="🔥 Nuke Əmri", value="`!nuke` - Kanalı klonlayıb köhnəsini silərək sıfırlayır.", inline=False)
+            embed.add_field(name="Spam Qoruması", value="Flood edənləri avtomatik cəzalandırır.", inline=False)
+            embed.add_field(name="🔥 Nuke Əmri", value="`!nuke` - Kanalı sıfırlayıb yenidən yaradır.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "2. İdarəetmə və Moderasiya":
-            embed = discord.Embed(title="⚙️ Baza 2: Moderasiya Paneli", description="Aktiv moderasiya əmrləri siyahısı.", color=XAS_COLOR)
-            embed.add_field(name="Kanal Kilidləri", value="`!lock` / `!unlock` / `!hide` / `!reveal` / `!slowmode`", inline=False)
-            embed.add_field(name="Cəza Alətləri", value="`!ban` / `!kick` / `!clear` / `!timeout` / `!unban`", inline=False)
-            embed.add_field(name="İnformativ Komutlar", value="`!ping` / `!serverinfo` / `!userinfo` / `!avatar` / `!botinfo`", inline=False)
+            embed = discord.Embed(title="⚙️ Moderasiya Paneli", description="Aktiv moderasiya əmrləri.", color=XAS_COLOR)
+            embed.add_field(name="Kanal Əmrləri", value="`!lock` / `!unlock` / `!hide` / `!reveal` / `!slowmode`", inline=False)
+            embed.add_field(name="Cəza Əmrləri", value="`!ban` / `!kick` / `!clear` / `!timeout`", inline=False)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "3. Əyləncə, Oyunlar və Alətlər":
-            embed = discord.Embed(title="🎮 Baza 3: Əyləncə & Oyunlar (100+ Sistem)", description="İstifadəçilər üçün interaktiv oyunlar və əyləncə.", color=XAS_COLOR)
-            embed.add_field(name="Romantik & Əyləncə", value="`!sex` / `!fuck` / `!kiss` | `!roll` | `!coinflip` | `!rps` | `!slot`", inline=False)
-            embed.add_field(name="Əyləncəli Testlər", value="`!iq` | `!gay` | `!handsome` | `!hack` | `!love` | `!joke` | `!8ball`", inline=False)
-            embed.add_field(name="Faydalı Alətlər", value="`!calc` | `!weather` | `!fact` | `!quote` | `!poll` | `!afk`", inline=False)
+            embed = discord.Embed(title="🎮 Əyləncə & Oyunlar", description="İstifadəçilər üçün interaktiv oyunlar.", color=XAS_COLOR)
+            embed.add_field(name="Xüsusi Əmrlər", value="`!sex` / `!fuck` / `!kiss` | `!roll` | `!coinflip` | `!rps` | `!slot`", inline=False)
+            embed.add_field(name="Testlər & Alətlər", value="`!iq` | `!gay` | `!handsome` | `!hack` | `!love` | `!calc`", inline=False)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "4. XAS Xüsusi URL & Sistem":
-            embed = discord.Embed(title="💎 Baza 4: XAS URL & Sistem", description="XAS rəsmi server dəvət keçidi.", color=XAS_COLOR)
+            embed = discord.Embed(title="💎 XAS URL & Sistem", description="XAS rəsmi server dəvət keçidi.", color=XAS_COLOR)
             embed.add_field(name="Rəsmi Dəvət Linki", value="> discord.gg/xas\n> https://discord.gg/xas", inline=False)
-            embed.add_field(name="Keçid Statistikası", value="> Bu keçid sistem üzərindən avtomatik izlənilir.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
 class XASView(discord.ui.View):
@@ -221,11 +209,11 @@ class XASView(discord.ui.View):
 @bot.command(name="panel")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="💎 XAS ULTRA İDARƏETMƏ PANELİ (100+ KOMUT)",
-        description="Aşağıdakı açılan menyudan istədiyiniz kateqoriyanı seçərək əmrləri və sistemləri görə bilərsiniz.",
+        title="💎 XAS İDARƏETMƏ PANELİ",
+        description="Aşağıdakı açılan menyudan istədiyiniz kateqoriyanı seçə bilərsiniz.",
         color=XAS_COLOR
     )
-    embed.set_footer(text="XAS Security & Management System • 100+ Komut Aktiv")
+    embed.set_footer(text="XAS Security & Management System")
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
@@ -234,14 +222,13 @@ async def bot_panel(ctx):
 @bot.command(name="url")
 async def server_url(ctx):
     embed = discord.Embed(
-        title=f"📊 {ctx.guild.name} — XAS Sistem & Dəvət Məlumatı",
-        description="Serverin rəsmi bağlantıları və təhlükəsizlik statusu:",
+        title=f"📊 {ctx.guild.name} — XAS Sistem Məlumatı",
+        description="Serverin rəsmi bağlantıları:",
         color=XAS_COLOR
     )
     embed.add_field(name="🔗 Əsas Dəvət Keçidi", value="> [discord.gg/xas](https://discord.gg/xas)", inline=False)
-    embed.add_field(name="🛡️ Təhlükəsizlik Vəziyyəti", value="> Anti-GG, Anti-Spam və Avtomatik Qoruma sistemi **Aktivdir**.", inline=False)
-    embed.add_field(name="💎 Server Sahibi", value=f"> {ctx.guild.owner.mention if ctx.guild.owner else 'Bilinmir'}", inline=False)
-    embed.set_footer(text="XAS Security • Official System Panel")
+    embed.add_field(name="🛡️ Status", value="> Təhlükəsizlik sistemi **Aktivdir**.", inline=False)
+    embed.set_footer(text="XAS Security • Official Panel")
     await ctx.send(embed=embed)
 
 # =====================================================================
@@ -250,7 +237,7 @@ async def server_url(ctx):
 @bot.command(name="ping")
 async def ping_cmd(ctx):
     lat = round(bot.latency * 1000)
-    await ctx.send(f"Pong! 🏓 Botun gecikmə müddəti: **{lat}ms**")
+    await ctx.send(f"Pong! 🏓 Gecikmə müddəti: **{lat}ms**")
 
 @bot.command(name="serverinfo")
 async def serverinfo_cmd(ctx):
@@ -259,17 +246,15 @@ async def serverinfo_cmd(ctx):
     embed.add_field(name="👑 Sahib", value=g.owner, inline=True)
     embed.add_field(name="👥 Üzv Sayı", value=g.member_count, inline=True)
     embed.add_field(name="📁 Kanal Sayı", value=len(g.channels), inline=True)
-    embed.add_field(name="🛡️ Rol Sayı", value=len(g.roles), inline=True)
-    embed.add_field(name="📅 Yaradılma Tarixi", value=g.created_at.strftime("%Y-%m-%d"), inline=True)
+    embed.set_thumbnail(url=g.icon.url if g.icon else None)
     await ctx.send(embed=embed)
 
 @bot.command(name="userinfo")
 async def userinfo_cmd(ctx, member: discord.Member = None):
     m = member or ctx.author
-    embed = discord.Embed(title=f"👤 {m.name} Haqqında Məlumat", color=m.color)
+    embed = discord.Embed(title=f"👤 {m.name} Haqqında", color=m.color)
     embed.add_field(name="İstifadəçi ID", value=m.id, inline=True)
     embed.add_field(name="Qoşulduğu Tarix", value=m.joined_at.strftime("%Y-%m-%d"), inline=True)
-    embed.add_field(name="Əsas Rolu", value=m.top_role.mention, inline=True)
     embed.set_thumbnail(url=m.display_avatar.url)
     await ctx.send(embed=embed)
 
@@ -278,14 +263,6 @@ async def avatar_cmd(ctx, member: discord.Member = None):
     m = member or ctx.author
     embed = discord.Embed(title=f"🖼️ {m.name} - Avatar", color=XAS_COLOR)
     embed.set_image(url=m.display_avatar.url)
-    await ctx.send(embed=embed)
-
-@bot.command(name="botinfo")
-async def botinfo_cmd(ctx):
-    embed = discord.Embed(title="🤖 XAS Ultra Bot Məlumatı", description="Python və Discord.py kitabxanası ilə yazılmış tam təchizatlı idarəetmə botu.", color=XAS_COLOR)
-    embed.add_field(name="Yaradıcı / Sahib", value=f"<@{SAHIB_ID}>", inline=True)
-    embed.add_field(name="Kitabxana", value="Discord.py", inline=True)
-    embed.add_field(name="Status", value="Render Server Üzərində Aktiv", inline=True)
     await ctx.send(embed=embed)
 
 @bot.command(name="level", aliases=["lvl", "seviye"])
@@ -297,7 +274,7 @@ async def level_cmd(ctx, member: discord.Member = None):
 @bot.command(name="afk")
 async def afk_cmd(ctx, *, sebep="Səbəb göstərilməyib"):
     afk_users[ctx.author.id] = sebep
-    await ctx.send(f"💤 {ctx.author.mention}, uğurla AFK rejiminə keçdin. Səbəb: **{sebep}**")
+    await ctx.send(f"💤 {ctx.author.mention}, AFK rejiminə keçdin. Səbəb: **{sebep}**")
 
 # =====================================================================
 # 8. SAHİB VƏ MODERASİYA ƏMRLƏRİ
@@ -321,59 +298,59 @@ async def hide_cmd(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=False)
-    await ctx.send("🙈 Bu kanal hamıdan gizlətildi.")
+    await ctx.send("🙈 Bu kanal gizlətildi.")
 
 @bot.command(name="reveal")
 async def reveal_cmd(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
-    await ctx.send("🐵 Bu kanal yenidən hər kəsə göstərildi.")
+    await ctx.send("🐵 Bu kanal yenidən göstərildi.")
 
 @bot.command(name="slowmode")
 async def slowmode_cmd(ctx, seconds: int):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await ctx.channel.edit(slowmode_delay=seconds)
-    await ctx.send(f"⏱️ Kanalın yavaş modu `{seconds}` saniyə olaraq tənzimləndi.")
+    await ctx.send(f"⏱️ Yavaş mod `{seconds}` saniyə edildi.")
 
 @bot.command(name="nuke")
 async def nuke_ctx(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     position = ctx.channel.position
-    new_channel = await ctx.channel.clone(reason="XAS Nuke Əmri")
+    new_channel = await ctx.channel.clone(reason="XAS Nuke")
     await ctx.channel.delete()
     await new_channel.edit(position=position)
-    await new_channel.send("💥 Kanal uğurla sıfırlandı və təmizləndi! XAS Security.")
+    await new_channel.send("💥 Kanal sıfırlandı!")
 
 @bot.command(name="ban")
 async def ban_cmd(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await member.ban(reason=reason)
-    await ctx.send(f"🔨 {member.name} serverdən ban edildi! Səbəb: {reason}")
+    await ctx.send(f"🔨 {member.name} ban edildi! Səbəb: {reason}")
 
 @bot.command(name="kick")
 async def kick_cmd(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await member.kick(reason=reason)
-    await ctx.send(f"👢 {member.name} serverdən atıldı! Səbəb: {reason}")
+    await ctx.send(f"👢 {member.name} atıldı! Səbəb: {reason}")
 
 @bot.command(name="timeout", aliases=["mute"])
 async def timeout_cmd(ctx, member: discord.Member, minutes: int, *, reason="Göstərilməyib"):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await member.timeout(timedelta(minutes=minutes), reason=reason)
-    await ctx.send(f"🔇 {member.name} `{minutes}` dəqiqə müddətinə Timeout olundu. Səbəb: {reason}")
+    await ctx.send(f"🔇 {member.name} `{minutes}` dəqiqə mute olundu.")
 
 @bot.command(name="clear", aliases=["sil"])
 async def clear_cmd(ctx, amount: int = 5):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await ctx.channel.purge(limit=amount + 1)
-    msg = await ctx.send(f"🧹 `{amount}` ədəd mesaj təmizləndi.")
+    msg = await ctx.send(f"🧹 `{amount}` ədəd mesaj silindi.")
     await asyncio.sleep(3)
     await msg.delete()
 
@@ -383,7 +360,7 @@ async def clear_cmd(ctx, amount: int = 5):
 @bot.command(name="sex", aliases=["öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
-        description=f"🔥 `{ctx.author.name}` ilə `{member.name}` ehtiraslı şəkildə öpüşdülər! (Sex)",
+        description=f"🔥 `@! {ctx.author.name}` ilə `{member.mention}` ehtiraslı şəkildə öpüşdülər! (Sex)",
         color=XAS_COLOR
     )
     embed.set_image(url="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2")
@@ -392,7 +369,7 @@ async def sex_cmd(ctx, member: discord.Member):
 @bot.command(name="fuck")
 async def fuck_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
-        description=f"🔥 `{ctx.author.name}` ilə `{member.name}` ehtiraslı şəkildə birlikdə oldular! (Fuck)",
+        description=f"🔥 `@! {ctx.author.name}` ilə `{member.mention}` ehtiraslı şəkildə birlikdə oldular! (Fuck)",
         color=XAS_COLOR
     )
     embed.set_image(url="https://images.unsplash.com/photo-1518199266791-5375a83190b7")
@@ -401,7 +378,7 @@ async def fuck_cmd(ctx, member: discord.Member):
 @bot.command(name="kiss")
 async def kiss_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
-        description=f"💋 `{ctx.author.name}` `{member.name}` adlı şəxsi öpdü!",
+        description=f"💋 `@! {ctx.author.name}` `{member.mention}` adlı şəxsi öpdü!",
         color=XAS_COLOR
     )
     embed.set_image(url="https://images.unsplash.com/photo-1518609878373-06d740f60d8b")
@@ -445,28 +422,18 @@ async def hack_cmd(ctx, member: discord.Member):
 @bot.command(name="slot")
 async def slot_cmd(ctx):
     sembollər = ["🍒", "🍋", "🍊", "🍇", "🔔", "💎", "7️⃣"]
-    c1 = random.choice(sembollər)
-    c2 = random.choice(sembollər)
-    c3 = random.choice(sembollər)
-    
+    c1, c2, c3 = random.choice(sembollər), random.choice(sembollər), random.choice(sembollər)
     netice = f"🎰 | {c1} | {c2} | {c3} |"
     if c1 == c2 == c3:
-        await ctx.send(f"{netice}\n🎉 Təbriklər, **Jackpot** vurdun! Qazandın!")
+        await ctx.send(f"{netice}\n🎉 Təbriklər, **Jackpot** vurdun!")
     elif c1 == c2 or c2 == c3 or c1 == c3:
         await ctx.send(f"{netice}\n✨ Pis deyil, 2 eyni simvol tapdın!")
     else:
-        await ctx.send(f"{netice}\n❌ Təəssüf, uduzdun! Yenidən sına.")
+        await ctx.send(f"{netice}\n❌ Uduzdun, yenidən sına.")
 
 @bot.command(name="8ball", aliases=["sual"])
 async def eight_ball(ctx, *, soru):
-    cavablar = [
-        "Bəli, mütləq!",
-        "Şübhəsiz ki, hə.",
-        "Gələcək qaranlıqdır, təkrar soruş.",
-        "Xeyir, heç vaxt.",
-        "Mümkündür, amma çətindir.",
-        "Qətiyyən yox!"
-    ]
+    cavablar = ["Bəli, mütləq!", "Şübhəsiz ki, hə.", "Gələcək qaranlıqdır.", "Xeyir, heç vaxt.", "Qətiyyən yox!"]
     await ctx.send(f"🎱 Sual: **{soru}**\n🔮 Cavab: **{random.choice(cavablar)}**")
 
 @bot.command(name="calc")
@@ -475,14 +442,13 @@ async def calc_cmd(ctx, *, expression):
         res = eval(expression)
         await ctx.send(f"🔢 Nəticə: **{res}**")
     except:
-        await ctx.send("❌ Xəta! Riyazi ifadəni düzgün yazın (məsələn: `!calc 5*5`)")
+        await ctx.send("❌ Xəta! İfadəni düzgün yazın (məsələn: `!calc 5*5`)")
 
 @bot.command(name="joke", aliases=["zarafat"])
 async def joke_cmd(ctx):
     jokes = [
         "Kompyuter niyə soyuqdəymə oldu? Çünki pəncərəni açıq qoymuşdu!",
-        "Təmirçi niyə yoruldu? Çünki ziddən deyirlər.",
-        "Müəllim şagirdə: Şagird, deyilənə görə dərsdə yatırsan? Şagird: Yalan deyirlər müəllim, gözlərimi dincəldirəm."
+        "Təmirçi niyə yoruldu? Çünki ziddən deyirlər."
     ]
     await ctx.send(f"😄 Zarafat: {random.choice(jokes)}")
 
@@ -492,7 +458,7 @@ async def rps_cmd(ctx, choice: str):
     bot_choice = random.choice(choices)
     cho = choice.lower()
     if cho not in choices:
-        await ctx.send("Zəhmət olmasa seçimlərdən birini yaz: `daş`, `kağız` və ya `qayçı`!")
+        await ctx.send("Zəhmət olmasa seç: `daş`, `kağız` və ya `qayçı`!")
         return
     if cho == bot_choice:
         res = "Heç-heçə!"
@@ -500,7 +466,7 @@ async def rps_cmd(ctx, choice: str):
         res = "Sən qazandın!"
     else:
         res = "Mən qazandım!"
-    await ctx.send(f"Sənin seçimin: **{cho}** | Mənim seçimin: **{bot_choice}** -> **{res}**")
+    await ctx.send(f"Seçimin: **{cho}** | Mənim: **{bot_choice}** -> **{res}**")
 
 @bot.command(name="poll", aliases=["sorğu"])
 async def poll_cmd(ctx, *, soru):
