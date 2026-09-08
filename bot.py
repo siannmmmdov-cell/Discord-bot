@@ -202,7 +202,7 @@ class XASMenyu(discord.ui.Select):
 
         elif self.values[0] == "3. Əyləncə, Oyunlar və Alətlər":
             embed = discord.Embed(title="🎮 Baza 3: Əyləncə & Oyunlar", description="İstifadəçilər üçün interaktiv oyunlar.", color=XAS_COLOR)
-            embed.add_field(name="Romantik & Əyləncə", value="`!sex` / `!kiss` (Öpüşmə efektləri) | `!roll` | `!coinflip` | `!rps`", inline=False)
+            embed.add_field(name="Romantik & Əyləncə", value="`!sex` / `!fuck` / `!kiss` (Öpüşmə efektləri) | `!roll` | `!coinflip` | `!rps`", inline=False)
             embed.add_field(name="Əyləncəli Testlər", value="`!iq` | `!gay` | `!handsome` | `!hack` | `!love` | `!joke`", inline=False)
             embed.add_field(name="Faydalı Alətlər", value="`!calc` | `!weather` | `!fact` | `!quote` | `!poll` | `!afk`", inline=False)
             await interaction.response.edit_message(embed=embed)
@@ -396,21 +396,28 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, ÖPÜŞMƏ (SEX/KİSS) VƏ OYUN KOMUTLARI
+# 9. ƏYLƏCƏ, ÖPÜŞMƏ (SEX/FUCK/KİSS) VƏ OYUN KOMUTLARI
 # =====================================================================
-@bot.command(name="sex", aliases=["kiss", "öpüş", "öp"])
+@bot.command(name="sex", aliases=["fuck", "kiss", "öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
     gifler = [
         "https://media1.giphy.com/media/3o7TKGhH4CKKBlOWtW/giphy.gif",
         "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1aXl5NXZ4OWFpOTZwbGJqeGZ4aWJpOW5ueDRqaXlnZWMyNXVxMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2vn7_xvqT1VwY/giphy.gif",
-        "https://media.giphy.com/media/12VXIxGaNRFdlm/giphy.gif"
+        "https://media.giphy.com/media/12VXIxGaNRFdlm/giphy.gif",
+        "https://media.giphy.com/media/l4FGuhL4U2WyjdkaY/giphy.gif",
+        "https://media.giphy.com/media/3og0IPxMM0erATueVW/giphy.gif"
     ]
+    
+    secilen_gif = random.choice(gifler)
+    
     embed = discord.Embed(
-        title="🔥 Romantik Anlar!",
-        description=f"❤️ {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər!",
+        title="Fuck",
         color=XAS_COLOR
     )
-    embed.set_image(url=random.choice(gifler))
+    embed.set_author(name=f"{ctx.author.name} & {member.name}")
+    embed.set_image(url=secilen_gif)
+    embed.set_footer(text="Əyləncə və Statistika — Fuck")
+    
     await ctx.send(embed=embed)
 
 @bot.command(name="roll")
@@ -500,3 +507,4 @@ if __name__ == "__main__":
     if TOKEN:
         bot.run(TOKEN)
         
+ 
