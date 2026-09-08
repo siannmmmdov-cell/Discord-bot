@@ -74,7 +74,7 @@ async def status_task():
         discord.Activity(type=discord.ActivityType.watching, name="!panel | XAS Security"),
         discord.Activity(type=discord.ActivityType.playing, name="discord.gg/xas"),
         discord.Activity(type=discord.ActivityType.listening, name="100+ Komut & Sistem"),
-        discord.Activity(type=discord.ActivityType.competing, name="DEADAZE Community")
+        discord.Activity(type=discord.ActivityType.competing, name="XAS Community")
     ]
     await bot.change_presence(activity=random.choice(activities))
 
@@ -378,39 +378,33 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI (WAVE STİLİNDƏ EMBED & REPLY)
+# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI (EMBED ŞƏKİL & REPLY)
 # =====================================================================
 @bot.command(name="sex", aliases=["öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
-        title="Sex",
-        description=f"`{ctx.author.name}` & `{member.name}`",
+        description=f"🔥 `{ctx.author.name}` ilə `{member.name}` ehtiraslı şəkildə öpüşdülər! (Sex)",
         color=XAS_COLOR
     )
     embed.set_image(url="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2")
-    embed.set_footer(text="Əyləncə və Statistika — Sex")
     await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="fuck")
 async def fuck_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
-        title="Fuck",
-        description=f"`{ctx.author.name}` & `{member.name}`",
+        description=f"🔥 `{ctx.author.name}` ilə `{member.name}` ehtiraslı şəkildə birlikdə oldular! (Fuck)",
         color=XAS_COLOR
     )
     embed.set_image(url="https://images.unsplash.com/photo-1518199266791-5375a83190b7")
-    embed.set_footer(text="Əyləncə və Statistika — Fuck")
     await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="kiss")
 async def kiss_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
-        title="Kiss",
-        description=f"`{ctx.author.name}` & `{member.name}`",
+        description=f"💋 `{ctx.author.name}` `{member.name}` adlı şəxsi öpdü!",
         color=XAS_COLOR
     )
     embed.set_image(url="https://images.unsplash.com/photo-1518609878373-06d740f60d8b")
-    embed.set_footer(text="Əyləncə və Statistika — Kiss")
     await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="roll")
@@ -526,4 +520,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-    
+        
