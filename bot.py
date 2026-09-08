@@ -36,6 +36,7 @@ intents.guilds = True
 intents.voice_states = True
 intents.reactions = True
 intents.presences = True
+intents.invites = True  # Avtomatik dəvətləri izləmək üçün vacibdir
 
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
@@ -44,10 +45,11 @@ spam_takip = {}
 spam_sayaci = {}
 user_levels = {}
 afk_users = {}
+server_invites = {}
 XAS_COLOR = discord.Color.from_rgb(30, 30, 40)
 
 # =====================================================================
-# 3. CORE EVENTS & AUTOMATION
+# 3. CORE EVENTS & AUTOMATION (DƏVƏT KEŞLƏMƏSİ)
 # =====================================================================
 @bot.event
 async def on_ready():
@@ -56,6 +58,15 @@ async def on_ready():
     print(f" Bot Tag: {bot.user}")
     print(f" Server Sayı: {len(bot.guilds)}")
     print(f"--------------------------------------------------")
+    
+    # Bütün serverlərin aktiv dəvətlərini yaddaşa yığırıq
+    for guild in bot.guilds:
+        try:
+            invs = await guild.invites()
+            server_invites[guild.id] = {inv.code: inv.uses for inv in invs}
+        except:
+            pass
+            
     status_task.start()
 
 @tasks.loop(seconds=10)
@@ -92,7 +103,6 @@ async def on_message(message):
         await bot.process_commands(message)
         return
 
-    # Sahibə toxunulmazlıq
     if message.author.id == SAHIB_ID:
         await bot.process_commands(message)
         return
@@ -175,8 +185,8 @@ class XASMenyu(discord.ui.Select):
         options = [
             discord.SelectOption(label="1. Təhlükəsizlik və Nuke", description="Anti-GG, spam qoruması, nuke və kanal təhlükəsizliyi.", emoji="🛡️"),
             discord.SelectOption(label="2. İdarəetmə və Moderasiya", description="Ban, kick, clear, lock, unlock, slowmode, hide.", emoji="⚙️"),
-            discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zər, yazı-pər, daş-kağız, iq, gay, handsome, calc.", emoji="🎮"),
-            discord.SelectOption(label="4. XAS Xüsusi URL & Sistem", description="XAS server rəsmi dəvət linki, statistikalar və info.", emoji="💎")
+            discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zər, yazı-pər, daş-kağız, sex, kiss, iq, calc.", emoji="🎮"),
+            discord.SelectOption(label="4. XAS Xüsusi URL & Sistem", description="XAS server rəsmi dəvət linki və avtomatik statistika.", emoji="💎")
         ]
         super().__init__(placeholder="XAS İdarəetmə Menyusundan Bölmə Seçin...", min_values=1, max_values=1, options=options)
 
@@ -197,15 +207,13 @@ class XASMenyu(discord.ui.Select):
 
         elif self.values[0] == "3. Əyləncə, Oyunlar və Alətlər":
             embed = discord.Embed(title="🎮 Baza 3: Əyləncə & Oyunlar", description="İstifadəçilər üçün interaktiv oyunlar.", color=XAS_COLOR)
-            embed.add_field(name="Şans Oyunları", value="`!roll` (zər) | `!coinflip` (yazı-pər) | `!rps` (daş-kağız)", inline=False)
-            embed.add_field(name="Əyləncəli Testlər", value="`!iq` | `!gay` | `!handsome` | `!hack` | `!love` | `!joke`", inline=False)
-            embed.add_field(name="Faydalı Alətlər", value="`!calc` | `!weather` | `!fact` | `!quote` | `!poll` | `!afk`", inline=False)
+            embed.add_field(name="Romantik & Əyləncə", value="`!sex` / `!kiss` (Öpüşmə efektləri) | `!roll` | `!coinflip` | `!rps`", inline=False)
+            embed.add_field(name="Testlər və Alətlər", value="`!iq` | `!gay` | `!handsome` | `!hack` | `!love` | `!calc`", inline=False)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "4. XAS Xüsusi URL & Sistem":
-            embed = discord.Embed(title="💎 Baza 4: XAS URL & Statistikalar", description="XAS rəsmi server dəvət keçidi.", color=XAS_COLOR)
-            embed.add_field(name="Rəsmi Dəvət Linki", value="> discord.gg/xas\n> https://discord.gg/xas", inline=False)
-            embed.add_field(name="Keçid Statistikası", value="> Bu keçid sistem üzərindən 100+ dəfə istifadə olunub.", inline=False)
+            embed = discord.Embed(title="💎 Baza 4: XAS URL & Avtomatik Statistikalar", description="XAS rəsmi server dəvət keçidi.", color=XAS_COLOR)
+            embed.add_field(name="Dəvət Komutu", value="> `!url` yazaraq anlıq real dəvət sayını görə bilərsən.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
 class XASView(discord.ui.View):
@@ -224,18 +232,26 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. .URL ÖZƏL KOMUTU
+# 6. AVTO-DƏVƏT SİSTEMLİ .URL KOMUTU
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
+    try:
+        invites = await ctx.guild.invites()
+        total_uses = sum(inv.uses for inv in invites)
+        primary_invite = invites[0].url if invites else "https://discord.gg/xas"
+    except:
+        total_uses = "Hesablanır..."
+        primary_invite = "https://discord.gg/xas"
+
     embed = discord.Embed(
-        title="XAS Serverinin Xüsusi Dəvət Keçidi",
-        description="XAS serverinin rəsmi və daimi dəvət keçidi.",
+        title="XAS Serverinin Avtomatik Dəvət Sistemi",
+        description="Serverin rəsmi və daimi dəvət keçidi:",
         color=XAS_COLOR
     )
-    embed.add_field(name="Keçid", value="> discord.gg/xas\n> https://discord.gg/xas", inline=False)
-    embed.add_field(name="İstifadə Sayı", value="> Bu keçid indiyədək 100+ dəfə istifadə olunub.", inline=False)
-    embed.set_footer(text="Qoruma Sistemi • XAS Security")
+    embed.add_field(name="🔗 Aktiv Keçid", value=f"> {primary_invite}", inline=False)
+    embed.add_field(name="📈 Ümumi Dəvət İstifadə Sayı", value=> f"> Bu serverdə linklər toplam **{total_uses}** dəfə istifadə olunub!", inline=False)
+    embed.set_footer(text="XAS Realtime Invite Tracker")
     await ctx.send(embed=embed)
 
 # =====================================================================
@@ -254,7 +270,6 @@ async def serverinfo_cmd(ctx):
     embed.add_field(name="👥 Üzv Sayı", value=g.member_count, inline=True)
     embed.add_field(name="📁 Kanal Sayı", value=len(g.channels), inline=True)
     embed.add_field(name="🛡️ Rol Sayı", value=len(g.roles), inline=True)
-    embed.add_field(name="📅 Yaradılma Tarixi", value=g.created_at.strftime("%Y-%m-%d"), inline=True)
     await ctx.send(embed=embed)
 
 @bot.command(name="userinfo")
@@ -263,7 +278,6 @@ async def userinfo_cmd(ctx, member: discord.Member = None):
     embed = discord.Embed(title=f"👤 {m.name} Haqqında Məlumat", color=m.color)
     embed.add_field(name="İstifadəçi ID", value=m.id, inline=True)
     embed.add_field(name="Qoşulduğu Tarix", value=m.joined_at.strftime("%Y-%m-%d"), inline=True)
-    embed.add_field(name="Əsas Rolu", value=m.top_role.mention, inline=True)
     embed.set_thumbnail(url=m.display_avatar.url)
     await ctx.send(embed=embed)
 
@@ -278,7 +292,6 @@ async def avatar_cmd(ctx, member: discord.Member = None):
 async def botinfo_cmd(ctx):
     embed = discord.Embed(title="🤖 XAS Ultra Bot Məlumatı", description="Python və Discord.py kitabxanası ilə yazılmış tam təchizatlı idarəetmə botu.", color=XAS_COLOR)
     embed.add_field(name="Yaradıcı / Sahib", value=f"<@{SAHIB_ID}>", inline=True)
-    embed.add_field(name="Kitabxana", value="Discord.py", inline=True)
     embed.add_field(name="Status", value="Render Server Üzərində Aktiv", inline=True)
     await ctx.send(embed=embed)
 
@@ -372,8 +385,23 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, OYUN VƏ ALƏTLƏR (TAM VƏ SƏLİQƏLİ)
+# 9. ƏYLƏCƏ, ÖPÜŞMƏ (SEX/KİSS) VƏ OYUN KOMUTLARI
 # =====================================================================
+@bot.command(name="sex", aliases=["kiss", "öpüş", "öp"])
+async def sex_cmd(ctx, member: discord.Member):
+    gifler = [
+        "https://media1.giphy.com/media/3o7TKGhH4CKKBlOWtW/giphy.gif",
+        "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1aXl5NXZ4OWFpOTZwbGJqeGZ4aWJpOW5ueDRqaXlnZWMyNXVxMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2vn7_xvqT1VwY/giphy.gif",
+        "https://media.giphy.com/media/12VXIxGaNRFdlm/giphy.gif"
+    ]
+    embed = discord.Embed(
+        title="🔥 Romantik Anlar!",
+        description=f"❤️ {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər!",
+        color=XAS_COLOR
+    )
+    embed.set_image(url=random.choice(gifler))
+    await ctx.send(embed=embed)
+
 @bot.command(name="roll")
 async def roll_cmd(ctx):
     await ctx.send(f"🎲 Zər atıldı: **{random.randint(1, 6)}**")
@@ -402,12 +430,6 @@ async def handsome_cmd(ctx, member: discord.Member = None):
 async def love_cmd(ctx, member1: discord.Member, member2: discord.Member = None):
     m2 = member2 or ctx.author
     await ctx.send(f"❤️ {member1.name} və {m2.name} uyğunluğu: **%{random.randint(10, 100)}**")
-
-@bot.command(name="hack")
-async def hack_cmd(ctx, member: discord.Member):
-    await ctx.send(f"💻 {member.name} hack olunur...")
-    await asyncio.sleep(2)
-    await ctx.send(f"📧 IP: `192.168.1.{random.randint(10, 99)}` | Şifrə: `123456_xas` | Şəhər: `Baku`")
 
 @bot.command(name="calc")
 async def calc_cmd(ctx, *, expression):
@@ -441,16 +463,6 @@ async def rps_cmd(ctx, choice: str):
     else:
         res = "Mən qazandım!"
     await ctx.send(f"Sənin seçimin: **{cho}** | Mənim seçimin: **{bot_choice}** -> **{res}**")
-
-@bot.command(name="poll", aliases=["sorğu"])
-async def poll_cmd(ctx, *, soru):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        return
-    embed = discord.Embed(title="📊 XAS Səsvermə Paneli", description=soru, color=XAS_COLOR)
-    embed.set_footer(text=f"Sorğunu açan: {ctx.author.name}")
-    msg = await ctx.send(embed=embed)
-    await msg.add_reaction("👍")
-    await msg.add_reaction("👎")
 
 # =====================================================================
 # 10. BOTU İŞƏ SALMAQ (RUN)
