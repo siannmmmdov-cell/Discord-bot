@@ -378,37 +378,39 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI (YENİ ƏLAVƏLƏrlə)
+# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI (WAVE STİLİNDƏ EMBED & REPLY)
 # =====================================================================
 @bot.command(name="sex", aliases=["öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
-    pinterest_link_1 = "https://pin.it/76Uyx72Az"
     embed = discord.Embed(
-        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Sex)\n\n🔗 **Pinterest Şəkil Linki:** [Buradan Bax]({pinterest_link_1})",
+        title="Sex",
+        description=f"`{ctx.author.name}` & `{member.name}`",
         color=XAS_COLOR
     )
+    embed.set_image(url="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2")
+    embed.set_footer(text="Əyləncə və Statistika — Sex")
     await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="fuck")
 async def fuck_cmd(ctx, member: discord.Member):
-    pinterest_link_2 = "https://pin.it/3N6rWVMi5"
     embed = discord.Embed(
-        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Fuck)\n\n🔗 **Pinterest Şəkil Linki:** [Buradan Bax]({pinterest_link_2})",
+        title="Fuck",
+        description=f"`{ctx.author.name}` & `{member.name}`",
         color=XAS_COLOR
     )
+    embed.set_image(url="https://images.unsplash.com/photo-1518199266791-5375a83190b7")
+    embed.set_footer(text="Əyləncə və Statistika — Fuck")
     await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="kiss")
 async def kiss_cmd(ctx, member: discord.Member):
-    gifler = [
-        "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
-        "https://media.giphy.com/media/10UxDBfTEr2gy4/giphy.gif"
-    ]
     embed = discord.Embed(
-        description=f"💋 {ctx.author.mention} {member.mention} istifadəçisini yanağından öpdü!",
+        title="Kiss",
+        description=f"`{ctx.author.name}` & `{member.name}`",
         color=XAS_COLOR
     )
-    embed.set_image(url=random.choice(gifler))
+    embed.set_image(url="https://images.unsplash.com/photo-1518609878373-06d740f60d8b")
+    embed.set_footer(text="Əyləncə və Statistika — Kiss")
     await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="roll")
@@ -445,6 +447,33 @@ async def hack_cmd(ctx, member: discord.Member):
     await ctx.send(f"💻 {member.name} hack olunur...")
     await asyncio.sleep(2)
     await ctx.send(f"📧 IP: `192.168.1.{random.randint(10, 99)}` | Şifrə: `123456_xas` | Şəhər: `Baku`")
+
+@bot.command(name="slot")
+async def slot_cmd(ctx):
+    sembollər = ["🍒", "🍋", "🍊", "🍇", "🔔", "💎", "7️⃣"]
+    c1 = random.choice(sembollər)
+    c2 = random.choice(sembollər)
+    c3 = random.choice(sembollər)
+    
+    netice = f"🎰 | {c1} | {c2} | {c3} |"
+    if c1 == c2 == c3:
+        await ctx.send(f"{netice}\n🎉 Təbriklər, **Jackpot** vurdun! Qazandın!")
+    elif c1 == c2 or c2 == c3 or c1 == c3:
+        await ctx.send(f"{netice}\n✨ Pis deyil, 2 eyni simvol tapdın!")
+    else:
+        await ctx.send(f"{netice}\n❌ Təəssüf, uduzdun! Yenidən sına.")
+
+@bot.command(name="8ball", aliases=["sual"])
+async def eight_ball(ctx, *, soru):
+    cavablar = [
+        "Bəli, mütləq!",
+        "Şübhəsiz ki, hə.",
+        "Gələcək qaranlıqdır, təkrar soruş.",
+        "Xeyir, heç vaxt.",
+        "Mümkündür, amma çətindir.",
+        "Qətiyyən yox!"
+    ]
+    await ctx.send(f"🎱 Sual: **{soru}**\n🔮 Cavab: **{random.choice(cavablar)}**")
 
 @bot.command(name="calc")
 async def calc_cmd(ctx, *, expression):
@@ -497,4 +526,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-        
+    
