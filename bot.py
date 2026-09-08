@@ -180,7 +180,7 @@ class XASMenyu(discord.ui.Select):
         options = [
             discord.SelectOption(label="1. Təhlükəsizlik və Nuke", description="Anti-GG, spam qoruması, nuke və kanal təhlükəsizliyi.", emoji="🛡️"),
             discord.SelectOption(label="2. İdarəetmə və Moderasiya", description="Ban, kick, clear, lock, unlock, slowmode, hide.", emoji="⚙️"),
-            discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zər, yazı-pər, daş-kağız, sex, kiss, iq, handsome, calc.", emoji="🎮"),
+            discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zər, yazı-pər, daş-kağız, sex, fuck, kiss, iq.", emoji="🎮"),
             discord.SelectOption(label="4. XAS Xüsusi URL & Sistem", description="XAS server rəsmi dəvət linki, statistikalar və info.", emoji="💎")
         ]
         super().__init__(placeholder="XAS İdarəetmə Menyusundan Bölmə Seçin...", min_values=1, max_values=1, options=options)
@@ -396,25 +396,43 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, ÖPÜŞMƏ (SEX/FUCK/KİSS) VƏ OYUN KOMUTLARI
+# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI
 # =====================================================================
-@bot.command(name="sex", aliases=["fuck", "kiss", "öpüş", "öp"])
+@bot.command(name="sex", aliases=["öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
-    gifler = [
-        "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
-        "https://media.giphy.com/media/10UxDBfTEr2gy4/giphy.gif",
-        "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif",
-        "https://media.giphy.com/media/l0HlvcW4Pz7nsu0c0/giphy.gif"
-    ]
-    
-    secilen_gif = random.choice(gifler)
+    # Birinci Pinterest linki (Ayrı)
+    pinterest_link_1 = "https://pin.it/76Uyx72Az"
     
     embed = discord.Embed(
-        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər!",
+        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Sex)",
         color=XAS_COLOR
     )
-    embed.set_image(url=secilen_gif)
+    embed.set_image(url=pinterest_link_1)
+    await ctx.send(embed=embed)
+
+@bot.command(name="fuck")
+async def fuck_cmd(ctx, member: discord.Member):
+    # İkinci Pinterest linki (Ayrı)
+    pinterest_link_2 = "https://pin.it/3N6rWVMi5"
     
+    embed = discord.Embed(
+        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Fuck)",
+        color=XAS_COLOR
+    )
+    embed.set_image(url=pinterest_link_2)
+    await ctx.send(embed=embed)
+
+@bot.command(name="kiss")
+async def kiss_cmd(ctx, member: discord.Member):
+    gifler = [
+        "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
+        "https://media.giphy.com/media/10UxDBfTEr2gy4/giphy.gif"
+    ]
+    embed = discord.Embed(
+        description=f"💋 {ctx.author.mention} {member.mention} istifadəçisini yanağından öpdü!",
+        color=XAS_COLOR
+    )
+    embed.set_image(url=random.choice(gifler))
     await ctx.send(embed=embed)
 
 @bot.command(name="roll")
