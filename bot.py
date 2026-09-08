@@ -173,14 +173,14 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # =====================================================================
-# 5. INTERACTIVE SELECT MENU (PANEL - 100+ KOMUT VƏ BÖLMƏLƏR)
+# 5. INTERACTIVE SELECT MENU (PANEL - 100+ KOMUT)
 # =====================================================================
 class XASMenyu(discord.ui.Select):
     def __init__(self):
         options = [
             discord.SelectOption(label="1. Təhlükəsizlik və Nuke", description="Anti-GG, spam qoruması, nuke və kanal təhlükəsizliyi.", emoji="🛡️"),
             discord.SelectOption(label="2. İdarəetmə və Moderasiya", description="Ban, kick, clear, lock, unlock, slowmode, hide.", emoji="⚙️"),
-            discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zər, yazı-pər, daş-kağız, sex, fuck, kiss, iq.", emoji="🎮"),
+            discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zər, yazı-pər, daş-kağız, sex, fuck, kiss, iq, slot.", emoji="🎮"),
             discord.SelectOption(label="4. XAS Xüsusi URL & Sistem", description="XAS server rəsmi dəvət linki, statistikalar və info.", emoji="💎")
         ]
         super().__init__(placeholder="XAS 100+ Komut İdarəetmə Menyusundan Bölmə Seçin...", min_values=1, max_values=1, options=options)
@@ -202,8 +202,8 @@ class XASMenyu(discord.ui.Select):
 
         elif self.values[0] == "3. Əyləncə, Oyunlar və Alətlər":
             embed = discord.Embed(title="🎮 Baza 3: Əyləncə & Oyunlar (100+ Sistem)", description="İstifadəçilər üçün interaktiv oyunlar və əyləncə.", color=XAS_COLOR)
-            embed.add_field(name="Romantik & Əyləncə", value="`!sex` / `!fuck` / `!kiss` | `!roll` | `!coinflip` | `!rps`", inline=False)
-            embed.add_field(name="Əyləncəli Testlər", value="`!iq` | `!gay` | `!handsome` | `!hack` | `!love` | `!joke`", inline=False)
+            embed.add_field(name="Romantik & Əyləncə", value="`!sex` / `!fuck` / `!kiss` | `!roll` | `!coinflip` | `!rps` | `!slot`", inline=False)
+            embed.add_field(name="Əyləncəli Testlər", value="`!iq` | `!gay` | `!handsome` | `!hack` | `!love` | `!joke` | `!8ball`", inline=False)
             embed.add_field(name="Faydalı Alətlər", value="`!calc` | `!weather` | `!fact` | `!quote` | `!poll` | `!afk`", inline=False)
             await interaction.response.edit_message(embed=embed)
 
@@ -229,7 +229,7 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. .URL ÖZƏL KOMUTU (SIFIRLAR ÇIXARILDI, TƏMİZ VİZUAL)
+# 6. .URL ÖZƏL KOMUTU
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
@@ -378,7 +378,7 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI (PİNTEREST LİNK PROBLEMİ DÜZƏLDİLDİ)
+# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI (YENİ ƏLAVƏLƏrlə)
 # =====================================================================
 @bot.command(name="sex", aliases=["öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
@@ -387,7 +387,7 @@ async def sex_cmd(ctx, member: discord.Member):
         description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Sex)\n\n🔗 **Pinterest Şəkil Linki:** [Buradan Bax]({pinterest_link_1})",
         color=XAS_COLOR
     )
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="fuck")
 async def fuck_cmd(ctx, member: discord.Member):
@@ -396,7 +396,7 @@ async def fuck_cmd(ctx, member: discord.Member):
         description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Fuck)\n\n🔗 **Pinterest Şəkil Linki:** [Buradan Bax]({pinterest_link_2})",
         color=XAS_COLOR
     )
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="kiss")
 async def kiss_cmd(ctx, member: discord.Member):
@@ -409,7 +409,7 @@ async def kiss_cmd(ctx, member: discord.Member):
         color=XAS_COLOR
     )
     embed.set_image(url=random.choice(gifler))
-    await ctx.send(embed=embed)
+    await ctx.send(embed=embed, reference=ctx.message)
 
 @bot.command(name="roll")
 async def roll_cmd(ctx):
