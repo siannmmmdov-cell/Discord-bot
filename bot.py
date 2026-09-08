@@ -229,26 +229,37 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. .URL ÖZƏL KOMUTU (AVTO-STATİSTİKA)
+# 6. .URL ÖZƏL KOMUTU (SERVERDƏN REAL DƏVƏT MƏLUMATI)
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
     try:
         invites = await ctx.guild.invites()
-        total_uses = sum(inv.uses for inv in invites)
-        primary_invite = invites[0].url if invites else "https://discord.gg/xas"
-    except:
-        total_uses = "Hesablanır..."
-        primary_invite = "https://discord.gg/xas"
+        if invites:
+            davet_listesi = []
+            toplam_istifade = 0
+            for inv in invites:
+                toplam_istifade += inv.uses
+                davet_listesi.append(f"> [{inv.code}]({inv.url}) — **{inv.uses}** dəfə istifadə olunub")
+            sergilenen_linkler = "\n".join(davet_listesi[:3])
+        else:
+            sergilenen_linkler = "> Serverdə hələ aktiv dəvət linki yoxdur."
+            toplam_istifade = 0
+    except discord.Forbidden:
+        sergilenen_linkler = "> Botun 'Dəvətləri Görüntülə' (Manage Guild/Invites) icazəsi yoxdur!"
+        toplam_istifade = "Bilinmir"
+    except Exception as e:
+        sergilenen_linkler = f"> Xəta baş verdi: {e}"
+        toplam_istifade = 0
 
     embed = discord.Embed(
-        title="XAS Serverinin Xüsusi Dəvət Keçidi",
-        description="XAS serverinin rəsmi və daimi dəvət keçidi.",
+        title=f"📊 {ctx.guild.name} — Real Dəvət Statistikası",
+        description="Serverin cari dəvət linkləri və real istifadə sayları aşağıdadır:",
         color=XAS_COLOR
     )
-    embed.add_field(name="Keçid", value=f"> {primary_invite}\n> https://discord.gg/xas", inline=False)
-    embed.add_field(name="İstifadə Sayı", value=f"> Bu keçid indiyədək toplama **{total_uses}** dəfə istifadə olunub.", inline=False)
-    embed.set_footer(text="Qoruma Sistemi • XAS Security")
+    embed.add_field(name="🔗 Aktiv Dəvət Linkləri", value=sergilenen_linkler, inline=False)
+    embed.add_field(name="📈 Ümumi İstifadə Sayı", value=f"> Bu server üçün açılan bütün linklər ümumilikdə **{toplam_istifade}** dəfə işlədilib.", inline=False)
+    embed.set_footer(text="XAS Security • Real-Time Invite System")
     await ctx.send(embed=embed)
 
 # =====================================================================
