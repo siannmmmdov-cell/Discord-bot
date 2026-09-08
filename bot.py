@@ -173,7 +173,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # =====================================================================
-# 5. INTERACTIVE SELECT MENU (PANEL)
+# 5. INTERACTIVE SELECT MENU (PANEL - 100+ KOMUT VƏ BÖLMƏLƏR)
 # =====================================================================
 class XASMenyu(discord.ui.Select):
     def __init__(self):
@@ -183,7 +183,7 @@ class XASMenyu(discord.ui.Select):
             discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Zər, yazı-pər, daş-kağız, sex, fuck, kiss, iq.", emoji="🎮"),
             discord.SelectOption(label="4. XAS Xüsusi URL & Sistem", description="XAS server rəsmi dəvət linki, statistikalar və info.", emoji="💎")
         ]
-        super().__init__(placeholder="XAS İdarəetmə Menyusundan Bölmə Seçin...", min_values=1, max_values=1, options=options)
+        super().__init__(placeholder="XAS 100+ Komut İdarəetmə Menyusundan Bölmə Seçin...", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
         if self.values[0] == "1. Təhlükəsizlik və Nuke":
@@ -201,14 +201,14 @@ class XASMenyu(discord.ui.Select):
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "3. Əyləncə, Oyunlar və Alətlər":
-            embed = discord.Embed(title="🎮 Baza 3: Əyləncə & Oyunlar", description="İstifadəçilər üçün interaktiv oyunlar.", color=XAS_COLOR)
-            embed.add_field(name="Romantik & Əyləncə", value="`!sex` / `!fuck` / `!kiss` (Öpüşmə efektləri) | `!roll` | `!coinflip` | `!rps`", inline=False)
+            embed = discord.Embed(title="🎮 Baza 3: Əyləncə & Oyunlar (100+ Sistem)", description="İstifadəçilər üçün interaktiv oyunlar və əyləncə.", color=XAS_COLOR)
+            embed.add_field(name="Romantik & Əyləncə", value="`!sex` / `!fuck` / `!kiss` | `!roll` | `!coinflip` | `!rps`", inline=False)
             embed.add_field(name="Əyləncəli Testlər", value="`!iq` | `!gay` | `!handsome` | `!hack` | `!love` | `!joke`", inline=False)
             embed.add_field(name="Faydalı Alətlər", value="`!calc` | `!weather` | `!fact` | `!quote` | `!poll` | `!afk`", inline=False)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "4. XAS Xüsusi URL & Sistem":
-            embed = discord.Embed(title="💎 Baza 4: XAS URL & Statistikalar", description="XAS rəsmi server dəvət keçidi.", color=XAS_COLOR)
+            embed = discord.Embed(title="💎 Baza 4: XAS URL & Sistem", description="XAS rəsmi server dəvət keçidi.", color=XAS_COLOR)
             embed.add_field(name="Rəsmi Dəvət Linki", value="> discord.gg/xas\n> https://discord.gg/xas", inline=False)
             embed.add_field(name="Keçid Statistikası", value="> Bu keçid sistem üzərindən avtomatik izlənilir.", inline=False)
             await interaction.response.edit_message(embed=embed)
@@ -221,45 +221,27 @@ class XASView(discord.ui.View):
 @bot.command(name="panel")
 async def bot_panel(ctx):
     embed = discord.Embed(
-        title="💎 XAS ULTRA İDARƏETMƏ PANELİ",
+        title="💎 XAS ULTRA İDARƏETMƏ PANELİ (100+ KOMUT)",
         description="Aşağıdakı açılan menyudan istədiyiniz kateqoriyanı seçərək əmrləri və sistemləri görə bilərsiniz.",
         color=XAS_COLOR
     )
-    embed.set_footer(text="XAS Security & Management System • 100+ Komut")
+    embed.set_footer(text="XAS Security & Management System • 100+ Komut Aktiv")
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. .URL ÖZƏL KOMUTU (SERVERDƏN REAL DƏVƏT MƏLUMATI)
+# 6. .URL ÖZƏL KOMUTU (SIFIRLAR ÇIXARILDI, TƏMİZ VİZUAL)
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
-    try:
-        invites = await ctx.guild.invites()
-        if invites:
-            davet_listesi = []
-            toplam_istifade = 0
-            for inv in invites:
-                toplam_istifade += inv.uses
-                davet_listesi.append(f"> [{inv.code}]({inv.url}) — **{inv.uses}** dəfə istifadə olunub")
-            sergilenen_linkler = "\n".join(davet_listesi[:3])
-        else:
-            sergilenen_linkler = "> Serverdə hələ aktiv dəvət linki yoxdur."
-            toplam_istifade = 0
-    except discord.Forbidden:
-        sergilenen_linkler = "> Botun 'Dəvətləri Görüntülə' (Manage Guild/Invites) icazəsi yoxdur!"
-        toplam_istifade = "Bilinmir"
-    except Exception as e:
-        sergilenen_linkler = f"> Xəta baş verdi: {e}"
-        toplam_istifade = 0
-
     embed = discord.Embed(
-        title=f"📊 {ctx.guild.name} — Real Dəvət Statistikası",
-        description="Serverin cari dəvət linkləri və real istifadə sayları aşağıdadır:",
+        title=f"📊 {ctx.guild.name} — XAS Sistem & Dəvət Məlumatı",
+        description="Serverin rəsmi bağlantıları və təhlükəsizlik statusu:",
         color=XAS_COLOR
     )
-    embed.add_field(name="🔗 Aktiv Dəvət Linkləri", value=sergilenen_linkler, inline=False)
-    embed.add_field(name="📈 Ümumi İstifadə Sayı", value=f"> Bu server üçün açılan bütün linklər ümumilikdə **{toplam_istifade}** dəfə işlədilib.", inline=False)
-    embed.set_footer(text="XAS Security • Real-Time Invite System")
+    embed.add_field(name="🔗 Əsas Dəvət Keçidi", value="> [discord.gg/xas](https://discord.gg/xas)", inline=False)
+    embed.add_field(name="🛡️ Təhlükəsizlik Vəziyyəti", value="> Anti-GG, Anti-Spam və Avtomatik Qoruma sistemi **Aktivdir**.", inline=False)
+    embed.add_field(name="💎 Server Sahibi", value=f"> {ctx.guild.owner.mention if ctx.guild.owner else 'Bilinmir'}", inline=False)
+    embed.set_footer(text="XAS Security • Official System Panel")
     await ctx.send(embed=embed)
 
 # =====================================================================
@@ -396,30 +378,24 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI
+# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI (PİNTEREST LİNK PROBLEMİ DÜZƏLDİLDİ)
 # =====================================================================
 @bot.command(name="sex", aliases=["öpüş", "öp"])
 async def sex_cmd(ctx, member: discord.Member):
-    # Birinci Pinterest linki (Ayrı)
     pinterest_link_1 = "https://pin.it/76Uyx72Az"
-    
     embed = discord.Embed(
-        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Sex)",
+        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Sex)\n\n🔗 **Pinterest Şəkil Linki:** [Buradan Bax]({pinterest_link_1})",
         color=XAS_COLOR
     )
-    embed.set_image(url=pinterest_link_1)
     await ctx.send(embed=embed)
 
 @bot.command(name="fuck")
 async def fuck_cmd(ctx, member: discord.Member):
-    # İkinci Pinterest linki (Ayrı)
     pinterest_link_2 = "https://pin.it/3N6rWVMi5"
-    
     embed = discord.Embed(
-        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Fuck)",
+        description=f"🔥 {ctx.author.mention} ilə {member.mention} ehtiraslı şəkildə öpüşdülər! (Fuck)\n\n🔗 **Pinterest Şəkil Linki:** [Buradan Bax]({pinterest_link_2})",
         color=XAS_COLOR
     )
-    embed.set_image(url=pinterest_link_2)
     await ctx.send(embed=embed)
 
 @bot.command(name="kiss")
