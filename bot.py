@@ -84,7 +84,7 @@ async def on_member_join(member):
         pass
 
 # =====================================================================
-# 4. ADVANCED SECURITY & AUTOMOD (BÜTÜN SPAM VƏ ŞABLONLAR DAXİL)
+# 4. ADVANCED SECURITY & AUTOMOD (GÜVƏNLİK VƏ SPAM QORUMASI)
 # =====================================================================
 @bot.event
 async def on_message(message):
@@ -207,7 +207,7 @@ class XASMenyu(discord.ui.Select):
 
         elif self.values[0] == "4. XAS Xüsusi URL & Sistem":
             embed = discord.Embed(title="💎 XAS URL & Sistem", description="Serverin aktiv dəvət keçidi və statistika məlumatı.", color=XAS_COLOR)
-            embed.add_field(name="Rəsmi Dəvət Məlumatı", value="> `!url` yazaraq anlıq dəvət sayını görə bilərsən.", inline=False)
+            embed.add_field(name="Rəsmi Dəvət Məlumatı", value="> `!url` yazaraq anlıq dəvət sayını real görə bilərsən.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
 class XASView(discord.ui.View):
@@ -226,35 +226,39 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. .URL REAL-TIME İNSTANCE & INVITE TRACKER KOMUTU
+# 6. .URL REAL-TIME İNSTANCE & INVITE TRACKER KOMUTU (REAL VƏ DƏQİQ)
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
     try:
         invites = await ctx.guild.invites()
         if invites:
-            aktiv_davet = max(invites, key=lambda i: i.uses)
-            link_url = aktiv_davet.url
-            toplam_istifade = aktiv_davet.uses
-            davet_eden = aktiv_davet.inviter.name if aktiv_davet.inviter else "Naməlum"
+            aktif_davet = max(invites, key=lambda i: i.uses)
+            secilen_link = aktif_davet.url
+            toplam_istifade = aktif_davet.uses
+            davet_eden = aktif_davet.inviter.name if aktif_davet.inviter else "Server Üzvü"
         else:
-            link_url = "Serverin aktiv dəvət linki yoxdur."
-            toplam_istifade = 0
-            davet_eden = "Yoxdur"
-    except:
-        link_url = "Botun 'Manage Server' icazəsi yoxdur!"
+            secilen_link = f"https://discord.gg/{ctx.guild.vanity_url_code}" if ctx.guild.vanity_url else "Aktiv dəvət linki tapılmadı."
+            toplam_istifade = ctx.guild.vanity_url.uses if ctx.guild.vanity_url else 0
+            davet_eden = "Xüsusi URL"
+    except Exception as e:
+        secilen_link = "Botun icazəsi çatışmır (Manage Server lazımdır)."
         toplam_istifade = 0
         davet_eden = "Xəta"
 
     embed = discord.Embed(
         title=f"📊 {ctx.guild.name} — Real Dəvət Statistikası",
-        description="Serverin aktiv dəvət bağlantısı və anlıq istifadə sayı:",
+        description="Serverin anlıq olaraq bazadan çəkilən rəsmi dəvət məlumatları:",
         color=XAS_COLOR
     )
-    embed.add_field(name="🔗 Aktiv Dəvət Linki", value=f"> {link_url}", inline=False)
-    embed.add_field(name="📈 Neçə Nəfər İstifadə Edib?", value=f"> **{toplam_istifade}** nəfər bu linklə qoşulub!", inline=False)
-    embed.add_field(name="👑 Linki Yaradan", value=f"> `{davet_eden}`", inline=False)
-    embed.set_footer(text="XAS Security • Anlıq Yenilənən Statistik Sistem")
+    embed.add_field(name="🔗 Aktiv Dəvət Linki", value=f"> {secilen_link}", inline=False)
+    embed.add_field(name="📈 Anlıq İstifadə Sayı", value=f"> **{toplam_istifade}** nəfər", inline=True)
+    embed.add_field(name="👑 Linki Yaradan", value=f"> `{davet_eden}`", inline=True)
+    
+    if ctx.guild.icon:
+        embed.set_thumbnail(url=ctx.guild.icon.url)
+        
+    embed.set_footer(text=f"Sorğulayan: {ctx.author.name} • XAS Real-Time Tracker", icon_url=ctx.author.display_avatar.url)
     await ctx.send(embed=embed)
 
 # =====================================================================
