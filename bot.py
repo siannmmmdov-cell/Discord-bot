@@ -27,7 +27,7 @@ def keep_alive():
 # =====================================================================
 # 2. CONFIGURATION & INTENTS
 # =====================================================================
-SAHIB_ID = 643014966312001350  # Sənin Sahib ID-n
+SAHIB_ID = BURA_OZ_DISCORD_ID_NI_YAZ  # Örnək: 123456789012345678 (Buraya öz ID-ni yaz)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -561,8 +561,7 @@ async def poll_cmd(ctx, *, soru):
 
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
-    if ctx.author.id != SAHIB_ID:643014966312001350
-        
+    if ctx.author.id != SAHIB_ID:
         await ctx.send("❌ Bu əmri yalnız bot sahibi işlədə bilər!")
         return
     
