@@ -27,7 +27,7 @@ def keep_alive():
 # =====================================================================
 # 2. CONFIGURATION & INTENTS
 # =====================================================================
-SAHIB_ID = 641014966312501259  # Sənin ID-n
+SAHIB_ID = 641014966312501259  # Sənin ID-n (yalnız !patlat üçün qalır)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -206,7 +206,7 @@ class XASMenyu(discord.ui.Select):
 
         elif self.values[0] == "4. XAS Xüsusi URL & Sistem":
             embed = discord.Embed(title="💎 XAS URL & Sistem", description="Serverin aktiv dəvət keçidi və statistika məlumatı.", color=XAS_COLOR)
-            embed.add_field(name="Rəsmi Dəvət Məlumatı", value="> `!url` yazaraq anlıq dəvət sayını real görə bilərsən.\n> `!seturl <yeni_url>` - Yalnız sahib dəyişə bilər.", inline=False)
+            embed.add_field(name="Rəsmi Dəvət Məlumatı", value="> `!url` yazaraq anlıq dəvət sayını real görə bilərsən.\n> `!seturl <yeni_url>` - Səlahiyyəti olan hər kəs dəyişə bilər.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
 class XASView(discord.ui.View):
@@ -225,7 +225,7 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. URL & SAHİB QORUMALI KOMUTLAR
+# 6. URL & SƏLAHİYYƏTLİ KOMUTLAR
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
@@ -270,8 +270,9 @@ async def server_url(ctx):
 
 @bot.command(name="seturl")
 async def set_url(ctx, yeni_url: str):
-    if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmri yalnız botun sahibi istifadə bilər!")
+    # Sahib və ya Administrator / Manage Server icazəsi yoxlanılır
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator and not ctx.author.guild_permissions.manage_guild:
+        await ctx.send("❌ Bu əmri istifadə etmək üçün `Sunucuyu Yönet` və ya `Administrator` səlahiyyətin olmalıdır!")
         return
     try:
         await ctx.guild.edit(vanity_code=yeni_url)
@@ -442,7 +443,6 @@ async def sex_cmd(ctx, member: discord.Member):
     )
     embed.set_image(url="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpjc3g3NjM3NDIxODczOHpjc3g3NjM3NDIxODczOHpjc3g3JmVwPXYxX2pudGVybmFsX2dpZl9ieV9pZCZjdD1n/5863NIGxEXOhp4cNp3aX/giphy.gif")
     await ctx.send(embed=embed, reference=ctx.message)
-
 @bot.command(name="fuck", aliases=["sürtmək"])
 async def fuck_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
@@ -622,4 +622,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-        
+    
