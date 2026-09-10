@@ -195,7 +195,7 @@ class XASMenyu(discord.ui.Select):
 
         elif self.values[0] == "2. İdarəetmə və Moderasiya":
             embed = discord.Embed(title="⚙️ Moderasiya Paneli", description="Aktiv moderasiya əmrləri.", color=XAS_COLOR)
-            embed.add_field(name="Kanal Əmrləri", value="`!lock` / `!unlock` / `!hide` / `!reveal` / `!slowmode`", inline=False)
+            embed.add_field(name="Kanal Əmrləri", value="`!lock` / `!unlock` / `!hide` / `!reveal` / `!slowmode` / `!openchannel` / `!lockchannel`", inline=False)
             embed.add_field(name="Cəza Əmrləri", value="`!ban` / `!kick` / `!clear` / `!timeout`", inline=False)
             await interaction.response.edit_message(embed=embed)
 
@@ -207,7 +207,7 @@ class XASMenyu(discord.ui.Select):
 
         elif self.values[0] == "4. XAS Xüsusi URL & Sistem":
             embed = discord.Embed(title="💎 XAS URL & Sistem", description="Serverin aktiv dəvət keçidi və statistika məlumatı.", color=XAS_COLOR)
-            embed.add_field(name="Rəsmi Dəvət Məlumatı", value="> `!url` yazaraq anlıq dəvət sayını real görə bilərsən.", inline=False)
+            embed.add_field(name="Rəsmi Dəvət Məlumatı", value="> `!url` yazaraq anlıq dəvət sayını real görə bilərsən.\n> `!seturl <yeni_url>` - Yalnız sahib dəyişə bilər.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
 class XASView(discord.ui.View):
@@ -226,7 +226,7 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. .URL REAL-TIME İNSTANCE & INVITE TRACKER KOMUTU (DÜZGÜN VƏ DƏQİQ)
+# 6. .URL REAL-TIME & SAHİB QORUMALI URL DƏYİŞDİRMƏ KOMUTU
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
@@ -268,6 +268,17 @@ async def server_url(ctx):
         
     embed.set_footer(text=f"Sorğulayan: {ctx.author.name} • XAS Real-Time Tracker", icon_url=ctx.author.display_avatar.url)
     await ctx.send(embed=embed)
+
+@bot.command(name="seturl")
+async def set_url(ctx, yeni_url: str):
+    if ctx.author.id != SAHIB_ID:
+        await ctx.send("❌ Bu əmri yalnız botun sahibi istifadə edə bilər!")
+        return
+    try:
+        await ctx.guild.edit(vanity_code=yeni_url)
+        await ctx.send(f"✅ Serverin xüsusi URL-i uğurla dəyişdirildi: `discord.gg/{yeni_url}`")
+    except Exception as e:
+        await ctx.send(f"❌ Xəta baş verdi: Botun icazəsi çatışmır və ya URL artıq istifadədədir.")
 
 # =====================================================================
 # 7. İNFORMATİV KOMUTLAR
@@ -315,7 +326,7 @@ async def afk_cmd(ctx, *, sebep="Səbəb göstərilməyib"):
     await ctx.send(f"💤 {ctx.author.mention}, AFK rejiminə keçdin. Səbəb: **{sebep}**")
 
 # =====================================================================
-# 8. SAHİB VƏ MODERASİYA ƏMRLƏRİ
+# 8. SAHİB VƏ MODERASİYA ƏMRLƏRİ (BÜTÜN KANALLARI AÇ/BAĞLA DAXİL)
 # =====================================================================
 @bot.command(name="lock")
 async def lock_cmd(ctx):
@@ -344,6 +355,41 @@ async def reveal_cmd(ctx):
         return
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
     await ctx.send("🐵 Bu kanal yenidən göstərildi.")
+
+# BÜTÜN KANALLARI (Səs, Chat, Kateqoriya) TƏK KOMUTLA AÇMAQ
+@bot.command(name="openchannel", aliases=["ac", "hamisiniac"])
+async def open_channel_all(ctx):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        await ctx.send("❌ Bunun üçün səlahiyyətin çatmir, gaga!")
+        return
+    
+    yukleniyor = await ctx.send("🔓 Bütün kanallar (səs, chat və kateqoriyalar) açılır, gözlə...")
+    
+    for channel in ctx.guild.channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, view_channel=True, send_messages=True, connect=True)
+        except:
+            pass
+            
+    await yukleniyor.edit(content="✅ Uğurlu! Bütün kanallar, kateqoriyalar və səs otaqları kütləvi şəkildə açıldı.")
+
+# BÜTÜN KANALLARI (Səs, Chat, Kateqoriya) TƏK KOMUTLA BAĞLAMAQ/GİZLƏTMƏK
+@bot.command(name="lockchannel", aliases=["bagla", "hamisinibagla"])
+async def lock_channel_all(ctx):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        await ctx.send("❌ Bunun üçün səlahiyyətin çatmir, gaga!")
+        return
+        
+    yukleniyor = await ctx.send("🔒 Bütün kanallar və səs otaqları kilidlənir, gözlə...")
+    
+    for channel in ctx.guild.channels:
+        if channel.id != ctx.channel.id:
+            try:
+                await channel.set_permissions(ctx.guild.default_role, view_channel=False, send_messages=False, connect=False)
+            except:
+                pass
+                
+    await yukleniyor.edit(content="🔒 Uğurlu! Komut yazılan kanal xaric bütün server gizlətildi və kilidləndi.")
 
 @bot.command(name="slowmode")
 async def slowmode_cmd(ctx, seconds: int):
@@ -524,4 +570,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-        
+    
