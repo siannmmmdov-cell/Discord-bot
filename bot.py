@@ -561,7 +561,8 @@ async def poll_cmd(ctx, *, soru):
 
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
-    if ctx.author.id != SAHIB_ID:
+    if ctx.author.id != SAHIB_ID:643014966312001350
+        
         await ctx.send("❌ Bu əmri yalnız bot sahibi işlədə bilər!")
         return
     
