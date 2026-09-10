@@ -27,7 +27,7 @@ def keep_alive():
 # =====================================================================
 # 2. CONFIGURATION & INTENTS
 # =====================================================================
-SAHIB_ID = BURA_OZ_DISCORD_ID_NI_YAZ  # Örnək: 123456789012345678 (Buraya öz ID-ni yaz)
+SAHIB_ID = 641014966312501259  # Sənin ID-n bura yazıldı
 
 intents = discord.Intents.default()
 intents.message_content = True
