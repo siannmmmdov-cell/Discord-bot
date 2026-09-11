@@ -1,381 +1,183 @@
-import discord
-from discord.ext import commands
+import os
 import random
 import asyncio
-import os
-import time
-from flask import Flask
-from threading import Thread
+from datetime import datetime, timedelta
+import discord
+from discord.ext import commands
+from keep_alive import keep_alive
 
 # ==========================================
-# 1. 7/24 AKTİVLİK ÜÇÜN FLASK SERVERİ
+# 1. PARAMETRLƏR VƏ İNİTİALİZASİYA
 # ==========================================
-app = Flask('')
+INTENTS = discord.Intents.default()
+INTENTS.members = True
+INTENTS.message_content = True
+INTENTS.guilds = True
+INTENTS.voice_states = True
 
-@app.route('/')
-def home():
-    return "XAS Bot tam gücü ilə 7/24 aktivdir və işləyir!"
+bot = commands.Bot(command_prefix="!", intents=INTENTS)
 
-def run():
-    app.run(host='0.0.0.0', port=8080)
+SAHIB_ID = 111111111111111111  # Öz Discord ID-nizi bura yazın
+GUVENLI_SERVER_ID = 111111111111111111  # Qorunan server ID-si
+XAS_COLOR = discord.Color.blurple()
 
-def keep_alive():
-    t = Thread(target=run)
-    t.start()
-
-# ==========================================
-# 2. BOTUN İNTENTLƏRİ VƏ PARAMETRLƏRİ
-# ==========================================
-intents = discord.Intents.default()
-intents.message_content = True
-intents.guilds = True
-intents.members = True
-intents.presences = True
-intents.voice_states = True
-
-bot = commands.Bot(command_prefix="!", intents=intents)
-
-SAHIB_ID = 641014966312501259
-GUVENLI_SERVER_ID = 1520692621964738722
-XAS_COLOR = discord.Color.from_rgb(20, 24, 33)
-
-user_message_counts = {}
-user_last_message_time = {}
 user_xp = {}
-user_warns = {}
+user_last_message = {}
+user_message_counts = {}
 
 # ==========================================
-# 3. BOT HAZIR OLDUĞUNDA İŞLƏYƏN EVENT
+# 2. BOT HAZIR OLAN KİMİ (ON_READY)
 # ==========================================
 @bot.event
 async def on_ready():
-    print("--------------------------------------------------")
-    print(f"Botun adı: {bot.user.name}")
-    print(f"Botun ID-si: {bot.user.id}")
-    print("Status: Bütün sistemlər tam güclə aktivdir, Sahib!")
-    print("--------------------------------------------------")
-    await bot.change_presence(activity=discord.Game(name="!panel | XAS Bot Systems"))
+    print(f"✅ Bot işə düşdü: {bot.user.name} (ID: {bot.user.id})")
+    await bot.change_presence(activity=discord.Game(name="!yardım | XAS Bot"))
 
-# ==========================================
-# 4. WEBHOOK VƏ ANTİ-SPAM/QORUMA SİSTEMİ
-# ==========================================
+    for guild in bot.guilds:
+        await send_webhook_log(guild, "Bot Aktivləşdi", "Bot uğurla onlayn oldu və sistemlər işləkdir.", color=0xff0000)
+
 async def send_webhook_log(guild, title, description, color=0xff0000):
     try:
         log_chan = discord.utils.get(guild.text_channels, name="xas-log")
         if not log_chan:
             overwrites = {
-                guild.default_role: discord.PermissionOverwrite(view_channel=False),
-                guild.me: discord.PermissionOverwrite(view_channel=True, send_messages=True)
+                guild.default_role: discord.PermissionOverwrite(view_channel=False)
             }
             log_chan = await guild.create_text_channel("xas-log", overwrites=overwrites)
         
         webhooks = await log_chan.webhooks()
         webhook = webhooks[0] if webhooks else await log_chan.create_webhook(name="XAS Security Webhook")
         
-        embed = discord.Embed(title=title, description=description, color=color, timestamp=discord.utils.utcnow())
-        await webhook.send(embed=embed, username="XAS Security", avatar_url="https://i.imgur.com/AfFp7pu.png")
+        embed = discord.Embed(title=title, description=description, color=color, timestamp=datetime.utcnow())
+        await webhook.send(embed=embed, username="XAS Log Sistemi")
     except:
         pass
 
+# ==========================================
+# 3. ANTİ-SPAM VƏ XP SİSTEMİ (ON_MESSAGE)
+# ==========================================
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
 
-    content_lower = message.content.lower()
-    yasakli_kelimeler = ["/tag", "y1z", "g4r", "g3r", "discord.gg/"]
-    for kelime in yasakli_kelimeler:
-        if kelime in content_lower and message.author.id != SAHIB_ID:
-            try:
-                await message.delete()
-                await send_webhook_log(
-                    message.guild, 
-                    "🚨 Qadağan olunmuş söz / link bloklandı!", 
-                    f"**İstifadəçi:** {message.author.mention} (`{message.author.id}`)\n**Kanal:** {message.channel.mention}\n**Mesaj:** `{message.content}`"
-                )
-                return
-            except:
-                pass
-
     author_id = message.author.id
-    current_xp = user_xp.get(author_id, {"xp": 0, "level": 1})
-    current_xp["xp"] += random.randint(10, 25)
-    needed_xp = current_xp["level"] * 150
+    current_time = datetime.utcnow()
 
-    if current_xp["xp"] >= needed_xp:
-        current_xp["level"] += 1
-        current_xp["xp"] = 0
-        try:
-            await message.channel.send(f"🎉 Təbriklər {message.author.mention}! Səviyyə atladın: **Level {current_xp['level']}**")
-        except:
-            pass
-    user_xp[author_id] = current_xp
-
-    await bot.process_commands(message)
-
-    current_time = time.time()
-    if author_id in user_last_message_time:
-        diff = current_time - user_last_message_time[author_id]
+    # Anti-Spam Yoxlaması
+    if author_id in user_last_message:
+        diff = (current_time - user_last_message[author_id]).total_seconds()
         if diff < 1.0:
-            count = user_message_counts.get(author_id, 0) + 1
-            user_message_counts[author_id] = count
-            if count >= 4:
+            user_message_counts[author_id] = user_message_counts.get(author_id, 0) + 1
+            if user_message_counts[author_id] > 4:
                 try:
                     await message.delete()
-                    await send_webhook_log(
-                        message.guild, 
-                        "⚠️ Chat Spam Bloklandı!", 
-                        f"**İstifadəçi:** {message.author.mention} çox sürətli mesaj yazaraq spam etdi və mesajı silindi."
-                    )
+                    await message.channel.send(f"{message.author.mention}, zəhmət olmasa yavaş yazın! (Spam)", delete_after=5)
                 except:
                     pass
+                return
         else:
-            user_message_counts[author_id] = 1
-    else:
-        user_message_counts[author_id] = 1
-    user_last_message_time[author_id] = current_time
+            user_message_counts[author_id] = 0
 
-@bot.event
-async def on_member_join(member):
-    if member.bot and member.guild.id != GUVENLI_SERVER_ID:
+    user_last_message[author_id] = current_time
+
+    # XP Qazanma Sistemi
+    data = user_xp.get(author_id, {"xp": 0, "level": 1})
+    data["xp"] += random.randint(5, 15)
+    
+    next_level_xp = data["level"] * 100
+    if data["xp"] >= next_level_xp:
+        data["level"] += 1
+        data["xp"] = 0
         try:
-            await member.ban(reason="Təhlükəsizlik: İcazəsiz bot girişi bloklandı.")
-            await send_webhook_log(
-                member.guild, 
-                "🤖 İcazəsiz Bot Bloklandı!", 
-                f"**Bot:** {member.mention} (`{member.name}`) serverə qatılmağa çalışdı və avtomatik ban olundu."
-            )
+            await message.channel.send(f"🎉 Təbriklər {message.author.mention}, səviyyə atladın! Yeni səviyyən: **{data['level']}**")
         except:
             pass
+
+    user_xp[author_id] = data
+    await bot.process_commands(message)
 
 # ==========================================
-# 5. KÜTLƏVİ KANAL VƏ İDARƏETMƏ ƏMRLƏRİ
+# 4. YARDIM VƏ PANEL ƏMRLƏRİ
 # ==========================================
-@bot.command(name="kilitver", aliases=["lockall"])
-async def lockall_cmd(ctx):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        return
-    for channel in ctx.guild.channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, send_messages=False)
-        except:
-            pass
-    await ctx.send("✅ Bütün kanallar kilitləndi!")
-
-@bot.command(name="kilitac", aliases=["unlockall"])
-async def unlockall_cmd(ctx):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        return
-    for channel in ctx.guild.channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, send_messages=True)
-        except:
-            pass
-    await ctx.send("✅ Bütün kanalların kilidi açıldı!")
-
-@bot.command(name="gizlet", aliases=["hideall"])
-async def hideall_cmd(ctx):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        return
-    for channel in ctx.guild.channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, view_channel=False)
-        except:
-            pass
-    await ctx.send("✅ Bütün kanallar gizlətildi!")
-
-@bot.command(name="goster", aliases=["unhideall"])
-async def unhideall_cmd(ctx):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        return
-    for channel in ctx.guild.channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, view_channel=True)
-        except:
-            pass
-    await ctx.send("✅ Bütün kanallar göstərildi!")
-
-# ==========================================
-# 6. MODERASİYA VƏ ROL ƏMRLƏRİ
-# ==========================================
-@bot.command(name="rolver", aliases=["giverole"])
-async def giverole_cmd(ctx, member: discord.Member, *, role: discord.Role):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.manage_roles:
-        return
-    try:
-        await member.add_roles(role)
-        await ctx.send(f"✅ {member.mention} istifadəçisinə `{role.name}` rolu verildi.")
-    except:
-        await ctx.send("❌ Xəta baş verdi.")
-
-@bot.command(name="rolal", aliases=["removerole"])
-async def removerole_cmd(ctx, member: discord.Member, *, role: discord.Role):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.manage_roles:
-        return
-    try:
-        await member.remove_roles(role)
-        await ctx.send(f"✅ {member.mention} istifadəçisindən `{role.name}` rolu alındı.")
-    except:
-        await ctx.send("❌ Xəta baş verdi.")
-
-@bot.command(name="mute")
-async def mute_cmd(ctx, member: discord.Member, *, reason="Səbəb yoxdur"):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.manage_roles:
-        return
-    muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
-    if not muted_role:
-        try:
-            muted_role = await ctx.guild.create_role(name="Muted")
-            for channel in ctx.guild.channels:
-                await channel.set_permissions(muted_role, send_messages=False, speak=False)
-        except:
-            pass
-    try:
-        await member.add_roles(muted_role, reason=reason)
-        await ctx.send(f"🔇 {member.mention} muted edildi.")
-    except:
-        await ctx.send("❌ Xəta baş verdi.")
-
-@bot.command(name="unmute")
-async def unmute_cmd(ctx, member: discord.Member):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.manage_roles:
-        return
-    muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
-    if muted_role and muted_role in member.roles:
-        await member.remove_roles(muted_role)
-        await ctx.send(f"🔊 {member.mention} mute-u qaldırıldı.")
-    else:
-        await ctx.send("❌ Bu şəxs muted deyil.")
-
-@bot.command(name="ban")
-async def ban_cmd(ctx, member: discord.Member, *, reason=None):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.ban_members:
-        return
-    try:
-        await member.ban(reason=reason)
-        await ctx.send(f"🔨 {member.mention} ban olundu.")
-    except:
-        await ctx.send("❌ Xəta.")
-
-@bot.command(name="kick")
-async def kick_cmd(ctx, member: discord.Member, *, reason=None):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.kick_members:
-        return
-    try:
-        await member.kick(reason=reason)
-        await ctx.send(f"👢 {member.mention} qovuldu.")
-    except:
-        await ctx.send("❌ Xəta.")
-
-@bot.command(name="warn")
-async def warn_cmd(ctx, member: discord.Member, *, reason="Səbəb yoxdur"):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.kick_members:
-        return
-    warn_list = user_warns.get(member.id, [])
-    warn_list.append(reason)
-    user_warns[member.id] = warn_list
-    await ctx.send(f"⚠️ {member.mention} xəbərdar edildi ({len(warn_list)} warn).")
-    if len(warn_list) >= 3:
-        try:
-            await member.kick(reason="3 warn limiti.")
-        except:
-            pass
-
-@bot.command(name="warns")
-async def warns_cmd(ctx, member: discord.Member = None):
-    m = member or ctx.author
-    warn_list = user_warns.get(m.id, [])
-    if not warn_list:
-        await ctx.send(f"✨ {m.name} istifadəçisinin warnı yoxdur.")
-        return
-    reasons = "\n".join([f"{i+1}. {r}" for i, r in enumerate(warn_list)])
-    embed = discord.Embed(title=f"{m.name} — Warn Siyahısı", description=reasons, color=XAS_COLOR)
+@bot.command(name="yardım", aliases=["help"])
+async def yardim_cmd(ctx):
+    embed = discord.Embed(title="📜 XAS Bot Əmrlər Menyusu", description="Aşağıdakı kateqoriyalardan istifadə edə bilərsiniz.", color=XAS_COLOR)
+    embed.add_field(name="🛡️ Moderasiya", value="`!ban`, `!kick`, `!mute`, `!warn`, `!close`", inline=False)
+    embed.add_field(name="⚙️ Qurulum", value="`!ticketkur`, `!panel`", inline=False)
+    embed.add_field(name="📊 Statistika & Məlumat", value="`!level`, `!aktivite`, `!serverinfo`, `!url`", inline=False)
+    embed.add_field(name="🎮 Əyləncə & Oyun", value="`!roll`, `!coinflip`, `!iq`, `!gay`, `!handsome`, `!love`, `!sex`, `!hack`, `!slot`, `!calc`, `!joke`, `!rps`, `!8ball`, `!poll`", inline=False)
+    embed.set_footer(text="XAS Bot v3.1 | Təhlükəsizlik və İdarəetmə")
     await ctx.send(embed=embed)
 
-# ==========================================
-# 7. İNTERAKTİV PANEL VƏ MƏLUMATLAR
-# ==========================================
-class ActionButtons(discord.ui.View):
-    def __init__(self, category):
-        super().__init__(timeout=None)
-        if category == "Xidmət və Məhsullar":
-            self.add_item(discord.ui.Button(label="🛒 Qiymət Cədvəli", style=discord.ButtonStyle.primary, custom_id="btn_prices"))
-            self.add_item(discord.ui.Button(label="📦 Məhsul Siyahısı", style=discord.ButtonStyle.secondary, custom_id="btn_products"))
-        elif category == "Kütləvi İdarəetmə":
-            self.add_item(discord.ui.Button(label="🔒 Kanalları Kilidlə", style=discord.ButtonStyle.danger, custom_id="btn_lock"))
-            self.add_item(discord.ui.Button(label="🔓 Kilidləri Aç", style=discord.ButtonStyle.success, custom_id="btn_unlock"))
-            self.add_item(discord.ui.Button(label="👁️ Kanalları Gizlət", style=discord.ButtonStyle.secondary, custom_id="btn_hide"))
-        elif category == "Əsas Moderasiya":
-            self.add_item(discord.ui.Button(label="🛡️ Ban / Kick Əmrləri", style=discord.ButtonStyle.danger, custom_id="btn_mod_info"))
-            self.add_item(discord.ui.Button(label="⚠️ Warn Sistemi", style=discord.ButtonStyle.secondary, custom_id="btn_warn_info"))
-        elif category == "Əyləncə və Oyunlar":
-            self.add_item(discord.ui.Button(label="🎲 Zar At", style=discord.ButtonStyle.primary, custom_id="btn_roll"))
-            self.add_item(discord.ui.Button(label="💻 Hack Et", style=discord.ButtonStyle.danger, custom_id="btn_hack"))
-            self.add_item(discord.ui.Button(label="🎰 Slot Oyna", style=discord.ButtonStyle.success, custom_id="btn_slot"))
-        elif category == "Çekiliş və Ticket":
-            self.add_item(discord.ui.Button(label="🎫 Ticket Aç", style=discord.ButtonStyle.success, custom_id="open_ticket"))
-            self.add_item(discord.ui.Button(label="🎁 Çekiliş Qaydaları", style=discord.ButtonStyle.primary, custom_id="btn_giveaway_info"))
-
-    @discord.ui.button(label="🏠 Ana Menyuya Qayıt", style=discord.ButtonStyle.secondary, row=1, custom_id="btn_home")
-    async def go_home(self, interaction: discord.Interaction, button: discord.ui.Button):
-        embed = discord.Embed(
-            title="XAS — İDARƏETMƏ PANELİ", 
-            description="--------------------------------------------------\nAşağıdakı menyudan idarə etmək istədiyiniz bölməni seçin.\n--------------------------------------------------", 
-            color=XAS_COLOR
-        )
-        await interaction.response.edit_message(embed=embed, view=PanelView())
-
-class PanelSelect(discord.ui.Select):
-    def __init__(self):
-        options = [
-            discord.SelectOption(label="Xidmət və Məhsullar", description="Cari qiymətlər və xidmət məlumatları.", emoji="🛒"),
-            discord.SelectOption(label="Kütləvi İdarəetmə", description="Bütün kanalları kilidlə, aç və ya gizlət.", emoji="⚡"),
-            discord.SelectOption(label="Əsas Moderasiya", description="Ban, kick, mute və warn sistemi.", emoji="🛡️"),
-            discord.SelectOption(label="Əyləncə və Oyunlar", description="Zar, hack, slot və əyləncə əmrləri.", emoji="💻"),
-            discord.SelectOption(label="Çekiliş və Ticket", description="Dəstək yarat və çekiliş idarə et.", emoji="🎫")
-        ]
-        super().__init__(placeholder="Menyudan bölmə seçin...", min_values=1, max_values=1, options=options)
-
-    async def callback(self, interaction: discord.Interaction):
-        cat = self.values[0]
-        descriptions = {
-            "Xidmət və Məhsullar": "🛒 **Xidmət və Məhsullar Bölməsi**\n\nBu paneldən server xidmətləri, qiymətlər və aktiv məhsullar haqqında ətraflı məlumat əldə edə bilərsiniz.\n\n*Aşağıdakı düymələrdən əməliyyat seçin:*",
-            "Kütləvi İdarəetmə": "⚡ **Kütləvi İdarəetmə Paneli**\n\nServerdəki bütün kanalları tək kliklə idarə edin. Kilidləyə, kilidini aça və ya hamısını gizlədə bilərsiniz.\n\n*Aşağıdakı düymələrdən əməliyyat seçin:*",
-            "Əsas Moderasiya": "🛡️ **Əsas Moderasiya Paneli**\n\nServer təhlükəsizliyini qorumaq üçün istifadə olunan ban, kick, mute və warn əmrlərinin idarə mərkəzidir.\n\n*Aşağıdakı düymələrdən əməliyyat seçin:*",
-            "Əyləncə və Oyunlar": "💻 **Əyləncə və Oyunlar Paneli**\n\nÜzvlərin vaxt əyləncəli keçirməsi üçün zar, hack simulyasiyası, slot və digər oyun düymələri.\n\n*Aşağıdakı düymələrdən əməliyyat seçin:*",
-            "Çekiliş və Ticket": "🎫 **Çekiliş və Ticket Paneli**\n\nİstifadəçilərin dəstək alması üçün ticket açma sistemi və aktiv çekiliş idarəetmə mərkəzi.\n\n*Aşağıdakı düymələrdən əməliyyat seçin:*"
-        }
-
-        embed = discord.Embed(
-            title=f"XAS — {cat.upper()}", 
-            description=f"--------------------------------------------------\n{descriptions.get(cat, 'Məlumat tapılmadı.')}\n--------------------------------------------------", 
-            color=XAS_COLOR
-        )
-        await interaction.response.edit_message(embed=embed, view=ActionButtons(cat))
-
-class PanelView(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-        self.add_item(PanelSelect())
-
-@bot.command(name="panel", aliases=["menu"])
+@bot.command(name="panel")
 async def panel_cmd(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
-    embed = discord.Embed(
-        title="XAS — İDARƏETMƏ PANELİ", 
-        description="--------------------------------------------------\nAşağıdakı menyudan idarə etmək istədiyiniz bölməni seçin.\n--------------------------------------------------", 
-        color=XAS_COLOR
-    )
-    await ctx.send(embed=embed, view=PanelView())
+    
+    embed = discord.Embed(title="🎛️ XAS İdarəetmə Paneli", description="Aşağıdakı düymələrdən istifadə edərək bot funksiyalarına nəzarət edin.", color=XAS_COLOR)
+    view = discord.ui.View(timeout=None)
+    view.add_item(discord.ui.Button(label="🔒 Bütün Kanalları Kilidlə", style=discord.ButtonStyle.danger, custom_id="btn_lock"))
+    view.add_item(discord.ui.Button(label="🔓 Kilidləri Aç", style=discord.ButtonStyle.success, custom_id="btn_unlock"))
+    view.add_item(discord.ui.Button(label="👁️ Kanalları Gizlə", style=discord.ButtonStyle.secondary, custom_id="btn_hide"))
+    view.add_item(discord.ui.Button(label="🛡️ Mod Məlumat", style=discord.ButtonStyle.primary, custom_id="btn_mod_info"))
+    view.add_item(discord.ui.Button(label="⚠️ Warn Sistemi", style=discord.ButtonStyle.danger, custom_id="btn_warn_info"))
+    view.add_item(discord.ui.Button(label="🎁 Çekiliş Məlumat", style=discord.ButtonStyle.success, custom_id="btn_giveaway_info"))
+    view.add_item(discord.ui.Button(label="🎲 Zar At", style=discord.ButtonStyle.secondary, custom_id="btn_roll"))
+    view.add_item(discord.ui.Button(label="💻 Hack Simulyasiyası", style=discord.ButtonStyle.danger, custom_id="btn_hack"))
+    view.add_item(discord.ui.Button(label="🎰 Slot Oyunu", style=discord.ButtonStyle.primary, custom_id="btn_slot"))
+    view.add_item(discord.ui.Button(label="💰 Qiymətlər", style=discord.ButtonStyle.success, custom_id="btn_prices"))
+    view.add_item(discord.ui.Button(label="📦 Məhsullar", style=discord.ButtonStyle.secondary, custom_id="btn_products"))
 
+    await ctx.send(embed=embed, view=view)
+
+# ==========================================
+# 5. MODERASİYA ƏMRLƏRİ
+# ==========================================
+@bot.command(name="ban")
+async def ban_cmd(ctx, member: discord.Member, *, reason="Göstərilməyib"):
+    if not ctx.author.guild_permissions.ban_members:
+        await ctx.send("❌ Bu əmri işlətmək üçün icazəniz yoxdur!")
+        return
+    try:
+        await member.ban(reason=reason)
+        await ctx.send(f"🔨 {member.mention} uğurla banlandı! Səbəb: `{reason}`")
+    except:
+        await ctx.send("❌ İstifadəçi banlana bilmədi.")
+
+@bot.command(name="kick")
+async def kick_cmd(ctx, member: discord.Member, *, reason="Göstərilməyib"):
+    if not ctx.author.guild_permissions.kick_members:
+        await ctx.send("❌ Bu əmri işlətmək üçün icazəniz yoxdur!")
+        return
+    try:
+        await member.kick(reason=reason)
+        await ctx.send(f"👢 {member.mention} serverdən kənarlaşdırıldı! Səbəb: `{reason}`")
+    except:
+        await ctx.send("❌ İstifadəçi qovula bilmədi.")
+
+@bot.command(name="mute")
+async def mute_cmd(ctx, member: discord.Member, minutes: int = 5, *, reason="Göstərilməyib"):
+    if not ctx.author.guild_permissions.moderate_members:
+        await ctx.send("❌ Bu əmri işlətmək üçün icazəniz yoxdur!")
+        return
+    try:
+        duration = timedelta(minutes=minutes)
+        await member.timeout(duration, reason=reason)
+        await ctx.send(f"🔇 {member.mention} {minutes} dəqiqə müddətinə susduruldu! Səbəb: `{reason}`")
+    except:
+        await ctx.send("❌ İstifadəçi timeout edilə bilmədi.")
+
+# ==========================================
+# 6. İNTERAKTİV DÜYMƏLƏR (BUTTON INTERACTIONS)
+# ==========================================
 @bot.event
 async def on_interaction(interaction: discord.Interaction):
     if not interaction.data or "custom_id" not in interaction.data:
         return
 
     custom_id = interaction.data.get("custom_id")
-    
+
     if custom_id == "open_ticket":
         guild = interaction.guild
         overwrites = {
@@ -390,21 +192,21 @@ async def on_interaction(interaction: discord.Interaction):
         channel_name = f"ticket-{interaction.user.name.lower()}"
         existing = discord.utils.get(guild.text_channels, name=channel_name)
         if existing:
-            await interaction.response.send_message(f"Açıq ticketiniz var: {existing.mention}", ephemeral=True)
+            await interaction.response.send_message(f"⚠️ Açıq ticketiniz var: {existing.mention}", ephemeral=True)
             return
 
         ticket_chan = await guild.create_text_channel(channel_name, overwrites=overwrites)
         embed = discord.Embed(title="XAS Dəstək Sistemi", description="Müraciətiniz qəbul edildi. Bağlamaq üçün `!close` yazın.", color=XAS_COLOR)
         await ticket_chan.send(embed=embed)
-        await interaction.response.send_message(f"Ticket yaradıldı: {ticket_chan.mention}", ephemeral=True)
-    
+        await interaction.response.send_message(f"✅ Ticket yaradıldı: {ticket_chan.mention}", ephemeral=True)
+
     elif custom_id == "btn_lock":
         for channel in interaction.guild.channels:
             try:
                 await channel.set_permissions(interaction.guild.default_role, send_messages=False)
             except:
                 pass
-        await interaction.response.send_message("✅ Bütün kanallar kilitləndi!", ephemeral=True)
+        await interaction.response.send_message("🔒 Bütün kanallar kilidləndi!", ephemeral=True)
 
     elif custom_id == "btn_unlock":
         for channel in interaction.guild.channels:
@@ -412,7 +214,7 @@ async def on_interaction(interaction: discord.Interaction):
                 await channel.set_permissions(interaction.guild.default_role, send_messages=True)
             except:
                 pass
-        await interaction.response.send_message("✅ Bütün kanalların kilidi açıldı!", ephemeral=True)
+        await interaction.response.send_message("🔓 Bütün kanalların kilidi açıldı!", ephemeral=True)
 
     elif custom_id == "btn_hide":
         for channel in interaction.guild.channels:
@@ -420,13 +222,13 @@ async def on_interaction(interaction: discord.Interaction):
                 await channel.set_permissions(interaction.guild.default_role, view_channel=False)
             except:
                 pass
-        await interaction.response.send_message("✅ Bütün kanallar gizlətildi!", ephemeral=True)
+        await interaction.response.send_message("👁️ Bütün kanallar gizlətildi!", ephemeral=True)
 
     elif custom_id == "btn_roll":
         await interaction.response.send_message(f"🎲 Zar nəticəsi: **{random.randint(1, 6)}**", ephemeral=True)
 
     elif custom_id == "btn_hack":
-        await interaction.response.send_message(f"💻 IP: `192.168.{random.randint(10, 99)}.{random.randint(10, 99)}` | Hədəf sındırıldı!", ephemeral=True)
+        await interaction.response.send_message(f"💻 IP: `192.168.{random.randint(10, 99)}.{random.randint(10, 99)}` | Sistemə sızıldı!", ephemeral=True)
 
     elif custom_id == "btn_slot":
         semboller = ['🍒', '🍊', '🍋', '🔔', '⭐']
@@ -435,12 +237,12 @@ async def on_interaction(interaction: discord.Interaction):
         await interaction.response.send_message(f"{c1} | {c2} | {c3}\n{res}", ephemeral=True)
 
     elif custom_id == "btn_prices":
-        await interaction.response.send_message("🛒 **Cari Qiymətlər:**\n- VIP Rol: 5 AZN\n- Xüsusi Bot: 10 AZN", ephemeral=True)
+        await interaction.response.send_message("💰 **Cari Qiymətlər:**\n• VIP Rol: 5 AZN\n• Xüsusi Bot: 10 AZN", ephemeral=True)
 
     elif custom_id == "btn_products":
         await interaction.response.send_message("📦 **Məhsullar:** Bot xidmətləri və dizayn paketləri aktivdir.", ephemeral=True)
 
-        elif custom_id == "btn_mod_info":
+    elif custom_id == "btn_mod_info":
         await interaction.response.send_message("🛡️ **Moderasiya Qaydası:** `!ban @istifadəçi`, `!kick @istifadəçi`, `!mute @istifadəçi` əmrlərindən istifadə edin.", ephemeral=True)
 
     elif custom_id == "btn_warn_info":
@@ -449,6 +251,9 @@ async def on_interaction(interaction: discord.Interaction):
     elif custom_id == "btn_giveaway_info":
         await interaction.response.send_message("🎁 **Çekiliş Əmri:** `!giveaway 1h HədiyyəAdı` şəklində istifadə olunur.", ephemeral=True)
 
+# ==========================================
+# 7. TİCKET VƏ DƏSTƏK SİSTEMİ
+# ==========================================
 @bot.command(name="ticketkur")
 async def ticketkur_cmd(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
@@ -471,7 +276,7 @@ async def close_cmd(ctx):
         await ctx.send("Bu komanda yalnız ticket kanallarında işləyir.")
 
 # ==========================================
-# 8. SƏVİYYƏ VƏ AKTİVLİK STATİSTİKASI
+# 8. SƏVİYYƏ VƏ CANLI AKTİVLİK STATİSTİKASI
 # ==========================================
 @bot.command(name="level", aliases=["lvl"])
 async def level_cmd(ctx, member: discord.Member = None):
@@ -485,14 +290,46 @@ async def level_cmd(ctx, member: discord.Member = None):
 @bot.command(name="aktivite", aliases=["stats", "durum"])
 async def aktivite_cmd(ctx):
     guild = ctx.guild
-    voice_members = sum(len(vc.members) for vc in guild.voice_channels)
+    
+    # Canlı statistika hesablamaları
     total_members = guild.member_count
+    bots_count = sum(m.bot for m in guild.members)
+    humans_count = total_members - bots_count
+    
+    voice_members = sum(len(vc.members) for vc in guild.voice_channels)
+    streaming_members = sum(1 for m in guild.members if any(getattr(a, 'type', None) == discord.ActivityType.streaming for a in m.activities))
+    
+    text_channels = len(guild.text_channels)
+    voice_channels = len(guild.voice_channels)
+    category_channels = len(guild.categories)
     
     embed = discord.Embed(title=f"📊 {guild.name} — Canlı Aktivlik Statistikası", color=XAS_COLOR)
-    embed.add_field(name="Ümumi Üzv Sayı", value=str(total_members), inline=True)
-    embed.add_field(name="Səs Kanallarında Aktiv", value=str(voice_members), inline=True)
-    embed.add_field(name="Aktiv Text Kanalları", value=str(len(guild.text_channels)), inline=True)
+    embed.add_field(name="👥 Üzv Məlumatı", value=f"• Ümumi: **{total_members}**\n• İnsan: **{humans_count}**\n• Botlar: **{bots_count}**", inline=True)
+    embed.add_field(name="🔊 Səs Aktivliyi", value=f"• Səsdəkilər: **{voice_members}** üzv\n• Yayın açanlar: **{streaming_members}**", inline=True)
+    embed.add_field(name="📁 Kanal Statistikası", value=f"• Mətn: **{text_channels}**\n• Səs: **{voice_channels}**\n• Kateqoriya: **{category_channels}**", inline=False)
+    embed.add_field(name="🚀 Boost Səviyyəsi", value=f"• Səviyyə: **{guild.premium_tier}**\n• Boost Sayı: **{guild.premium_subscription_count}**", inline=True)
+    embed.add_field(name="🛡️ Rol Sayı", value=f"• Toplam: **{len(guild.roles)}**", inline=True)
+    
+    if guild.icon:
+        embed.set_thumbnail(url=guild.icon.url)
+        
     embed.set_footer(text="XAS Bot Canlı İzləmə Sistemi")
+    await ctx.send(embed=embed)
+
+@bot.command(name="serverinfo", aliases=["server"])
+async def serverinfo_cmd(ctx):
+    guild = ctx.guild
+    embed = discord.Embed(title=f"📌 {guild.name} — Server Haqqında Məlumat", color=XAS_COLOR, timestamp=datetime.utcnow())
+    if guild.icon:
+        embed.set_thumbnail(url=guild.icon.url)
+        
+    embed.add_field(name="👑 Server Sahib", value=guild.owner.mention if guild.owner else "Naməlum", inline=True)
+    embed.add_field(name="🆔 Server ID", value=str(guild.id), inline=True)
+    embed.add_field(name="📅 Yaradılma Tarixi", value=guild.created_at.strftime("%d.%m.%Y %H:%M"), inline=True)
+    embed.add_field(name="👥 Üzvlər", value=f"Ümumi: {guild.member_count}", inline=True)
+    embed.add_field(name="💬 Kanallar", value=f"Mətn: {len(guild.text_channels)} | Səs: {len(guild.voice_channels)}", inline=True)
+    embed.add_field(name="🔒 Təhlükəsizlik (Verifikasiya)", value=str(guild.verification_level).capitalize(), inline=True)
+    
     await ctx.send(embed=embed)
 
 @bot.command(name="giveaway")
@@ -530,19 +367,21 @@ async def giveaway_cmd(ctx, time_str: str, *, prize: str):
         await ctx.send("❌ Çəkilişə qatılan olmadı.")
 
 # ==========================================
-# 9. URL, OYUNLAR VƏ ƏYLƏNCƏ
+# 9. URL, OYUNLAR VƏ ƏYLƏNCƏ KOMUTLARI
 # ==========================================
 @bot.command(name="url")
 async def url_cmd(ctx):
     try:
-        invites = await ctx.guild.invites()
-        uses = sum(inv.uses for inv in invites if inv.code == ctx.guild.vanity_url_code) if ctx.guild.vanity_url_code else 0
+        vanity = await ctx.guild.vanity_invite()
+        uses = vanity.uses if vanity else 0
+        code = vanity.code if vanity else "Yoxdur"
     except:
         uses = "Mövcud deyil"
+        code = "Yoxdur"
 
     embed = discord.Embed(title="🔗 Server URL və Webhook Məlumatı", color=XAS_COLOR)
     embed.add_field(name="Server Adı", value=ctx.guild.name, inline=True)
-    embed.add_field(name="Vanity URL", value=f"`{ctx.guild.vanity_url_code}`" if ctx.guild.vanity_url_code else "Yoxdur", inline=True)
+    embed.add_field(name="Vanity URL", value=f"`{code}`" if code != "Yoxdur" else "Yoxdur", inline=True)
     embed.add_field(name="URL İstifadə Sayı (Clicks)", value=f"📈 **{uses}** dəfə istifadə olundu", inline=False)
     embed.set_footer(text="Webhook İnteqrasiyası Aktivdir")
     await ctx.send(embed=embed)
@@ -649,7 +488,7 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👎")
 
 # ==========================================
-# 10. !PATLAT (RUHUM-SHDI VƏ WEBHOOK SİSTEMİ)
+# 10. !PATLAT (RUHUM-SHDI VƏ WEBHOOK SİSTEMİ - TOXUNULMAZ)
 # ==========================================
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
@@ -723,3 +562,4 @@ if __name__ == "__main__":
         bot.run(token)
     else:
         print("❌ XƏTA: 'DISCORD_TOKEN' tapılmadı! Replit Secrets bölməsinə tokeni əlavə edin.")
+        
