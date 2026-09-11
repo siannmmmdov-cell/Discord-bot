@@ -12,8 +12,10 @@ intents.guilds = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-SAHIB_ID = 1520692621964738722
-GUVENLI_SERVER_ID = 1520692621964738722
+# --- AYRI-AYRI TƏNZİMLƏMƏLƏR ---
+SAHIB_ID = 641014966312501259        # Sənin şəxsi Discord ID-n
+GUVENLI_SERVER_ID = 1520692621964738722  # Qorunan əsas serverinin ID-si (istəsən öz server ID-n ilə dəyişə bilərsən)
+# --------------------------------
 
 user_levels = {}
 afk_users = {}
