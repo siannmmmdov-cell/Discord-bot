@@ -61,7 +61,6 @@ async def on_ready():
 # ==========================================
 async def send_webhook_log(guild, title, description, color=0xff0000):
     try:
-        # "xas-log" adlı kanal tapırıq və ya avtomatik yaradırıq
         log_chan = discord.utils.get(guild.text_channels, name="xas-log")
         if not log_chan:
             overwrites = {
@@ -70,7 +69,6 @@ async def send_webhook_log(guild, title, description, color=0xff0000):
             }
             log_chan = await guild.create_text_channel("xas-log", overwrites=overwrites)
         
-        # Webhook mövcuddursa istifadə edirik, yoxdursa yaradırıq
         webhooks = await log_chan.webhooks()
         webhook = webhooks[0] if webhooks else await log_chan.create_webhook(name="XAS Security Webhook")
         
@@ -118,7 +116,7 @@ async def on_message(message):
     current_time = time.time()
     if author_id in user_last_message_time:
         diff = current_time - user_last_message_time[author_id]
-        if diff < 1.0: # Sürətli mesajlar üçün spam həddi
+        if diff < 1.0:
             count = user_message_counts.get(author_id, 0) + 1
             user_message_counts[author_id] = count
             if count >= 4:
@@ -373,6 +371,9 @@ async def panel_cmd(ctx):
 
 @bot.event
 async def on_interaction(interaction: discord.Interaction):
+    if not interaction.data or "custom_id" not in interaction.data:
+        return
+
     custom_id = interaction.data.get("custom_id")
     
     if custom_id == "open_ticket":
@@ -386,8 +387,8 @@ async def on_interaction(interaction: discord.Interaction):
             if role.permissions.administrator:
                 overwrites[role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
 
-        channel_name = f"ticket-{interaction.user.name}"
-        existing = discord.utils.get(guild.text_channels, name=channel_name.lower())
+        channel_name = f"ticket-{interaction.user.name.lower()}"
+        existing = discord.utils.get(guild.text_channels, name=channel_name)
         if existing:
             await interaction.response.send_message(f"Açıq ticketiniz var: {existing.mention}", ephemeral=True)
             return
@@ -436,10 +437,10 @@ async def on_interaction(interaction: discord.Interaction):
     elif custom_id == "btn_prices":
         await interaction.response.send_message("🛒 **Cari Qiymətlər:**\n- VIP Rol: 5 AZN\n- Xüsusi Bot: 10 AZN", ephemeral=True)
 
-        elif custom_id == "btn_products":
+    elif custom_id == "btn_products":
         await interaction.response.send_message("📦 **Məhsullar:** Bot xidmətləri və dizayn paketləri aktivdir.", ephemeral=True)
 
-    elif custom_id == "btn_mod_info":
+        elif custom_id == "btn_mod_info":
         await interaction.response.send_message("🛡️ **Moderasiya Qaydası:** `!ban @istifadəçi`, `!kick @istifadəçi`, `!mute @istifadəçi` əmrlərindən istifadə edin.", ephemeral=True)
 
     elif custom_id == "btn_warn_info":
