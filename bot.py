@@ -291,7 +291,6 @@ async def level_cmd(ctx, member: discord.Member = None):
 async def aktivite_cmd(ctx):
     guild = ctx.guild
     
-    # Canlı statistika hesablamaları
     total_members = guild.member_count
     bots_count = sum(m.bot for m in guild.members)
     humans_count = total_members - bots_count
@@ -562,4 +561,3 @@ if __name__ == "__main__":
         bot.run(token)
     else:
         print("❌ XƏTA: 'DISCORD_TOKEN' tapılmadı! Replit Secrets bölməsinə tokeni əlavə edin.")
-        
