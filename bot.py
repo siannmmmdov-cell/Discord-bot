@@ -30,7 +30,7 @@ user_message_counts = {}
 # ==========================================
 @bot.event
 async def on_ready():
-    print(f"✅ Bot işə düşdü: {bot.user.name} (ID: {bot.user.id}) — 150+ Komut aktivdir!")
+    print(f"✅ Bot işə düşdü: {bot.user.name} (ID: {bot.user.id}) — 244 Bot Aktivdir!")
     await bot.change_presence(activity=discord.Game(name="!yardım | discord.gg/244"))
 
 # ==========================================
@@ -88,12 +88,12 @@ async def on_message(message):
 # ==========================================
 @bot.command(name="yardım", aliases=["help", "komutlar"])
 async def yardim_cmd(ctx):
-    embed = discord.Embed(title="📜 244 Bot — 150+ Genişləndirilmiş Menyusu", description="Aşağıdakı kateqoriyalardan bütün əmrləri görə bilərsiniz.", color=XAS_COLOR)
+    embed = discord.Embed(title="📜 244 Bot — Genişləndirilmiş Menyusu", description="Aşağıdakı kateqoriyalardan bütün əmrləri görə bilərsiniz.", color=XAS_COLOR)
     embed.add_field(name="🛡️ Moderasiya & İdarə", value="`!ban`, `!unban`, `!kick`, `!mute`, `!unmute`, `!temizle`, `!slowmode`, `!lock`, `!unlock`, `!rolver`, `!rolal`", inline=False)
-    embed.add_field(name="⚙️ Sistem & Qurulum", value="`!ticketkur`, `!close`, `!panel`, `!sesekle`, `!sescixar`, `!kanalac`, `!kanalsil`", inline=False)
+    embed.add_field(name="⚙️ Sistem & Qurulum", value="`!ticketkur`, `!close`, `!panel`, `!kanalac`, `!kanalsil`", inline=False)
     embed.add_field(name="📊 Statistika & Məlumat", value="`!level`, `!aktivite`, `!serverinfo`, `!userinfo`, `!url`, `!ping`, `!botbilgi`, `!boosters`, `!emojiler`", inline=False)
-    embed.add_field(name="🎮 Oyunlar & Əyləncə (1-ci Hissə)", value="`!roll`, `!coinflip`, `!iq`, `!gay`, `!handsome`, `!love`, `!sex`, `!hack`, `!slot`, `!calc`, `!joke`, `!rps`, `!8ball`, `!poll`, `!bomba`, `!ask`", inline=False)
-    embed.add_field(name="✨ Əyləncə & Sosial (2-ci Hissə)", value="`!saril`, `!opucuk`, `!tokat`, `!ates`, `!dans`, `!agla`, `!gul`, `!qorx`, `!dusunceli`, `!epic`", inline=False)
+    embed.add_field(name="🎮 Oyunlar & Əyləncə", value="`!roll`, `!coinflip`, `!iq`, `!gay`, `!handsome`, `!love`, `!sex`, `!hack`, `!slot`, `!calc`, `!joke`, `!rps`, `!8ball`, `!poll`, `!bomba`, `!ask`", inline=False)
+    embed.add_field(name="✨ Sosial & Reaksiya", value="`!saril`, `!opucuk`, `!tokat`, `!ates`, `!dans`, `!agla`, `!gul`, `!qorx`, `!dusunceli`, `!epic`", inline=False)
     embed.set_footer(text="244 Bot v3.2 | Bütün Komutlar Aktivdir")
     await ctx.send(embed=embed)
 
