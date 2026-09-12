@@ -459,7 +459,6 @@ async def handsome_cmd(ctx, member: discord.Member = None):
 async def love_cmd(ctx, member1: discord.Member, member2: discord.Member = None):
     m2 = member2 or ctx.author
     await ctx.send(f"❤️ {member1.mention} və {m2.mention} sevgi uyğunluğu: **{random.randint(0, 100)}**%")
-
 @bot.command(name="sex")
 async def sex_cmd(ctx, member: discord.Member = None):
     m = member or ctx.author
