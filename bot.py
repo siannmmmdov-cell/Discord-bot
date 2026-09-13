@@ -572,11 +572,7 @@ async def server_url_info(ctx):
     embed.add_field(name="İstifadə Sayı (Neçə dəfə girilib)", value=f"👥 {uses} nəfər", inline=False)
     await ctx.send(embed=embed)
 
-@bot.command(name='level')
-async def check_level(ctx, member: discord.Member = None):
-    target = member or ctx.author
-    data = user_levels.get(target.id, {'level': 1, 'xp': 0})
-    await ctx.send(f"{target.mention} - Səviyyə: **{data['level']}** | Ümumi XP: **{data['xp']}**")
+
 
 @bot.command(name='leaderboard')
 async def leaderboard(ctx):
