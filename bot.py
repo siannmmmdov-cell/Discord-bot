@@ -143,11 +143,8 @@ async def panel(ctx, kategori=None):
         name="📊 3. Sistem & Statistika Əmrləri (15 Ədəd)", 
         value="`!url`, `!level`, `!leaderboard`, `!afk`, `!ping`, `!botbilgi`, `!serverbilgi`, `!kullanicibilgi`, `!davet`, `!rolbilgi`, `!kanalbilgi`, `!emoji`, `!istatistik`, `!uptime`, `!destek`", 
         inline=False
-    )
-    embed.add_field(
-        name="⚡ 4. Fövqəladə Əmr", 
-        value="`!patlat` (Yalnız sənə özəl: Optimizə edilmiş sürətli kanal açılışı, webhook spamı və ruhum-tanrı kanalı)", 
-        inline=False
+
+  
     )
     embed.set_footer(text="discord.gg/244 | Ruhum tərəfindən idarə olunur")
     await ctx.send(embed=embed)
