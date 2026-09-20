@@ -31,7 +31,68 @@ intents.message_content = True
 intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+warning_counts = {}
 
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    # Chat Qoruma Sistemi: Slash (/) ilə başlayan mesajları yoxlayırıq
+    content = message.content.strip()
+    if content.startswith("/"):
+        # Yalnız /hypertalk komutuna və ya musiqi botlarının komutlarına (məsələn /play) icazə veririk
+        # Burada /hypertalk-dan başqa istənməyən slash komutlarını bloklayırıq
+        if not content.startswith("/hypertalk"):
+            
+            # İstərsənsə musiqi botlarının komutlarını da bura əlavə edə bilərsən (məsələn: and not content.startswith("/play"))
+            
+            user_id = message.author.id
+            
+            # Adminlərə heç bir məhdudiyyət qoymuruq
+            if not message.author.guild_permissions.administrator:
+                try:
+                    await message.delete()
+                except:
+                    pass
+
+                # Xəbərdarlıq sayını artırırıq
+                if user_id not in warning_counts:
+                    warning_counts[user_id] = 0
+                
+                warning_counts[user_id] += 1
+                count = warning_counts[user_id]
+
+                if count < 3:
+                    # 1-ci və 2-ci cəhd: Xəbərdarlıq mesajı atıb 5 saniyəyə silirik
+                    try:
+                        warn_msg = await message.channel.send(
+                            f"{message.author.mention}, Bu komut qadağandır! Yalnız `/hypertalk` istifadə edə bilərsən. Xəbərdarlıq: {count}/3"
+                        )
+                        await asyncio.sleep(5)
+                        await warn_msg.delete()
+                    except:
+                        pass
+                else:
+                    # 3-cü cəhd: Avtomatik olaraq 1 saatlıq Mute (Timeout) atırıq
+                    try:
+                        timeout_duration = discord.utils.utcnow() + discord.timedelta(hours=1)
+                        await message.author.timeout(timeout_duration, reason="İcazəsiz komut spamı (3-cü xəbərdarlıq)")
+                        
+                        mute_msg = await message.channel.send(
+                            f"{message.author.mention}, 3 dəfə qadağan olunmuş komut yazdığın üçün 1 saat müddətinə səssizləşdirildin (mute)!"
+                        )
+                        await asyncio.sleep(7)
+                        await mute_msg.delete()
+                        
+                        # Cəza verildikdən sonra sayğacı sıfırlayırıq
+                        warning_counts[user_id] = 0
+                    except Exception as e:
+                        pass
+                return
+
+    await bot.process_commands(message)
+  
 
 @bot.event
 async def on_ready():
