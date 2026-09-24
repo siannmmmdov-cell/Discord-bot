@@ -21,6 +21,28 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    @client.event
+async def on_message(message):
+    # Botların öz mesajlarını yoxlamamaq üçün
+    if message.author.bot:
+        return
+
+    # ---> BU KODU MƏHZ BURA, İLK SƏTRƏ YAPIŞDIR <---
+    if "@everyone" in message.content or "@here" in message.content:
+        if not message.author.guild_permissions.administrator:
+            try:
+                await message.delete()
+                warning = await message.channel.send(f"{message.author.mention}, @everyone / @here spamı qadağandır!")
+                await warning.delete(delay=3)
+                return
+            except Exception as e:
+                print(f"Spam silinərkən xəta: {e}")
+    # ----------------------------------------------------
+
+    content = message.content
+    lower_content = content.lower()
+    ...
+
     # Botların öz mesajlarını yoxlamasın
     if message.author.bot:
         return
