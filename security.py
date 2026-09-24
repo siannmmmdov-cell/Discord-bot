@@ -94,5 +94,5 @@ async def on_member_join(member):
 
 # Tokeni birbaşa koda yazmırıq ki, Discord banlamasın. 
 # Əsas bot.py faylına import edərək və ya gizli mühitdən oxudaraq işlədəcəksən.
-import os
-client.run(os.getenv("DISCORD_TOKEN"))
+
+
