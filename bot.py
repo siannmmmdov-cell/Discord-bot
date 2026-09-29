@@ -1,10 +1,26 @@
-
 import discord
 from discord.ext import commands
 import re
 import time
 import os
 from collections import defaultdict
+from flask import Flask
+from threading import Thread
+
+# --- RENDER PORT XƏTASINI ARADAN QALDIRMAQ ÜÇÜN FLASK SERVER ---
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "BELARUSYA Bot aktivdir!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = Thread(target=run)
+    t.start()
+# -------------------------------------------------------------
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -15,7 +31,7 @@ intents.moderation = True
 
 bot = commands.Bot(command_prefix="!", help_command=None, intents=intents)
 
-# Sənin əsl Discord ID-n buraya yazıldı
+# Sənin ID-n
 OWNER_ID = 641014966312501259
 
 anti_spam_status = {}
@@ -224,7 +240,7 @@ async def antispam(ctx, status: str):
     guild_id = ctx.guild.id
     if status.lower() == "enable":
         anti_spam_status[guild_id] = True
-        await ctx.send(f"⚠️ {ctx.guild.name} Təhlükəsizlik sistemi aktivləşdirildi.")
+        await ctx.send(f"⚠️️ {ctx.guild.name} Təhlükəsizlik sistemi aktivləşdirildi.")
     elif status.lower() == "disable":
         anti_spam_status[guild_id] = False
         await ctx.send(f"⚠️ {ctx.guild.name} Təhlükəsizlik sistemi söndürüldü.")
@@ -304,5 +320,7 @@ async def kick(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     await member.kick(reason=reason)
     await ctx.send(f"👢 **{member}** serverdən qovuldu. Səbəb: **{reason}**")
 
-bot.run(os.getenv("DISCORD_TOKEN"))
-            
+if __name__ == "__main__":
+    keep_alive()  # Veb serveri işə salır ki, Render port xətası verməsin
+    bot.run(os.getenv("DISCORD_TOKEN"))
+    
