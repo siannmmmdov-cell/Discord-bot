@@ -15,7 +15,7 @@ intents.moderation = True
 bot = commands.Bot(command_prefix="#", help_command=None, intents=intents)
 
 # BURAYA ÖZ DİSCORD İSTİFADƏÇİ ID-Nİ YAZMALISAN (Məsələn: 123456789012345678)
-OWNER_ID = 1154580271616237619  # Atdığın tokenə əsasən ID-n buraya yazıldı
+OWNER_ID = 641014966312501259  # Atdığın tokenə əsasən ID-n buraya yazıldı
 
 anti_spam_status = {}
 user_message_counts = {}
