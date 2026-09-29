@@ -46,7 +46,7 @@ def clean_text(text):
     text = text.lower()
     replacements = {
         '1': 'i', 'İ': 'i', 'l': 'i', 'ı': 'i', '3': 'e', 'Ə': 'e', '4': 'a', '0': 'a',
-        'O': 'o', '5': 's', '$': 's', '7': 't', '+': 't', '8': 'b'
+        'O': 'o', '5': 's', '$': 's', '7': 't', '+': 't', '8': 'b', '9': 'g'
     }
     for char, replacement in replacements.items():
         text = text.replace(char, replacement)
@@ -135,7 +135,7 @@ async def on_message(message):
     if message.mention_everyone or len(message.mentions) > 3:
         try:
             await message.delete()
-            await message.channel.send(f"{message.author.mention}, ananı sikə yavaş yaz, kotləvi etiketləmə qadağandır!")
+            await message.channel.send(f"{message.author.mention}, yavaş yaz, kütləvi etiketləmə qadağandır!")
             return
         except:
             pass
@@ -151,9 +151,9 @@ async def on_message(message):
                 long_text_warnings[message.author.id] = 0
                 duration = discord.utils.utcnow() + discord.timedelta(minutes=5)
                 await message.author.timeout(duration, reason="Həddindən artıq uzun mesaj spamı.")
-                await message.channel.send(f"{message.author.mention}, dəfələrlə dedik e, ananı sikə yavaş yaz! 5 dəqiqəlik dincəl.")
+                await message.channel.send(f"{message.author.mention}, həddindən artıq uzun mesaj yazdığın üçün 5 dəqiqəlik dincəl.")
             else:
-                await message.channel.send(f"{message.author.mention}, ananı sikə yavaş yaz! Uzun dastan yazma ({count}/3)")
+                await message.channel.send(f"{message.author.mention}, zəhmət olmasa bu qədər uzun dastan yazma! ({count}/3)")
             return
         except:
             pass
@@ -169,9 +169,9 @@ async def on_message(message):
                 caps_warnings[message.author.id] = 0
                 duration = discord.utils.utcnow() + discord.timedelta(minutes=5)
                 await message.author.timeout(duration, reason="Caps Lock spamı.")
-                await message.channel.send(f"{message.author.mention}, ananı sikə yavaş yaz, qışqırma! 5 dəqiqəlik dincəl.")
+                await message.channel.send(f"{message.author.mention}, qışqıraraq yazdığın üçün 5 dəqiqəlik timeout aldın.")
             else:
-                await message.channel.send(f"{message.author.mention}, ananı sikə yavaş yaz, kapsları söndür! ({count}/2)")
+                await message.channel.send(f"{message.author.mention}, zəhmət olmasa kapsları (Caps Lock) söndür! ({count}/2)")
             return
         except:
             pass
@@ -180,7 +180,7 @@ async def on_message(message):
     if any(domain in cleaned for domain in ["discord.gg", "http://", "https://", "t.me", "discord.com/invite"]):
         try:
             await message.delete()
-            await message.channel.send(f"{message.author.mention}, ananı sikə yavaş yaz, başqa serverin linkini atmaq qadağandır!")
+            await message.channel.send(f"{message.author.mention}, başqa serverin linkini atmaq qadağandır!")
             return
         except:
             pass
@@ -196,7 +196,7 @@ async def on_message(message):
     if last_msg[0] == content and current_time - last_msg[1] < 4:
         try:
             await message.delete()
-            await message.channel.send(f"{message.author.mention}, ananı sikə yavaş yaz, eyni mesajı təkrar spam etmə!")
+            await message.channel.send(f"{message.author.mention}, eyni mesajı təkrar spam etmə!")
             return
         except:
             pass
@@ -210,17 +210,20 @@ async def on_message(message):
     if len(user_message_counts[author_id]) > 5:
         try:
             await message.delete()
-            await message.channel.send(f"{message.author.mention}, ananı sikə yavaş yaz, klaviaturanı dağıtdın.")
+            await message.channel.send(f"{message.author.mention}, çox sürətli yazırsan, bir az yavaş ol.")
             return
         except:
             pass
 
     await bot.process_commands(message)
 
-# --- KOMANDALAR ---
+# --- KOMANDALAR (YALNIZ SƏNİN ÜÇÜN İŞLƏYİR) ---
 
 @bot.command(name="yardim", aliases=["help"])
 async def yardim(ctx):
+    if ctx.author.id != OWNER_ID:
+        return
+
     embed = discord.Embed(title="🛡️ Təhlükəsizlik Sistemi", description="Serverin nizam-intizamını qoru", color=0x2b2d31)
     embed.add_field(name="🔗 Davət Linki", value="!url - Serverin dəvət linkini göstərir.", inline=False)
     embed.add_field(name="🛡️ Anti-Spam", value="!antispam enable / disable - Məhafizəni idarə edir.", inline=False)
@@ -234,13 +237,12 @@ async def yardim(ctx):
 @bot.command(name="antispam")
 async def antispam(ctx, status: str):
     if ctx.author.id != OWNER_ID:
-        await ctx.send("Sənin bu əmri işlətməyə səlahiyyətin yoxdur!", delete_after=5)
         return
 
     guild_id = ctx.guild.id
     if status.lower() == "enable":
         anti_spam_status[guild_id] = True
-        await ctx.send(f"⚠️️ {ctx.guild.name} Təhlükəsizlik sistemi aktivləşdirildi.")
+        await ctx.send(f"⚠ {ctx.guild.name} Təhlükəsizlik sistemi aktivləşdirildi.")
     elif status.lower() == "disable":
         anti_spam_status[guild_id] = False
         await ctx.send(f"⚠️ {ctx.guild.name} Təhlükəsizlik sistemi söndürüldü.")
@@ -250,7 +252,6 @@ async def antispam(ctx, status: str):
 @bot.command(name="lock")
 async def lock(ctx):
     if ctx.author.id != OWNER_ID:
-        await ctx.send("Sənin bu əmri işlətməyə səlahiyyətin yoxdur!", delete_after=5)
         return
 
     await ctx.message.delete()
@@ -260,7 +261,6 @@ async def lock(ctx):
 @bot.command(name="unlock")
 async def unlock(ctx):
     if ctx.author.id != OWNER_ID:
-        await ctx.send("Sənin bu əmri işlətməyə səlahiyyətin yoxdur!", delete_after=5)
         return
 
     await ctx.message.delete()
@@ -269,6 +269,9 @@ async def unlock(ctx):
 
 @bot.command(name="url")
 async def server_url(ctx):
+    if ctx.author.id != OWNER_ID:
+        return
+
     if ctx.guild.vanity_url_code:
         try:
             vanity = await ctx.guild.vanity_invite()
@@ -281,7 +284,6 @@ async def server_url(ctx):
 @bot.command(name="sil", aliases=["təmizlə"])
 async def sil_komanda(ctx, limit: int = 5):
     if ctx.author.id != OWNER_ID:
-        await ctx.send("Sənin bu əmri işlətməyə səlahiyyətin yoxdur!", delete_after=5)
         return
 
     await ctx.message.delete()
@@ -290,11 +292,17 @@ async def sil_komanda(ctx, limit: int = 5):
 
 @bot.command(name="ping")
 async def ping(ctx):
+    if ctx.author.id != OWNER_ID:
+        return
+
     latency = round(bot.latency * 1000)
     await ctx.send(f"🏓 Pong! Botun gecikmə sürəti: **{latency}ms**")
 
 @bot.command(name="serverbilgisi")
 async def serverbilgisi(ctx):
+    if ctx.author.id != OWNER_ID:
+        return
+
     guild = ctx.guild
     embed = discord.Embed(title=f"📊 {guild.name} - Server Məlumatı", color=0x2b2d31)
     embed.add_field(name="👑 Server Sahibçisi", value=guild.owner, inline=True)
@@ -305,7 +313,6 @@ async def serverbilgisi(ctx):
 @bot.command(name="ban")
 async def ban(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     if ctx.author.id != OWNER_ID:
-        await ctx.send("Sənin bu əmri işlətməyə səlahiyyətin yoxdur!", delete_after=5)
         return
 
     await member.ban(reason=reason)
@@ -314,13 +321,12 @@ async def ban(ctx, member: discord.Member, *, reason="Göstərilməyib"):
 @bot.command(name="kick")
 async def kick(ctx, member: discord.Member, *, reason="Göstərilməyib"):
     if ctx.author.id != OWNER_ID:
-        await ctx.send("Sənin bu əmri işlətməyə səlahiyyətin yoxdur!", delete_after=5)
         return
 
     await member.kick(reason=reason)
     await ctx.send(f"👢 **{member}** serverdən qovuldu. Səbəb: **{reason}**")
 
 if __name__ == "__main__":
-    keep_alive()  # Veb serveri işə salır ki, Render port xətası verməsin
+    keep_alive()
     bot.run(os.getenv("DISCORD_TOKEN"))
     
