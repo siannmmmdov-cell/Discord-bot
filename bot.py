@@ -1,4 +1,3 @@
-
 import os
 from collections import defaultdict
 import re
@@ -14,7 +13,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-  return 'HOLLANDIA Bot aktivdir!'
+  return 'DİABLOS Bot aktivdir!'
 
 
 def run():
@@ -72,30 +71,28 @@ def clean_text(text):
 @bot.event
 async def on_ready():
   activity = discord.Activity(
-      type=discord.ActivityType.watching, name='HOLLANDIA Təhlükəsizlik 🛡️'
+      type=discord.ActivityType.watching, name='DİABLOS Təhlükəsizlik 🛡️'
   )
   await bot.change_presence(activity=activity)
-  print(f'HOLLANDIA Təhlükəsizlik Botu tam aktivdir: {bot.user}')
+  print(f'DİABLOS Təhlükəsizlik Botu tam aktivdir: {bot.user}')
 
 
-# --- YENİ: SAXTA HESAB VƏ BOT QORUNMASI (NORMAL İSTİFADƏÇİYƏ TOXUNmur) ---
+# --- SAXTA HESAB VƏ BOT QORUNMASI ---
 @bot.event
 async def on_member_join(member):
   try:
-    # Hesabın açılış tarixini yoxlayır (məsələn, 24 saatdan təzə açılıbsa və avatarı yoxdursa şübhəlidir)
     now = discord.utils.utcnow()
     account_age = (now - member.created_at).total_seconds()
 
-    # Əgər hesab 1 gündən az müddətdə açılıbsa və profil şəkli yoxdursa, avtomatik qovur
     if account_age < 86400 and not member.avatar:
       await member.kick(
-          reason='HOLLANDIA Anti-Bot: Şübhəli / Yeni yaradılmış saxta hesab.'
+          reason='DİABLOS Anti-Bot: Şübhəli / Yeni yaradılmış saxta hesab.'
       )
   except:
     pass
 
 
-# --- 1. SİSZL WEBHOOK QORUNMASI ---
+# --- 1. WEBHOOK QORUNMASI ---
 @bot.event
 async def on_webhooks_update(channel):
   try:
@@ -109,7 +106,7 @@ async def on_webhooks_update(channel):
     pass
 
 
-# --- 2. SİSZL KANAL YARadILMASI QORUNMASI ---
+# --- 2. KANAL YARADILMASI QORUNMASI ---
 @bot.event
 async def on_guild_channel_create(channel):
   try:
@@ -124,7 +121,7 @@ async def on_guild_channel_create(channel):
     pass
 
 
-# --- 3. SİSZL ROL YARADILMASI QORUNMASI ---
+# --- 3. ROL YARADILMASI QORUNMASI ---
 @bot.event
 async def on_guild_role_create(role):
   try:
@@ -139,7 +136,7 @@ async def on_guild_role_create(role):
     pass
 
 
-# --- 4. ANTI-NUKE (Kütləvi ban qorunması) ---
+# --- 4. ANTI-NUKE QORUNMASI ---
 @bot.event
 async def on_member_ban(guild, user):
   try:
@@ -186,14 +183,14 @@ async def on_message(message):
     await bot.process_commands(message)
     return
 
-  # YENİ: Token oğurluğu və təhlükəli fırıldaqçılıq linkləri qoruması
+  # Zərərli link və fırıldaqçılıq qoruması
   dangerous_patterns = ['discord-gift', 'free-nitro', 'steam-nitro', 'dlcord.gg']
   if any(pattern in cleaned for pattern in dangerous_patterns):
     try:
       await message.delete()
       duration = discord.utils.utcnow() + discord.timedelta(minutes=10)
       await message.author.timeout(
-          duration, reason='HOLLANDIA: Zərərli / Phishing link paylaşımı.'
+          duration, reason='DİABLOS: Zərərli / Phishing link paylaşımı.'
       )
       await message.channel.send(
           f'{message.author.mention}, zərərli link paylaşdığın üçün 10 dəqiqəlik timmout aldın!'
@@ -213,7 +210,7 @@ async def on_message(message):
     except:
       pass
 
-  # Cox uzunluqdan Artıq Yazı Qoruması (150 simvoldan cox)
+  # Çox uzun mesaj qoruması (150 simvoldan çox)
   if len(content) > 150:
     try:
       await message.delete()
@@ -225,7 +222,7 @@ async def on_message(message):
         duration = discord.utils.utcnow() + discord.timedelta(minutes=5)
         await message.author.timeout(duration, reason='Həddindən artıq uzun mesaj spamı.')
         await message.channel.send(
-            f'{message.author.mention}, həddindən artıq uzun mesaj yazdığın üçün 5 dəqiqəlik tınımlama aldın!'
+            f'{message.author.mention}, həddindən artıq uzun mesaj yazdığın üçün 5 dəqiqəlik timmout aldın!'
         )
       else:
         await message.channel.send(
@@ -251,7 +248,7 @@ async def on_message(message):
         )
       else:
         await message.channel.send(
-            f'{message.author.mention}, zəhmət olmasa kapsları (Caps Lock) söndür! ({count}/3)'
+            f'{message.author.mention}, zəhmət olmasa Caps Lock-u söndür! ({count}/3)'
         )
       return
     except:
@@ -316,12 +313,12 @@ async def yardim(ctx):
     return
 
   embed = discord.Embed(
-      title='🛡️ HOLLANDIA Təhlükəsizlik Sistemi',
+      title='🛡️ DİABLOS Təhlükəsizlik Sistemi',
       description="Serverin nizam-intizamını qoru.",
       color=0x2b2d31,
   )
   embed.add_field(
-      name='🔗 Davat Linki', value='`/url` - Serverin dəvət linkini göstərir.', inline=False
+      name='🔗 Dəvət Linki', value='`/url` - Serverin dəvət linkini göstərir.', inline=False
   )
   embed.add_field(
       name='🛡️ Anti-Spam', value='`/antispam enable / disable` - Mühafizəni idarə edir.', inline=False
@@ -338,7 +335,7 @@ async def yardim(ctx):
   embed.add_field(
       name='🏓 Gecikmə', value='`/ping` - Botun sürətini yoxlayır.', inline=False
   )
-  embed.set_footer(text=f'{ctx.guild.name} • HOLLANDIA Security Systems')
+  embed.set_footer(text=f'{ctx.guild.name} • DİABLOS Security Systems')
   await ctx.send(embed=embed)
 
 
@@ -383,7 +380,7 @@ async def unlock(ctx):
     await ctx.message.delete()
     await ctx.channel.set_permissions(ctx.guild.default_role, send_messages=True)
     await ctx.send(
-        f'🔓 Kanalın kilidi açıldı, ({ctx.guild.name}) sakinləri yenidən yazıça bilərsiniz.',
+        f'🔓 Kanalın kilidi açıldı, ({ctx.guild.name}) sakinləri yenidən yaza bilərsiniz.',
         delete_after=5,
     )
   except:
@@ -479,5 +476,4 @@ async def kick(ctx, member: discord.Member, *, reason='Göstərilməyib'):
 if __name__ == '__main__':
   keep_alive()
   bot.run(os.environ.get('DISCORD_TOKEN'))
-
-      
+        
