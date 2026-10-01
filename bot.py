@@ -209,7 +209,6 @@ async def on_message(message):
       await message.delete()
       warn_msg = await message.channel.send(
           f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, KİMİ ETİKETLƏRSƏN'
-          ' AMK, yavaş yaz!'
       )
       await warn_msg.delete(delay=5)
       return
@@ -244,9 +243,13 @@ async def on_message(message):
     except:
       pass
 
-  # Caps Lock Koruması
+  # --- CAPS LOCK KORUMASI (Random gülüşlər istisna olundu) ---
+  is_random_laugh = any(
+      x in cleaned for x in ['jsjs', 'sjsj', 'asj', 'ksj', 'djs', 'hsd', 'asd']
+  )
   if (
-      len(content) > 10
+      not is_random_laugh
+      and len(content) > 10
       and sum(1 for c in content if c.isupper()) / len(content) > 0.7
   ):
     try:
@@ -473,7 +476,7 @@ async def sil_komanda(ctx, limit: int = 5):
 
 
 @bot.command(name='ping')
-async def ping(ctx):
+async def ping(ctx.author.id != OWNER_ID):
   if ctx.author.id != OWNER_ID:
     return
 
@@ -527,4 +530,4 @@ async def kick(ctx, member: discord.Member, *, reason='Belirtilmemiş'):
 if __name__ == '__main__':
   keep_alive()
   bot.run(os.environ.get('DISCORD_TOKEN'))
-      
+        
