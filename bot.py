@@ -190,14 +190,15 @@ async def on_message(message):
   if any(pattern in cleaned for pattern in dangerous_patterns):
     try:
       await message.delete()
-      duration = discord.utils.utcnow() + discord.timedelta(minutes=10)
+      duration = discord.utils.utcnow() + discord.timedelta(seconds=10)
       await message.author.timeout(
           duration, reason='DİABLOS: Zararlı / Phishing link paylaşımı.'
       )
-      await message.channel.send(
-          f'{message.author.mention}, zararlı link paylaştığın için 10 dakikalık'
-          ' zaman aşımı (timeout) aldın!'
+      warn_msg = await message.channel.send(
+          f'{message.author.mention}, ANNESİNİ GÖTÜNDEN SİKTİĞİMİN OĞLU, o'
+          ' ne biçim linkdir öyle?! 10 saniye patlatdım seni, özüne qayıt!'
       )
+      await warn_msg.delete(delay=5)
       return
     except:
       pass
@@ -206,9 +207,11 @@ async def on_message(message):
   if message.mention_everyone or len(message.mentions) > 3:
     try:
       await message.delete()
-      await message.channel.send(
-          f'{message.author.mention}, yavaş yaz, toplu etiketlemek yasaktır!'
+      warn_msg = await message.channel.send(
+          f'{message.author.mention}, KİMİ ETİKETLİRSƏN VAY AMK, yavaş yaz,'
+          ' herkesi narahat etmə!'
       )
+      await warn_msg.delete(delay=5)
       return
     except:
       pass
@@ -222,19 +225,21 @@ async def on_message(message):
 
       if count >= 3:
         long_text_warnings[message.author.id] = 0
-        duration = discord.utils.utcnow() + discord.timedelta(minutes=5)
+        duration = discord.utils.utcnow() + discord.timedelta(seconds=10)
         await message.author.timeout(
             duration, reason='Aşırı uzun mesaj spamı.'
         )
-        await message.channel.send(
-            f'{message.author.mention}, aşırı uzun mesaj yazdığın için 5'
-            ' dakikalık zaman aşımı aldın!'
+        warn_msg = await message.channel.send(
+            f'{message.author.mention}, DEDİK Kİ DASTAN YAZMA! 3 dəfədir'
+            ' uzadırsan, aldın 10 saniyəlik timeout-u, indi dincəl!'
         )
+        await warn_msg.delete(delay=5)
       else:
-        await message.channel.send(
-            f'{message.author.mention}, lütfen bu kadar uzun destan yazma!'
-            f' ({count}/3)'
+        warn_msg = await message.channel.send(
+            f'{message.author.mention}, BURADA ROMAN YAZMIRIK AMK, o qədər'
+            f' uzatma! Uyarı: ({count}/3)'
         )
+        await warn_msg.delete(delay=5)
       return
     except:
       pass
@@ -251,16 +256,19 @@ async def on_message(message):
 
       if count >= 3:
         caps_warnings[message.author.id] = 0
-        duration = discord.utils.utcnow() + discord.timedelta(minutes=5)
+        duration = discord.utils.utcnow() + discord.timedelta(seconds=10)
         await message.author.timeout(duration, reason='Caps Lock Spam.')
-        await message.channel.send(
-            f'{message.author.mention}, bağırarak yazdığın için 5 dakikalık'
-            ' zaman aşımı aldın.'
+        warn_msg = await message.channel.send(
+            f'{message.author.mention}, QULAĞIMIZ PARTLADI ANANI SİKiM, 3'
+            ' dəfədir qışqırırsan, aldın 10 saniyəlik cəzanı!'
         )
+        await warn_msg.delete(delay=5)
       else:
-        await message.channel.send(
-            f"{message.author.mention}, lütfen Caps Lock'u kapat! ({count}/3)"
+        warn_msg = await message.channel.send(
+            f'{message.author.mention}, NİYƏ QIŞQIRIRSAN AMK, söndür o Caps'
+            f" Lock'u! Uyarı: ({count}/3)"
         )
+        await warn_msg.delete(delay=5)
       return
     except:
       pass
@@ -278,9 +286,12 @@ async def on_message(message):
   ):
     try:
       await message.delete()
-      await message.channel.send(
-          f'{message.author.mention}, başka sunucunun linkini atmak yasaktır!'
+      warn_msg = await message.channel.send(
+          f'{message.author.mention}, BAŞQA SERVERİN REKLamini GÖTÜMƏ'
+          ' SÜRTÜRSƏN? Bir də başqasının linkini atsan sənə başqa kino'
+          ' göstərəcəm!'
       )
+      await warn_msg.delete(delay=5)
       return
     except:
       pass
@@ -296,9 +307,11 @@ async def on_message(message):
   if last_msg[0] == content and current_time - last_msg[1] < 4:
     try:
       await message.delete()
-      await message.channel.send(
-          f'{message.author.mention}, aynı mesajı tekrar spam etme!'
+      warn_msg = await message.channel.send(
+          f'{message.author.mention}, EYNİ ŞEYİ TƏKRAR-TƏKRAR ATMA, '
+          'qıcıqlandırma adamı!'
       )
+      await warn_msg.delete(delay=5)
       return
     except:
       pass
@@ -314,9 +327,11 @@ async def on_message(message):
   if len(user_message_counts[author_id]) > 5:
     try:
       await message.delete()
-      await message.channel.send(
-          f'{message.author.mention}, çok hızlı yazıyorsun, biraz yavaş ol.'
+      warn_msg = await message.channel.send(
+          f'{message.author.mention}, PUL PAYLAYIRLAR MƏYƏR? Çox sürətli yazırsan,'
+          ' klaviaturanı dağıtma, yavaş ol!'
       )
+      await warn_msg.delete(delay=5)
       return
     except:
       pass
@@ -513,4 +528,4 @@ async def kick(ctx, member: discord.Member, *, reason='Belirtilmemiş'):
 if __name__ == '__main__':
   keep_alive()
   bot.run(os.environ.get('DISCORD_TOKEN'))
-        
+  
