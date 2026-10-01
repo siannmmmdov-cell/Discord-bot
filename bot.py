@@ -195,8 +195,8 @@ async def on_message(message):
           duration, reason='DİABLOS: Zararlı / Phishing link paylaşımı.'
       )
       warn_msg = await message.channel.send(
-          f'{message.author.mention}, ANNESİNİ GÖTÜNDEN SİKTİĞİMİN OĞLU, o'
-          ' ne biçim linkdir öyle?! 10 saniye patlatdım seni, özüne qayıt!'
+          f'{message.author.mention}, ANAVİ BACİVİ SİKDİM YAVAŞ YAZ, o nə'
+          ' biçim linkdir elə?! 10 saniyəlik partlatdım səni!'
       )
       await warn_msg.delete(delay=5)
       return
@@ -208,8 +208,8 @@ async def on_message(message):
     try:
       await message.delete()
       warn_msg = await message.channel.send(
-          f'{message.author.mention}, KİMİ ETİKETLİRSƏN VAY AMK, yavaş yaz,'
-          ' herkesi narahat etmə!'
+          f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, KİMİ ETİKETLƏRSƏN'
+          ' AMK, yavaş yaz!'
       )
       await warn_msg.delete(delay=5)
       return
@@ -230,14 +230,14 @@ async def on_message(message):
             duration, reason='Aşırı uzun mesaj spamı.'
         )
         warn_msg = await message.channel.send(
-            f'{message.author.mention}, DEDİK Kİ DASTAN YAZMA! 3 dəfədir'
-            ' uzadırsan, aldın 10 saniyəlik timeout-u, indi dincəl!'
+            f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, 3 DƏFƏDİR DASTAN'
+            ' YAZIRSAN! Aldın 10 saniyəlik timeout-u, indi dincəl!'
         )
         await warn_msg.delete(delay=5)
       else:
         warn_msg = await message.channel.send(
-            f'{message.author.mention}, BURADA ROMAN YAZMIRIK AMK, o qədər'
-            f' uzatma! Uyarı: ({count}/3)'
+            f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, BURADA ROMAN'
+            f' YAZMIRIK! Uyarı: ({count}/3)'
         )
         await warn_msg.delete(delay=5)
       return
@@ -259,14 +259,14 @@ async def on_message(message):
         duration = discord.utils.utcnow() + discord.timedelta(seconds=10)
         await message.author.timeout(duration, reason='Caps Lock Spam.')
         warn_msg = await message.channel.send(
-            f'{message.author.mention}, QULAĞIMIZ PARTLADI ANANI SİKiM, 3'
-            ' dəfədir qışqırırsan, aldın 10 saniyəlik cəzanı!'
+            f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, QULAĞIMIZ'
+            ' PARTLADI! 3 dəfədir qışqırırsan, aldın timeout-u!'
         )
         await warn_msg.delete(delay=5)
       else:
         warn_msg = await message.channel.send(
-            f'{message.author.mention}, NİYƏ QIŞQIRIRSAN AMK, söndür o Caps'
-            f" Lock'u! Uyarı: ({count}/3)"
+            f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, NİYƏ QIŞQIRIRSAN'
+            f" AMK, söndür o Caps'i! Uyarı: ({count}/3)"
         )
         await warn_msg.delete(delay=5)
       return
@@ -287,9 +287,8 @@ async def on_message(message):
     try:
       await message.delete()
       warn_msg = await message.channel.send(
-          f'{message.author.mention}, BAŞQA SERVERİN REKLamini GÖTÜMƏ'
-          ' SÜRTÜRSƏN? Bir də başqasının linkini atsan sənə başqa kino'
-          ' göstərəcəm!'
+          f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, BAŞQA SERVERİN'
+          ' REKLamini GÖTÜMƏ SÜRTÜRSƏN? Bir də link atsan banı yeyəcəksən!'
       )
       await warn_msg.delete(delay=5)
       return
@@ -308,8 +307,8 @@ async def on_message(message):
     try:
       await message.delete()
       warn_msg = await message.channel.send(
-          f'{message.author.mention}, EYNİ ŞEYİ TƏKRAR-TƏKRAR ATMA, '
-          'qıcıqlandırma adamı!'
+          f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, EYNİ ŞEYİ'
+          ' TƏKRAR-TƏKRAR ATMA!'
       )
       await warn_msg.delete(delay=5)
       return
@@ -328,8 +327,8 @@ async def on_message(message):
     try:
       await message.delete()
       warn_msg = await message.channel.send(
-          f'{message.author.mention}, PUL PAYLAYIRLAR MƏYƏR? Çox sürətli yazırsan,'
-          ' klaviaturanı dağıtma, yavaş ol!'
+          f'{message.author.mention}, ANAVİ BACİVİ SİKDİM, PUL PAYLAYIRLAR'
+          ' MƏYƏR? Çox sürətli yazırsan, yavaş ol!'
       )
       await warn_msg.delete(delay=5)
       return
@@ -528,4 +527,4 @@ async def kick(ctx, member: discord.Member, *, reason='Belirtilmemiş'):
 if __name__ == '__main__':
   keep_alive()
   bot.run(os.environ.get('DISCORD_TOKEN'))
-  
+      
